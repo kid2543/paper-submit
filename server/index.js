@@ -33,7 +33,7 @@ const storageImage = multer.diskStorage({
 
 //test
 app.get('/',(req, res) => {
-    res.send('Hello World')
+    res.send('Test get')
 })
 
 //-----------------------get All data--------------------------//
@@ -197,8 +197,8 @@ app.post('/create/conferences', async (req, res) => {
         res.status(500).json(error)
     }
 })
-//-------------------------End create data-----------------------------//
 
+//-------------------------End create data-----------------------------//
 
 //Find All
 
