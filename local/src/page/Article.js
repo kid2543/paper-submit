@@ -10,7 +10,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import React, { useState } from "react";
-import CardComponent from "../components/Card";
+import CardComponent from "../components/ArticleCard";
 import SearchIcon from "@mui/icons-material/Search";
 
 const itemOption1 = ["Op1", "Op2", "Op3"];
