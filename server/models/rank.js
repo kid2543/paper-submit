@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const rankSchema = mongoose.Schema(
     {
-        rank_code:{type:Number,require:true,unique:true},
-        name:{type:String,require:true}
+        rank_code:{type:Number,required:true,unique:true},
+        name:{type:String,required:true}
     }
 )
 

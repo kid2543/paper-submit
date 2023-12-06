@@ -4,7 +4,7 @@ const paperSchema = mongoose.Schema(
     {
         title:{
             type:String,
-            require:true
+            required:true
         },
         comment:[{type:mongoose.Schema.Types.ObjectId,ref:'commnet'}],
         confr_code:String,

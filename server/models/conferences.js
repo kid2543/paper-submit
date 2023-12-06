@@ -4,7 +4,7 @@ const conferencesSchema = mongoose.Schema(
     {
         title: {
             type: String,
-            require: true
+            required: true
         },
         data_item: {
             confr_desc: String,

@@ -2,9 +2,13 @@ const mongoose = require('mongoose')
 
 const authorSchema = mongoose.Schema(
     {
+        tname:{
+            type:Number,
+            required:true
+        },
         fname : {
             type: String,
-            require: true
+            required: true
         },
 
         lname: {
@@ -14,12 +18,12 @@ const authorSchema = mongoose.Schema(
 
         username: {
             type: String,
-            require:true,
+            required:true,
             unique: true
         },
         password: {
             type: String,
-            require: true,
+            required: true,
             min: [10, 'Must be at least 10,got {VALUE}']
         }
     }

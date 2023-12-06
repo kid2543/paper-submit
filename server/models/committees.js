@@ -4,7 +4,7 @@ const committeeSchema = mongoose.Schema(
     {
         fname : {
             type: String,
-            require: true
+            required: true
         },
 
         lname: {
@@ -14,12 +14,12 @@ const committeeSchema = mongoose.Schema(
 
         username: {
             type: String,
-            require:true,
+            required:true,
             unique: true
         },
         password: {
             type: String,
-            require: true,
+            required: true,
             min: [10, 'Must be at least 10,got {VALUE}']
         },
         add_by:{type:mongoose.Schema.Types.ObjectId,ref:'host'},

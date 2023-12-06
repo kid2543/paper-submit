@@ -4,7 +4,7 @@ const categorySchema = mongoose.Schema(
     {
         c_code : {
             type: String,
-            require: true,
+            required: true,
             unique: true
         },
 

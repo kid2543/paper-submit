@@ -6,6 +6,7 @@ const cors = require('cors')
 const multer = require('multer')
 const path = require('path')
 
+
 //midleware
 const Host = require('./models/host')
 const Author = require('./models/author')
@@ -16,10 +17,12 @@ const Paper = require('./models/paper')
 const Category = require('./models/category')
 const Comment = require('./models/comment')
 const Conferences = require('./models/conferences')
+const Name_title = require('./models/name_title')
 
 app.use(express.json())
 app.use(express.static('public'))
 app.use(cors())
+
 
 //storage for upload Image
 const storageImage = multer.diskStorage({
@@ -35,7 +38,6 @@ const storageImage = multer.diskStorage({
 app.get('/',(req, res) => {
     res.send('Test get')
 })
-
 //-----------------------get All data--------------------------//
 app.get('/host', async(req, res) => {
     try{
@@ -108,6 +110,7 @@ app.get('/category', async(req, res) => {
 })
 
 //----------------------Create Data--------------------------//
+
 app.post('/create/host',async (req, res) => {
     try{
         const host = await Host.create(req.body)
@@ -124,7 +127,7 @@ app.post('/create/author',async (req, res) => {
         res.status(201).json(author)
     } catch (error) {
         console.log(error)
-        res.status(500).json(error)
+        res.status(500).json(error.message)
     }
 })
 
@@ -198,7 +201,35 @@ app.post('/create/conferences', async (req, res) => {
     }
 })
 
+app.post('/create/nametitle', async (req, res) => {
+    try {
+        const nameTitle = await Name_title.create(req.body)
+        res.status(201).json(nameTitle)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json(error)
+    }
+})
+
 //-------------------------End create data-----------------------------//
+
+
+//Login
+app.post('/login', async (req,res) => {
+    try {
+        const check = await Author.findOne({username:req.body.username})
+        if (!check) {
+            res.status(404).send("Not Found")
+        }
+        if (check.password === req.body.password) {
+            res.status(200).json({fname:check.fname, lname:check.lname, token: check.username})
+        } else {
+            res.status(400).send("Wrong password")
+        }
+    } catch (error) {
+        res.status(500)
+    }
+})
 
 //Find All
 

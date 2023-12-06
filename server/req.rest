@@ -24,8 +24,9 @@ Content-Type: application/json
 
 {
     "fname":"อาทิตย์",
-    "lname": "พิทักษ์ช่วงชู",
-    "username":"author@mail.com",
+    "lname":"พิทักษ์ช่วงชู",
+    "tname":0,
+    "username":"author1@gmail.com",
     "password":"author1234"
 }
 
