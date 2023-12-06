@@ -6,6 +6,9 @@ import Announcement from "./page/Announcement";
 import Howto from "./page/Howto";
 import Login from "./page/Login";
 import Admin from "./page/Admin";
+import AuthorDashboard from "./page/AuthorDashboardLayout";
+import AuthorDashboardPage1 from "./page/AuthorDashboardPage1";
+import AuthorDashboardPage2 from "./page/AuthorDashboardPage2";
 
 
 export default function App() {
@@ -21,6 +24,10 @@ export default function App() {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/author/dashboard/" element={<AuthorDashboard />} >
+            <Route index element={<AuthorDashboardPage1 />} />
+            <Route path="send" element={<AuthorDashboardPage2 />} />
+          </Route>
         </Routes>
       </div>
 
