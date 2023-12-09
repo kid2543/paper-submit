@@ -8,6 +8,7 @@ import {
   CardActions,
   Link,
 } from "@mui/material";
+import Cover from '../asset/cover.jpg'
 
 const testLink = [
     {
@@ -34,8 +35,8 @@ function AnnCard() {
             <Card>
               <CardMedia
                 sx={{ height: 140 , width:300}}
-                image="/static/images/cards/contemplative-reptile.jpg"
-                title="green iguana"
+                image={Cover}
+                title="ประกาศบทความ"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="div">

@@ -1,32 +1,43 @@
-import React, { useState } from "react";
-import { Button, Container, TextField, Typography, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Button, Container, TextField, Typography, Box, Link, Alert } from "@mui/material";
+import axios from 'axios'
+import Cookies from 'universal-cookie'
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const cookies = new Cookies();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setUsername(e.target.value);
-    console.log(username)
   };
 
   const handlePassword = (e) => {
     setPassword(e.target.value);
-    console.log(password)
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("You are login");
-    console.log("handleSubmit");
+      await axios.post('http://localhost:4000/login',{username:username,password:password})
+      .then(res => {
+        if(res.status === 200){
+          cookies.set("token",res.data.token,{path: '/', expires: new Date(Date.now() + 10000)})
+          navigate("/")
+        }
+      })
+      .catch(err => {setError(err.response.data)}) 
   };
+ 
 
   return (
     <section>
       <Container maxWidth="sm" sx={{ mt: 5 }} >
         <Box component="form" onSubmit={handleSubmit}>
           <Typography align="center" variant="h4">
-            Loing
+            Sign in for <span style={{color:'#00A5FF'}}>PAPERSS</span>
           </Typography>
           <Box sx={{display:'flex',flexDirection:'column' , mt:5}}>
           <TextField
@@ -47,14 +58,17 @@ function Login() {
             type="submit"
             variant="contained"
           >
-            Login
+            Sign in
           </Button>
           <Button href="/registor" variant="outlined">
             Sign Up
           </Button>
           </Box>
-          
+          {error ? <Alert sx={{mt:2}} severity="warning">{error}</Alert> : null}
         </Box>
+        <Typography align="center" sx={{my:5, color:'gray'}}>
+            Back to <Link href="/">Home</Link>
+        </Typography>
       </Container>
     </section>
   );

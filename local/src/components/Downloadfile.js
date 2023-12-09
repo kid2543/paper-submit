@@ -16,11 +16,11 @@ function Downloadfile(props) {
     <Grid container spacing={2} sx={{ alignItems: "center" }}>
           <Grid item xs={6}>
             <ItemBox>
-              <Typography>{props.text}</Typography>
+              <Typography sx={{textAlign:'left'}}>{props.text}</Typography>
             </ItemBox>
           </Grid>
           <Grid item xs={6}>
-            <ItemBox>
+            <ItemBox sx={{textAlign:'end'}}>
               <Button
                 variant="outlined"
                 startIcon={<DownloadIcon />}

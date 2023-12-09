@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from 'react'
 import {
   SwipeableDrawer,
   Button,
@@ -10,21 +10,19 @@ import {
   Container,
   Link,
 } from "@mui/material";
-
-//import icon
 import DescriptionIcon from "@mui/icons-material/Description";
-import SendIcon from "@mui/icons-material/Send";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CreateIcon from '@mui/icons-material/Create';
 import { Outlet } from "react-router-dom";
 
-function AuthorDashboard() {
+function Host() {
+
   const [state, setState] = useState(false);
 
   const toggleDrawer = () => {
     setState(!state);
     console.log(state);
   };
-
   return (
     <div>
       <Container sx={{my:5}}>
@@ -47,26 +45,26 @@ function AuthorDashboard() {
           </Typography>
           </Link>
           <List sx={{ width: 400 }}>
-            <ListItemButton component="a" href="/author/dashboard/">
+            <ListItemButton component="a" href="/host">
               <ListItemIcon>
                 <DescriptionIcon />
               </ListItemIcon>
-              <ListItemText primary="รายการบทความ" />
+              <ListItemText primary="รายการงานประชุม" />
             </ListItemButton>
-            <ListItemButton component="a" href="/author/dashboard/send">
+            <ListItemButton component="a" href="/host/create">
               <ListItemIcon>
-                <SendIcon />
+                <CreateIcon />
               </ListItemIcon>
-              <ListItemText primary="ส่งบทความ" />
+              <ListItemText primary="สร้างงานประชุม" />
             </ListItemButton>
           </List>
         </SwipeableDrawer>
       </Container>
-      <Container sx={{my:5}}>
+      <Container>
         <Outlet />
       </Container>
     </div>
-  );
+  )
 }
 
-export default AuthorDashboard;
+export default Host

@@ -4,7 +4,7 @@ import Hero from "../asset/herobanner.jpeg";
 
 function Home() {
   return (
-    <div>
+    <div style={{height:'100vh'}}>
       <Box sx={{ display: "flex"}}>
         <section>
         <Container sx={{mt:8}}>
@@ -20,7 +20,7 @@ function Home() {
               และสำหรับผู้ที่ต้องการส่งบทความวิชาการ
             </Typography>
             <Box sx={{mt:3}}>
-              <Link href="/admin">
+              <Link href="/host">
                 <Button variant="contained" sx={{mr:2}}>สร้างงานประชุม</Button>
               </Link>
               <Link href="/ann">
@@ -30,7 +30,7 @@ function Home() {
           </Box>
         </Container>
         </section>
-        <Box>
+        <Box sx={{mt:8}}>
           <img src={Hero} alt="Hero Banner" style={{height:"100%", maxWidth:600}} />
         </Box>
       </Box>
