@@ -1,15 +1,13 @@
-GET http://localhost:4000/host
+GET http://localhost:4000/
 
 ###
 
-POST http://localhost:4000/create/host
+POST http://localhost:4000/login
 Content-Type: application/json
 
 {
-    "fname":"ผู้จัดงาน",
-    "lname": "ประชุมนานาชาติ",
-    "username":"testhost@mail.com",
-    "password":"host1234"
+    "username":"author1@gmail.com",
+    "password":"author1234"
 }
 
 

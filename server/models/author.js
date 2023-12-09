@@ -23,8 +23,7 @@ const authorSchema = mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
-            min: [10, 'Must be at least 10,got {VALUE}']
+            required: true
         }
     }
 )
