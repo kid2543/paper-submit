@@ -15,54 +15,46 @@ import {
 } from "@mui/material";
 
 //react and format
-import React, { useState } from "react";
-import { format, addDays } from "date-fns";
+import React, { useEffect, useState } from "react";
+import axios from 'axios'
+import Cookies from 'universal-cookie'
 
 //icon
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-//test format date
-const testDate = new Date();
-const getDate = format(testDate, "dd/MM/yyyy");
-const moreDate = (time, data) => {
-  time = addDays(time, 30);
-  data = format(time, "dd/MM/yyyy");
-  return data;
-};
-
-//test
-console.log(getDate);
-
-const number = [10,20]
-
-//mock up data
-const mockData = [
-  {
-    title: "หัวข้องานประชุม 1",
-    start_date: `${getDate}`,
-    end_date: `${moreDate(testDate)}`,
-    number_paper: number[0]
-  },
-  {
-    title: "หัวข้องานประชุม 2",
-    start_date: `${getDate}`,
-    end_date: `${moreDate(testDate)}`,
-    number_paper: number[1]
-  },
-];
-
 
 function HostDashBoard() {
+
+  const cookies = new Cookies();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [data, setData] = useState([])
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = (text) => {
+  const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleUpdate = (e) => {
+    console.log("Update")
+  }
+
+  const handleDel = () => {
+    console.log("Del")
+  }
+
+  useEffect(() => {
+    let owner = cookies.get('token')
+    axios.post('/conferences/user',{owner:owner})
+    .then(res => {
+      setData(res.data)
+    })
+    .catch(err => console.log(err))
+  })
 
   return (
     <div>
@@ -75,24 +67,20 @@ function HostDashBoard() {
             <TableHead>
               <TableRow>
                 <TableCell>Title</TableCell>
-                <TableCell align="right">Start Date</TableCell>
-                <TableCell align="right">End Date</TableCell>
-                <TableCell align="right">All</TableCell>
+                <TableCell align="right">Owner</TableCell>
                 <TableCell align="right">Tools</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {mockData.map((mock) => (
+              {data.map((datas) => (
                 <TableRow
-                  key={mock.title}
+                  key={datas._id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {mock.title}
+                    {datas.title}
                   </TableCell>
-                  <TableCell align="right">{mock.start_date}</TableCell>
-                  <TableCell align="right">{mock.end_date}</TableCell>
-                  <TableCell align="right">{mock.number_paper}</TableCell>
+                  <TableCell align="right">{datas.owner}</TableCell>
                   <TableCell align="right">
                     <Button
                       id="basic-button"
@@ -113,8 +101,8 @@ function HostDashBoard() {
                         "aria-labelledby": "basic-button",
                       }}
                     >
-                      <MenuItem onClick={handleClose}><EditIcon sx={{mr:1}} />EDIT</MenuItem>
-                      <MenuItem onClick={handleClose}><DeleteIcon sx={{mr:1}} />DELETE</MenuItem>
+                      <MenuItem data="Hello" onClick={handleUpdate}><EditIcon sx={{mr:1}} />EDIT</MenuItem>
+                      <MenuItem onClick={handleDel}><DeleteIcon sx={{mr:1}} />DELETE</MenuItem>
                     </Menu>
                   </TableCell>
                 </TableRow>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Container, TextField, Typography, Box, Link, Alert } from "@mui/material";
 import axios from 'axios'
 import Cookies from 'universal-cookie'
@@ -21,11 +21,11 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-      await axios.post('http://localhost:4000/login',{username:username,password:password})
+      await axios.post('/login',{username:username,password:password})
       .then(res => {
         if(res.status === 200){
-          cookies.set("token",res.data.token,{path: '/', expires: new Date(Date.now() + 10000)})
-          navigate("/")
+          cookies.set("token",res.data.token,{path: '/', expires: new Date(Date.now() + (1000 * 60 * 60 * 24))})
+          navigate(-1)
         }
       })
       .catch(err => {setError(err.response.data)}) 

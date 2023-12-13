@@ -21,7 +21,6 @@ function Host() {
 
   const toggleDrawer = () => {
     setState(!state);
-    console.log(state);
   };
   return (
     <div>

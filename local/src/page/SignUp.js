@@ -121,7 +121,7 @@ function SignUp() {
                 aria-labelledby="radio-buttons"
                 name="radio-buttons-group"
               >
-                <Box onClick={(e) => handleRadio(e)}>
+                <Box onClick={handleRadio}>
                   <FormControlLabel value={0} control={<Radio />} label="นาย" />
                   <FormControlLabel value={1} control={<Radio />} label="นาง" />
                   <FormControlLabel
@@ -133,7 +133,7 @@ function SignUp() {
               </RadioGroup>
             </FormControl>
             <TextField
-              onChange={(e) => handleFname(e)}
+              onChange={handleFname}
               label="ชื่อ"
               sx={{ mt: 5 }}
               required
@@ -141,7 +141,7 @@ function SignUp() {
               helperText={errorName ? "จำเป็นต้องใส่ชื่อ" : null}
             ></TextField>
             <TextField
-              onChange={(e) => handleLname(e)}
+              onChange={handleLname}
               label="นามสกุล"
               sx={{ mt: 5 }}
               required
@@ -149,7 +149,7 @@ function SignUp() {
               helperText={errorlname ? "จำเป็นต้องใส่ นามสกุล" : null}
             ></TextField>
             <TextField
-              onChange={(e) => handleUsername(e)}
+              onChange={handleUsername}
               label="Username (ใช้สำหรับเข้าสู่ระบบ)"
               sx={{ mt: 5 }}
               required
@@ -157,7 +157,7 @@ function SignUp() {
               helperText={errorUser ? "จำเป็นต้องใส่ Username" : null}
             ></TextField>
             <TextField
-              onChange={(e) => handlePassword(e)}
+              onChange={handlePassword}
               label="Password"
               type="password"
               sx={{ mt: 5 }}
@@ -170,7 +170,7 @@ function SignUp() {
               }
             ></TextField>
             <TextField
-              onChange={(e) => handleConfirmPassword(e)}
+              onChange={handleConfirmPassword}
               error={errorConfirm}
               helperText={errorConfirm ? "Password ไม่ตรงกัน" : null}
               label="Confirm Password"
