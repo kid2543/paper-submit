@@ -13,19 +13,15 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:4000/author
+GET http://localhost:4000/conferences/user
 
 ###
 
-POST http://localhost:4000/create/author
+POST http://localhost:4000/conferences/user
 Content-Type: application/json
 
 {
-    "fname":"อาทิตย์",
-    "lname":"พิทักษ์ช่วงชู",
-    "tname":0,
-    "username":"author1@gmail.com",
-    "password":"author1234"
+    "owner":"author1@gmail.com"
 }
 
 

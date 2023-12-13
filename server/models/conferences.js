@@ -20,9 +20,9 @@ const conferencesSchema = mongoose.Schema(
             regis:{remark:String,final_date:[Date],bank_name:String,ac_name:String,ac_type:String,ac_no:{type:Number, max:10},regis_type:[{name:String,price:[Number]}]},
             venue:{name:String,img:String,travel:String}
         },
-        confr_code:String,
+        confr_code:{type:String, required: true},
         category_code:[String],
-        owner:{type: mongoose.Schema.Types.ObjectId,ref: 'host'}
+        owner:String
     }
 )
 

@@ -6,6 +6,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const port = 4000
 
 //midleware
 const Host = require("./models/host");
@@ -102,9 +103,19 @@ app.get("/conferences", async (req, res) => {
   }
 });
 
+app.post("/conferences/user", async (req, res) => {
+  try {
+    const conferences = await Conferences.find(req.body)
+    res.status(200).json(conferences)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error)
+  }
+});
+
 app.get("/category", async (req, res) => {
   try {
-    const category = await Category.find({});
+    const category = await Category.find({})
     res.status(200).json(category);
   } catch (error) {
     console.log(error);
@@ -373,7 +384,7 @@ mongoose
   .connect("mongodb://127.0.0.1/paper_submition")
   .then(() => {
     console.log("connected to Mongodb");
-    app.listen(4000, console.log("Server is Runing"));
+    app.listen(port, console.log("Server is Runing on Port: " + port));
   })
   .catch((err) => {
     console.log(err);
