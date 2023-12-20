@@ -27,12 +27,10 @@ const handleChange = (event) => {
   );
 };
 
-console.log(cookies.get('token'))
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const owner = cookies.get('token')
-    axios.post('/create/conferences',{title:title,confr_code:code,category_code:ctcode,owner:owner}).then(res => console.log(res.data)).catch(err => console.log(err))
+    axios.post('/create/conferences',{title:title,confr_code:code,category_code:ctcode,owner:owner}).then(res => console.log("Conference Created" + res.data)).catch(err => console.log(err))
   }
 
   return (

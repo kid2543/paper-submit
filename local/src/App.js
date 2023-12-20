@@ -16,9 +16,16 @@ import SignUp from "./page/SignUp";
 import ArticleMock from "./page/ArticleMock";
 import Footer from "./components/Footer";
 import AnnMockPage from "./page/AnnMockPage";
-import Categories from "./components/Categories";
 import PrivateRoute from "./components/Private";
 import TestPrivate from "./page/TestPrivate";
+import HostUpdate from "./page/HostUpdate";
+import TitleUpdate from "./components/Host/TitleUpdate";
+import LogoUpdate from "./components/Host/LogoUpdate";
+import CategoryUpdate from "./components/Host/CategoryUpdate";
+import DateUpdate from "./components/Host/DateUpdate";
+import PresentUpdate from "./components/Host/PresentUpdate";
+import RegisUpdate from "./components/Host/RegisUpdate";
+import InvSpeakerUpdate from "./components/Host/InvSpeakerUpdate";
 
 export default function App() {
   return (
@@ -30,7 +37,6 @@ export default function App() {
           <Route path="article/:id" element={<ArticleMock />} />
           <Route path="ann" element={<Announcement />} />
           <Route path="howto" element={<Howto />} />
-          <Route path="cat" element={<Categories />} />
         </Route>
         <Route path="/ann/:id" element={<AnnMockPage />} />
         <Route path="/login" element={<Login />} />
@@ -59,6 +65,14 @@ export default function App() {
               </PrivateRoute>
             }
           />
+          <Route path=":id" element={<PrivateRoute><HostUpdate/></PrivateRoute>}/>
+          <Route path=":id/title" element={<PrivateRoute><TitleUpdate/></PrivateRoute>}/>
+          <Route path=":id/logo" element={<PrivateRoute><LogoUpdate/></PrivateRoute>}/>
+          <Route path=":id/category" element={<PrivateRoute><CategoryUpdate/></PrivateRoute>}/>
+          <Route path=":id/important-date" element={<PrivateRoute><DateUpdate/></PrivateRoute>}/>
+          <Route path=":id/present" element={<PrivateRoute><PresentUpdate/></PrivateRoute>}/>
+          <Route path=":id/regis" element={<PrivateRoute><RegisUpdate/></PrivateRoute>}/>
+          <Route path=":id/inv-speaker" element={<PrivateRoute><InvSpeakerUpdate/></PrivateRoute>}/>
         </Route>
         <Route
           path="/author/dashboard/"
