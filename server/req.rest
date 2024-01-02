@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:4000/conferences/user
+GET http://localhost:4000/category-for-confr/
 
 ###
 
@@ -92,7 +92,63 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:4000/upload/
+GET http://localhost:4000/get-image
+
+###
+POST http://localhost:4000
 
 ###
 POST http://localhost:4000/get-user/653609c636d33dfe3d0be199
+
+###
+PUT http://localhost:4000/conferences-update/657c1deac731b182069e237c
+Content-Type: application/json
+
+{
+    "title":"Chris",
+    "topic":["BACE", "BCDC"],
+    "desc":"ทดสอบๆ",
+    "important_date":[{"name":"วันสุดท้ายของการส่งบทความ","date":"2023-12-17"}],
+    "present":{"header":"test 1", "detail":["d1","d2"],"remark":""},
+    "regis":{"remark":"Hello"},
+    "inv":[{"name":"test 1","desc":"test 1","keynote":"test 1","img":"image_1703054592110.jpg"}]
+}
+
+
+###
+
+GET http://localhost:4000/conferences/user/65780df23d15f003fa42c80c
+
+###
+
+GET http://localhost:4000/category-for-confr/657c1deac731b182069e237c
+
+###
+POST http://localhost:4000/create/inv-speaker
+Content-Type: application/json
+
+{
+    "name":"name 6",
+    "desc":"desc 6",
+    "keynote":"keynote 6"
+}
+
+
+###
+POST http://localhost:4000/inv-speaker-get
+Content-Type: application/json
+
+{
+    "confr_code":"ART202"
+}
+
+###
+POST http://localhost:4000/inv-speaker-update
+Content-Type: application/json
+
+{
+    "id":"65854817a8f427d7edc745ff",
+    "name":"Name 123",
+    "desc": "desc 123",
+    "keynote":"keynote 123"
+}

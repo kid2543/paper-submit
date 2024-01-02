@@ -1,31 +1,34 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const conferencesSchema = mongoose.Schema(
-    {
-        title: {
-            type: String,
-            required: true
-        },
-        data_item: {
-            confr_desc: String,
-            important_date:[{name:String,date: {type:Date}}],
-            schedule: [{file:String}],
-            publication:[{order_number: Number, name:String}],
-            inv_speaker:[{name:String, desc:String, keynote:String, cv_prof:String, img:String}],
-            partner:[{img:String}],
-            logo:String,
-            brochure:String,
-            comittees:[{name:String, location:String}],
-            presentation_guide:{header:String,detail:[String],remark:String},
-            regis:{remark:String,final_date:[Date],bank_name:String,ac_name:String,ac_type:String,ac_no:{type:Number, max:10},regis_type:[{name:String,price:[Number]}]},
-            venue:{name:String,img:String,travel:String}
-        },
-        confr_code:{type:String, required: true},
-        category_code:[String],
-        owner:String
-    }
-)
+const conferencesSchema = mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  confr_code: { type: String, required: true , unique: true },
+  confr_desc: {type:String},
+  important_date: [{ name: {type:String}, date: { type: Date } }],
+  schedule: {type:String},
+  publication: [String],
+  partner: [{type:String}],
+  logo: {type:String},
+  brochure: {type:String},
+  presentation_guide: { header: {type:String}, detail: [{type:String}], remark: {type:String} },
+  regis: {
+    remark: {type:String},
+    early_bird_date: {type:Date},
+    regular_date: {type:Date},
+    bank_name: {type:String},
+    ac_name: {type:String},
+    ac_type: {type:String},
+    ac_no: { type: String },
+    regis_type: [{ name: String, price_1: {type:Number}, price_2:{type:Number} }],
+  },
+  venue: { name: {type:String}, desc: {type:String}, remark:{type:String}, img: {type:String}, travel: {type:String} },
+  category_code: [{type:String}],
+  owner: {type:String},
+});
 
-const Conferences = mongoose.model("conferences",conferencesSchema)
+const Conferences = mongoose.model("conferences", conferencesSchema);
 
-module.exports = Conferences
+module.exports = Conferences;
