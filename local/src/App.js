@@ -9,7 +9,7 @@ import Host from "./page/HostLayout";
 import AuthorDashboard from "./page/AuthorDashboardLayout";
 import AuthorDashboardPage1 from "./page/AuthorDashboardPage1";
 import AuthorDashboardPage2 from "./page/AuthorDashboardPage2";
-import { Container, Typography, Link, Box } from "@mui/material";
+import { Container, Typography, Link, Box, Modal } from "@mui/material";
 import HostDashBoard from "./page/HostDashBoard";
 import HostCreateDash from "./page/HostCreateDash";
 import SignUp from "./page/SignUp";
@@ -26,6 +26,12 @@ import DateUpdate from "./components/Host/DateUpdate";
 import PresentUpdate from "./components/Host/PresentUpdate";
 import RegisUpdate from "./components/Host/RegisUpdate";
 import InvSpeakerUpdate from "./components/Host/InvSpeakerUpdate";
+import PublicUpdate from "./components/Host/PublicUpdate";
+import PartnerUpdate from "./components/Host/PartnerUpdate";
+import VenueUpdate from "./components/Host/VenueUpdate";
+import VenueUpload from "./components/Host/VenueUpload";
+import ScheduleUpload from "./components/Host/ScheduleUpload";
+import BrochureUpload from "./components/Host/BrochureUpload";
 
 export default function App() {
   return (
@@ -73,6 +79,12 @@ export default function App() {
           <Route path=":id/present" element={<PrivateRoute><PresentUpdate/></PrivateRoute>}/>
           <Route path=":id/regis" element={<PrivateRoute><RegisUpdate/></PrivateRoute>}/>
           <Route path=":id/inv-speaker" element={<PrivateRoute><InvSpeakerUpdate/></PrivateRoute>}/>
+          <Route path=":id/public" element={<PrivateRoute><PublicUpdate/></PrivateRoute>}/>
+          <Route path=":id/partner" element={<PrivateRoute><PartnerUpdate/></PrivateRoute>}/>
+          <Route path=":id/venue" element={<PrivateRoute><VenueUpdate/></PrivateRoute>}/>
+          <Route path=":id/venue-upload" element={<PrivateRoute><VenueUpload/></PrivateRoute>}/>
+          <Route path=":id/schedule" element={<PrivateRoute><ScheduleUpload/></PrivateRoute>}/>
+          <Route path=":id/brochure" element={<PrivateRoute><BrochureUpload/></PrivateRoute>}/>
         </Route>
         <Route
           path="/author/dashboard/"

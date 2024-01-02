@@ -25,7 +25,7 @@ function Login() {
       .then(res => {
         if(res.status === 200){
           cookies.set("token",res.data.token,{path: '/', expires: new Date(Date.now() + (1000 * 60 * 60 * 24))})
-          navigate(-1)
+          navigate("/")
         }
       })
       .catch(err => {setError(err.response.data)}) 

@@ -1,138 +1,219 @@
 import {
   Container,
   Button,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 //icon
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 
 function HostUpdate() {
   const navigate = useNavigate();
   //เก็บข้อมูล บทความที่เลือกปัจจุบัน
-  const [data, setData] = useState();
+  const [data, setData] = useState([]);
   //เก็บข้อมูลหัวข้อที่มี
   const [category, setCategory] = useState([]);
+  //เก็บข้อมูลพิธีกร
+  const [inv, setInv] = useState([]);
   //get id จาก url
   const { id } = useParams();
+  const [state, setState] = useState(false);
 
   function handleClick(link) {
-    navigate("/host/"+ id + "/" + link)
+    navigate("/host/" + id + "/" + link);
+  }
+
+  async function fetchData() {
+    try {
+      const getData = await axios.get("/conferences-get/" + id);
+      const getInv = await axios.post("/inv-speaker-get", {
+        confr_code: getData.data.confr_code,
+      });
+      const getCategory = await axios.get("/category-for-confr/" + id);
+      setData([getData.data, getInv.data, getCategory.data]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setState(true);
+    }
   }
 
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const data = await axios.get("/category-for-confr/" + id);
-        setCategory(data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchData = async () => {
-      try {
-        const data = await axios.get("/conferences-get/" + id);
-        setData(data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCategory();
     fetchData();
-  },[id]);
+  }, []);
 
   return (
     <Container>
-      {data ? (<div>
-        <p>
-          Code งานประชุม : {data.confr_code}
-        </p>
-        <p>
-          Owner : {data.owner}
-        </p>
-        <p>
-          title : {data.title}
-          <Button onClick={() => handleClick("title")}><EditIcon/></Button>
-        </p>
-        <p>
-          Logo : <br/><img src={"/image/"+ data.logo} alt={data.logo} width="200px"/>
-          <Button onClick={() => handleClick("logo")}><EditIcon/></Button>
-        </p>
-        <p>
-          หัวข้อที่เกี่ยวข้องกับงานประชุม : <Button onClick={() => handleClick("category")}><EditIcon/></Button>
-        </p>
-        <ul>{category.map((item) => (<li key={item._id}>{item.name}</li>))}</ul>
-        <p>
-          วันสำคัญ : <Button onClick={() => handleClick("important-date")}><EditIcon/></Button>
-        </p>
-        <ul>{data.important_date.map((date) => (<li key={date.name}>ชื่อ: {date.name}<br/>วันที่: {date.date}</li>))}</ul>
-        <h4>
-          ข้อแนะนำการนำเสนอผลงาน : <Button onClick={() => handleClick("present")}><EditIcon/></Button>
-        </h4>
-        <p>
-          หัวข้อ : {data.presentation_guide.header}
-        </p>
-        <p>
-          รายละเอียด : 
-        </p>
-        <ul>{data.presentation_guide.detail.map((item,index) => (<li key={index}>{item}</li>))}</ul>
-        <p>
-          รายละเอียดเพิ่มเติม : {data.presentation_guide.remark}
-        </p>
-        <h4>
-          การลงทะเบียน <Button onClick={() => handleClick("regis")}><EditIcon/></Button>
-        </h4>
-        <p>
-          วันที่ลงทะเบียนแบบ Early Bird : {data.regis.early_bird_date}
-        </p>
-        <p>
-          วันที่ลงทะเบียนแบบ Regular : {data.regis.regular_date}
-        </p>
-        <p>
-          ประเภทการลงทะเบียน : 
-        </p>
-        <ul>{data.regis.regis_type.map((item,index) => (<li key={index}>ชื่อ: {item.name}<br/> Early Bird: {item.price_1}<br/> Regular: {item.price_2}</li>))}</ul>
-        <p>
-          ชื่อธนาคาร : {data.regis.bank_name}
-        </p>
-        <p>
-          ชื่อบัญชี : {data.regis.ac_name}
-        </p>
-        <p>
-          ประเภทบัญชี : {data.regis.ac_type}
-        </p>
-        <p>
-          เลขบัญชี : {data.regis.ac_no}
-        </p>
-        <h4>พิธีกร</h4>
-        <ul>{data.inv_speaker.map((item,index) => (<li key={index}>ชื่อ: {item.name}<br/> คำอธิบาย: {item.desc}<br/> keynote: {item.keynote} <br/> cv: <a href={"/"+item.cv_prof} download>Download CV</a><br/>รูปพิธีกร: <img src={item.img} alt="รูปพิธีกร"/></li>))}</ul>
-        <p>
-          สำนักพิมพ์
-        </p>
-        <ul>{data.publication.map((item, index) => <li key={index}>{item}</li>)}</ul>
-        <h4>
-          สถานที่จัดงานประชุม
-        </h4>
-        <p>
-          ชื่อสถานที่ : {data.venue.name}<br/>
-          รูปสถานที่ : <img src={data.venue.img} alt="รูปงานประชุมวิชาการ" /><br/>
-          Link สถานที่ท่องเที่ยว : <a href={data.venue.travel}>{data.venue.travel}</a>
-        </p>
-        <p>
-          schedule : <a href={"/" + data.schedule}>Download schedule</a>
-        </p>
-        <p>
-          partner :
-        </p>
-        <ul>{data.partner.map((image,index) => (<li key={index}><img src={image} alt={image}/></li>))}</ul>
-        <p>
-          รูปสำหรับเชิญส่งบทความ: <img src={data.brochure} alt={data.brochure}/>
-        </p>
-      </div>
-      ):(<h2>Loading.....</h2>)}
+      {state ? (
+        <div>
+          <h2>รายละเอียดข้อมูลของงานประชุม {data[0].confr_code}</h2>
+          <Box>
+            <h5>Title</h5>
+            <p>{data[0].title}</p>
+            <Button variant="outlined" onClick={() => handleClick("title")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Presentation Guide</h5>
+            <p>{data[0].presentation_guide.header}</p>
+            <Button variant="outlined" onClick={() => handleClick("present")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Category code</h5>
+            {data[2].map((item) => (
+              <p key={item._id}>{item.name}</p>
+            ))}
+            <Button variant="outlined" onClick={() => handleClick("category")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Important Date</h5>
+            {data[0].important_date.map((item) => (
+              <p key={item._id}>{item.name}</p>
+            ))}
+            <Button
+              variant="outlined"
+              onClick={() => handleClick("important-date")}
+            >
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Invite speaker</h5>
+            {data[1].map((item) => (
+              <p key={item._id}>ชื่อพิธีกร: {item.name}</p>
+            ))}
+            <Button
+              variant="outlined"
+              onClick={() => handleClick("inv-speaker")}
+            >
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Publication</h5>
+            {data[0].publication.map((item, index) => (
+              <p key={index}>ชื่อสำนักพิมพ์: {item}</p>
+            ))}
+            <Button variant="outlined" onClick={() => handleClick("public")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Partner</h5>
+            {data[0].partner.map((item, index) => (
+              <p key={index}>{item}</p>
+            ))}
+            <Button variant="outlined" onClick={() => handleClick("partner")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Regis</h5>
+            <p>ชื่อบัญชี: {data[0].regis.ac_name}</p>
+            <Button variant="outlined" onClick={() => handleClick("regis")}>
+              Edit
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Venue</h5>
+            {data[0].venue ? (
+              <div>
+                <p>ชื่อสถานที่จัดงาน: {data[0].venue.name}</p>
+                <p>รายละเอียดสถานที่จัดงาน: {data[0].venue.desc}</p>
+                <p>รายละเอียดเพิ่มเติม: {data[0].venue.remark}</p>
+                <p>Link สถานที่ท่องเที่ยว: {data[0].venue.travel}</p>
+                <div>
+                  <img
+                    width={100}
+                    src={"/image/" + data[0].venue.img}
+                    alt={data[0].venue.img}
+                  />
+                </div>
+              </div>
+            ) : (
+              <p>Not have data</p>
+            )}
+            <Button variant="outlined" onClick={() => handleClick("venue")}>
+              Edit
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => handleClick("venue-upload")}
+            >
+              Upload
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Schedule</h5>
+            <div>
+              <a href={"http://localhost:4000/pdf/" + data[0].schedule}>Pdf</a>
+            </div>
+            <Button variant="outlined" onClick={() => handleClick("schedule")}>
+              Upload
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Logo</h5>
+            <div>
+              <img
+                width={100}
+                src={"/image/" + data[0].logo}
+                alt={data[0].logo}
+              />
+            </div>
+            <Button variant="outlined" onClick={() => handleClick("logo")}>
+              Upload
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Brochure</h5>
+            <div>
+              <img
+                width={100}
+                src={"/image/" + data[0].brochure}
+                alt={data[0].brochure}
+              />
+            </div>
+            <Button variant="outlined" onClick={() => handleClick("brochure")}>
+              Upload
+            </Button>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Owner</h5>
+            <p>{data[0].owner}</p>
+          </Box>
+          <hr />
+          <Box>
+            <h5>Conferences code</h5>
+            <p>{data[0].confr_code}</p>
+          </Box>
+        </div>
+      ) : (
+        <h2>Loading.....</h2>
+      )}
     </Container>
   );
 }

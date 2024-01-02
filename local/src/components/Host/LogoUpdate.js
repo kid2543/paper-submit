@@ -23,8 +23,6 @@ function LogoUpdate() {
         } catch (error) {
             console.log(error)
         }
-
-        
     }
 
   return (
