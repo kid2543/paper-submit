@@ -5,11 +5,8 @@ import {
   ListItemButton,
   ListItemText,
   Box,
-  CssBaseline,
-  AppBar,
   Toolbar,
   IconButton,
-  Typography,
   Drawer,
   Link,
 } from "@mui/material";
@@ -18,24 +15,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useParams } from "react-router-dom";
 
 const drawerWidth = 240;
-const navItems = [
-  "Home",
-  "Call for papers",
-  "Committees",
-  "Author guideline",
-  "Program",
-  "Registration",
-  "Tutorials",
-  "Conference Venue",
-];
-
-const MockData = [
-  {
-    page: 1,
-    title: "หัวข้อที่ 1",
-    desc: "รายละเอียดงานประชุมวิชาการ",
-  },
-];
 
 function AnnMockPage(props) {
   const params = useParams();
@@ -48,20 +27,70 @@ function AnnMockPage(props) {
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        ชื่อหัวข้องานประชุม
-      </Typography>
+      <Box sx={{p:2}}>
+      <Link variant="h5" href="/">
+        PAPERSS
+      </Link>
+      </Box>
+ 
       <Divider />
       <List>
-        {navItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <Link href={"/ann/" + params.id + "/" + item}>
-              <ListItemButton sx={{ textAlign: "center" }}>
-                <ListItemText primary={item} />
-              </ListItemButton>
-            </Link>
-          </ListItem>
-        ))}
+        <ListItem>
+          <Link href={"/ann/" + params.id}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="Home" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/call-for-paper"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="Call for paper" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/comiittees"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="comiittees" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/author-guideline"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="author-guideline" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/program"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="program" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/registration"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="registration" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/tutorials"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="tutorials" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href={"/ann/" + params.id + "/venue"}>
+            <ListItemButton sx={{ textAlign: "center" }}>
+              <ListItemText primary="venue" />
+            </ListItemButton>
+          </Link>
+        </ListItem>
       </List>
     </Box>
   );
@@ -70,26 +99,17 @@ function AnnMockPage(props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <div>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <AppBar component="nav">
+    <Box>
           <Toolbar>
             <IconButton
               color="inherit"
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              ชื่อหัวข้องานประชุม
-            </Typography>
           </Toolbar>
-        </AppBar>
-        <nav>
           <Drawer
             container={container}
             variant="temporary"
@@ -107,13 +127,7 @@ function AnnMockPage(props) {
           >
             {drawer}
           </Drawer>
-        </nav>
-        <Box component="main" sx={{ p: 3 }}>
-          <Toolbar />
-          <Typography>Paper Submission</Typography>
-        </Box>
-      </Box>
-    </div>
+    </Box>
   );
 }
 

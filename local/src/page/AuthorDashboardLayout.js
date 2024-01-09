@@ -15,10 +15,11 @@ import {
 import DescriptionIcon from "@mui/icons-material/Description";
 import SendIcon from "@mui/icons-material/Send";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
 function AuthorDashboard() {
   const [state, setState] = useState(false);
+  const {id} = useParams();
 
   const toggleDrawer = () => {
     setState(!state);
@@ -47,13 +48,13 @@ function AuthorDashboard() {
           </Typography>
           </Link>
           <List sx={{ width: 400 }}>
-            <ListItemButton component="a" href="/author/dashboard/">
+            <ListItemButton component="a" href={"/author/dashboard/"+id}>
               <ListItemIcon>
                 <DescriptionIcon />
               </ListItemIcon>
               <ListItemText primary="รายการบทความ" />
             </ListItemButton>
-            <ListItemButton component="a" href="/author/dashboard/send">
+            <ListItemButton component="a" href={"/author/dashboard/" + id + "/send"}>
               <ListItemIcon>
                 <SendIcon />
               </ListItemIcon>

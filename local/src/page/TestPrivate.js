@@ -1,22 +1,18 @@
-import { Button } from '@mui/material';
+
 import React from 'react'
-import Cookies from 'universal-cookie'
-import { useNavigate } from 'react-router-dom';
+import LogoutComponent from '../components/LogoutComponent';
+import Cookies from 'universal-cookie';
 
 function TestPrivate() {
 
-    const navigate = useNavigate();
-    const cookies = new Cookies();
-
-    const logout = () => {
-        cookies.set('token',null)
-        navigate("/login")
-    }
+  const cookies = new Cookies();
+  const token = cookies.get('token')
 
   return (
     <div>
         <h2>Private Page</h2>
-        <Button onClick={logout}>Log out</Button>
+        {token}
+        <LogoutComponent/>
     </div>
   )
 }

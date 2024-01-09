@@ -28,9 +28,14 @@ function HostDashBoard() {
   const cookies = new Cookies();
   const [data, setData] = useState([])
     
-  function handleUpdate(value) {
-    navigate("/host/"+ value)
+  function handleUpdate(id) {
+    navigate("/host/"+ id)
   }
+
+  function handleAssign(id) {
+    navigate("/host/"+ id + "/view")
+  }
+
 
   function handleDel(value) {
     console.log(value)
@@ -44,7 +49,7 @@ function HostDashBoard() {
       setData(res.data)
     })
     .catch(err => console.log(err))
-  })
+  },[])
 
   return (
     <div>
@@ -77,6 +82,7 @@ function HostDashBoard() {
                   <TableCell align="right">{datas.confr_code}</TableCell>
                   <TableCell align="right">
                     <Button variant="outlined" sx={{mr:1}} onClick={() => handleUpdate(datas._id)}>Edit</Button>
+                    <Button variant="outlined" sx={{mr:1}} onClick={() => handleAssign(datas._id)}>assign</Button>
                     <Button color="error" onClick={() => handleDel(datas._id)}>DELETE</Button>
                   </TableCell>
                 </TableRow>

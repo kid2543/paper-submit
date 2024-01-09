@@ -4,7 +4,7 @@ import axios from 'axios'
 import Cookies from 'universal-cookie'
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function AuthorLogin() {
   const cookies = new Cookies();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -21,11 +21,11 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-      await axios.post('/login',{username:username,password:password})
+      await axios.post('/author-login',{username:username,password:password})
       .then(res => {
         if(res.status === 200){
           cookies.set("token",res.data.token,{path: '/', expires: new Date(Date.now() + (1000 * 60 * 60 * 24))})
-          navigate("/")
+          navigate(-1)
         }
       })
       .catch(err => {setError(err.response.data)}) 
@@ -37,7 +37,7 @@ function Login() {
       <Container maxWidth="sm" sx={{ mt: 5 }} >
         <Box component="form" onSubmit={handleSubmit}>
           <Typography align="center" variant="h4">
-            Sign in for <span style={{color:'#00A5FF'}}>Host</span>
+            Sign in for <span style={{color:'#00A5FF'}}>Author</span>
           </Typography>
           <Box sx={{display:'flex',flexDirection:'column' , mt:5}}>
           <TextField
@@ -74,4 +74,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default AuthorLogin;

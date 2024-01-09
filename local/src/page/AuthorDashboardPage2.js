@@ -1,92 +1,49 @@
 import React, { useState } from "react";
 import {
-  Typography,
   TextField,
-  FormControl,
-  Container,
-  Grid,
-  InputLabel,
-  Select,
-  MenuItem,
   Button,
-  styled
+  Box,
+
 } from "@mui/material";
-import FileUploadIcon from '@mui/icons-material/FileUpload';
+
+import axios from 'axios'
+import Cookies from 'universal-cookie'
 
 
 function AuthorDashboardPage2() {
-  const [age, setAge] = useState("");
-  const [file, setFile] = useState({});
 
-  const handleChange = (e) => {
-    setAge(e.target.value);
-  };
+  const [title, setTitle] = useState();
+  const [confr, setConfr] = useState();
+  const [file, setFile] = useState([]);
+  const cookies = new Cookies()
+  const owner = cookies.get('token')
 
-  const handleFile = (e) => {
-    setFile(e.target.file)
-    console.log(file)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('file',file)
+    formData.append('title',title)
+    formData.append('confr', confr)
+    formData.append('owner',owner )
+    await axios.post('/create/paper',formData)
+    .then(res => console.log(res))
+    .catch(err => console.log(err))
   }
 
-  const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-  });
-
   return (
-    <section>
-      <Container>
-        <Typography variant="h4" align="center">
-          แบบฟอร์มส่งบทความ
-        </Typography>
-        <Typography variant="subtitle1">รายละเอียดบทความ</Typography>
-        <FormControl fullWidth sx={{ my: 2 }} variant="standard">
-          <InputLabel>ประเภทบทความ</InputLabel>
-          <Select value={age} onChange={handleChange} label="Age">
-            <MenuItem value={10}>Ten</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
-          </Select>
-          <Grid container spacing={2} sx={{my:2}}>
-            <Grid item xs={6}>
-              <TextField fullWidth label="ชื่อบทความ" variant="standard" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField fullWidth label="คำสำคัญ (Keyword)" variant="standard" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField fullWidth label="ชื่อผู้เขียน" variant="standard" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField fullWidth label="ที่อยู่ในการติดต่อ" variant="standard" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField fullWidth label="เบอร์โทรศัพท์" variant="standard" />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField fullWidth label="Email" variant="standard" />
-            </Grid>
-            <Grid item xs={12}>
-              <Button variant="outlined" startIcon={<FileUploadIcon />} onClick={upload}>
-                  Upload File
-              </Button>
-              <VisuallyHiddenInput type="file" onChange={(e) => handleFile(e)} id="upload" />
-            </Grid>
-          </Grid>
-        </FormControl>
-      </Container>
-    </section>
+    <Box component="form" onSubmit={handleSubmit}>
+      <h2>ส่งบทความ</h2>
+      <TextField label="ชื่อบทความ" onChange={(e) => setTitle(e.target.value)} />
+      <TextField label="งานประชุมที่ต้องการส่ง" onChange={(e) => setConfr(e.target.value)} />
+      <Box>
+        <h4>แนบไฟล์เอกสาร</h4>
+        <input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files[0])}/>
+      </Box>
+      <Box sx={{mt:5}}>
+        <Button variant="contained" type="submit" onSubmit={handleSubmit}>ส่งบทความ</Button>
+      </Box>
+    </Box>
   );
 }
 
 export default AuthorDashboardPage2;
-
-function upload() {
-  document.getElementById('upload').click();
-}

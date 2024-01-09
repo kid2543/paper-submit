@@ -2,25 +2,19 @@ import {
   Container,
   Button,
   Box,
-  List,
-  ListItem,
-  ListItemText,
+
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 //icon
-import EditIcon from "@mui/icons-material/Edit";
+
 
 function HostUpdate() {
   const navigate = useNavigate();
   //เก็บข้อมูล บทความที่เลือกปัจจุบัน
   const [data, setData] = useState([]);
-  //เก็บข้อมูลหัวข้อที่มี
-  const [category, setCategory] = useState([]);
-  //เก็บข้อมูลพิธีกร
-  const [inv, setInv] = useState([]);
   //get id จาก url
   const { id } = useParams();
   const [state, setState] = useState(false);
@@ -54,9 +48,17 @@ function HostUpdate() {
         <div>
           <h2>รายละเอียดข้อมูลของงานประชุม {data[0].confr_code}</h2>
           <Box>
-            <h5>Title</h5>
+            <h5>หัวข้อ</h5>
             <p>{data[0].title}</p>
             <Button variant="outlined" onClick={() => handleClick("title")}>
+              Edit
+            </Button>
+          </Box>
+          <hr/>
+          <Box>
+            <h5>คำอธิบายเกี่ยวกับงานประชุม</h5>
+            <p>{data[0].confr_desc}</p>
+            <Button variant="outlined" onClick={() => handleClick("desc")}>
               Edit
             </Button>
           </Box>
@@ -144,7 +146,7 @@ function HostUpdate() {
                 <div>
                   <img
                     width={100}
-                    src={"/image/" + data[0].venue.img}
+                    src="https://res.cloudinary.com/dciv8zipz/image/upload/f_auto,q_auto/rw7bmnsf46borjmxozyk"
                     alt={data[0].venue.img}
                   />
                 </div>
