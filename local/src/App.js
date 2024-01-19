@@ -9,7 +9,7 @@ import Host from "./page/HostLayout";
 import AuthorDashboard from "./page/AuthorDashboardLayout";
 import AuthorDashboardPage1 from "./page/AuthorDashboardPage1";
 import AuthorDashboardPage2 from "./page/AuthorDashboardPage2";
-import { Container, Typography, Link, Box, Modal } from "@mui/material";
+import { Container, Typography, Link, Box } from "@mui/material";
 import HostDashBoard from "./page/HostDashBoard";
 import HostCreateDash from "./page/HostCreateDash";
 import SignUp from "./page/SignUp";
@@ -49,6 +49,9 @@ import AuthorLogin from "./page/AuthorLogin";
 import AuthorPrivate from "./components/AuthorPrivate";
 import HostAssign from "./page/HostAssign";
 import AddReviewer from "./page/AddReviewer";
+import NewCategory from "./components/Host/NewCategory";
+import Reviewer from "./components/Host/Reviewer";
+import NewReviwer from "./components/Host/NewReviwer";
 
 export default function App() {
   return (
@@ -104,6 +107,22 @@ export default function App() {
             }
           />
           <Route
+            path="reviewer"
+            element={
+              <PrivateRoute>
+                <Reviewer />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="reviewer/create"
+            element={
+              <PrivateRoute>
+                <NewReviwer />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path=":id"
             element={
               <PrivateRoute>
@@ -140,6 +159,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <CategoryUpdate />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path=":id/category/new"
+            element={
+              <PrivateRoute>
+                <NewCategory />
               </PrivateRoute>
             }
           />

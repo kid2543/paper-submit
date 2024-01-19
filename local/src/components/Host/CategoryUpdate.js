@@ -1,84 +1,52 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-} from "@mui/material";
+import { Button } from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
 
 //icon
-import SaveIcon from "@mui/icons-material/Save";
-import { useParams } from "react-router-dom";
+
 
 function CategoryUpdate() {
-    const navigate = useNavigate();
+
   const {id} = useParams();
-  const [data, setData] = useState([]);
-  const [category, setCategory] = useState([]);
+  const [data, setData] = useState();
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setCategory(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
-
-  const handleUpdate = async () => {
+  const fethCategory = async () => {
     try {
-        await axios.put("/conferences-update/" + id, {topic:category});
-        alert("Data is Updated")
-        navigate(-1)
+      const getCode = await axios.get('/category-for-confr/' + id)
+      setData(getCode.data)
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
-  };
-
+    
+  }
   useEffect(() => {
-    const fethData = async () => {
-      try {
-        const Data = await axios.get("/category");
-        setData(Data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fethData();
-  });
+    fethCategory();
+  },[])
 
   return (
-    <form>
+    <div>
       <h2>Update Category</h2>
-
-      {data ? (
-        <FormControl sx={{ m: 1, minWidth: "200px" }}>
-          <InputLabel id="label-category">เลือกหัวข้อที่ต้องการ</InputLabel>
-          <Select
-            labelId="label-category"
-            label="เลือกหัวข้อที่ต้องการ"
-            value={category}
-            onChange={handleChange}
-            multiple
-          >
-            {data.map((item) => (
-              <MenuItem key={item._id} value={item.c_code}>
-                {item.name}
-              </MenuItem>
+        <Button variant='contained' href={"/host/" + id + "/category/new"}>เพิ่มหัวข้อใหม่</Button>
+      <div>
+        {data ? (
+          <div>
+            {data.map((item,index) => (
+              <div key={item._id}>
+                <h1>หัวข้อที่: {index + 1}</h1>
+                <p>ชื่อ: <span>{item.name}</span></p>
+                <p>คำอธิบาย: <span>{item.desc}</span></p>
+                <p>Code หัวข้อ: <span>{item.category_code}</span></p>
+                <p>Topic: <span>{item.topic}</span></p>
+                <hr/>
+              </div>
             ))}
-          </Select>
-          <Button variant="contained" onClick={handleUpdate}>
-            <SaveIcon />
-          </Button>
-        </FormControl>
-      ) : (
-        <h2>Loading</h2>
-      )}
-    </form>
+          </div>
+        ): (
+          <h2>No data</h2>
+        )}
+      </div>
+    </div>
   );
 }
 

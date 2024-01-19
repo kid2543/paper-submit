@@ -6,6 +6,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const shortid = require("shortid")
 const port = 4000;
 
 //midleware
@@ -21,6 +22,9 @@ const Conferences = require("./models/conferences");
 const Name_title = require("./models/name_title");
 const UploadFile = require("./models/uploadfile");
 const InvSpeaker = require("./models/inv_speaker");
+const Topic = require("./models/topic");
+
+
 
 app.use(express.json());
 app.use(express.static("public"));
@@ -62,14 +66,28 @@ const uploadImage = multer({
 
 //test
 app.get("/", (req, res) => {
-  res.send("Test get");
+  res.send("Paper Submission");
 });
+app.get("/test", (req, res) => {
+  console.log(shortid.generate());
+});
+
 //-----------------------get All data--------------------------//
 
 app.get("/host", async (req, res) => {
   try {
     const host = await Host.find({});
     res.status(200).json(host);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
+app.get("/topic", async (req, res) => {
+  try {
+    const topic = await Topic.find({});
+    res.status(200).json(topic);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -150,8 +168,8 @@ app.get("/category-for-confr/:id", async (req, res) => {
   try {
     const id = req.params.id
     const getData = await Conferences.findById(id)
-    const getCode = getData.category_code
-    const category_code = await Category.find({"c_code": {$in:getCode}})
+    const getCode = getData.confr_code
+    const category_code = await Category.find({"confr_code": getCode})
     res.status(200).json(category_code)
   } catch (error) {
     console.log(error)
@@ -174,6 +192,16 @@ app.post("/create/host", async (req, res) => {
   try {
     const host = await Host.create(req.body);
     res.status(201).json(host);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+});
+
+app.post("/create/topic", async (req, res) => {
+  try {
+    const topic = await Topic.create(req.body);
+    res.status(201).json(topic);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -249,9 +277,14 @@ app.post("/create/rank", async (req, res) => {
   }
 });
 
-app.post("/create/paper", async (req, res) => {
+app.post("/create/paper",uploadPdf.single('file'), async (req, res) => {
   try {
-    const paper = await Paper.create(req.body);
+    const paper = await Paper.create({
+      title:req.body.title,
+      confr_code:req.body.confr,
+      file:req.file.filename,
+      owner:req.body.owner
+    });
     res.status(201).json(paper);
   } catch (error) {
     console.log(error);
@@ -294,6 +327,26 @@ app.post("/create/nametitle", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
+    const check = await Host.findOne({ username: req.body.username });
+    if (!check) {
+      res.status(404).send("Not Found");
+    }
+    if (check.password === req.body.password) {
+      res.status(200).json({
+        fname: check.fname,
+        lname: check.lname,
+        token: check.username,
+      });
+    } else {
+      res.status(400).send("Wrong password");
+    }
+  } catch (error) {
+    res.status(500);
+  }
+});
+
+app.post("/author-login", async (req, res) => {
+  try {
     const check = await Author.findOne({ username: req.body.username });
     if (!check) {
       res.status(404).send("Not Found");
@@ -322,6 +375,7 @@ app.put("/conferences-update/:id", async (req, res) => {
       $set: {
         title: userInput.title,
         confr_code: userInput.code,
+        confr_desc: userInput.desc,
         category_code: userInput.topic,
         presentation_guide: userInput.present,
         regis:userInput.regis,
@@ -358,6 +412,93 @@ app.get('/inv-speaker-get/:id', async (req,res) => {
   }
 })
 
+app.post('/author-get-by-username', async (req, res) => {
+  try {
+    const getAuthor = await Author.findOne({username:req.body.username})
+    res.status(200).json(getAuthor)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.post('/paper-table', async (req,res) => {
+  try {
+    const getPaper = await Paper.find({owner:req.body.owner})
+    res.status(200).json(getPaper)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.get('/conferences-paper/:id', async (req,res) => {
+  try {
+    const confrId = req.params.id;
+    const getConfr = await Conferences.findById(confrId)
+    const getPaper = await Paper.find({confr_code:getConfr.confr_code})
+    res.status(200).json(getPaper)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+app.post('/conferences/paper', async (req,res) => {
+  try {
+    const getPaper = await Paper.find({confr_code:req.body.confr})
+    res.status(200).json(getPaper)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.get('/paper-get/:id', async (req,res) => {
+  try {
+    const id = req.params.id;
+    const getPaper = await Paper.findById(id)
+    res.status(200).json(getPaper)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.get('/committees-get/:id', async (req,res) => {
+  try {
+    const id = req.params.id;
+    const getCommit = await Committee.findById(id)
+    res.status(200).json(getCommit)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.post('/committees-assign/:id', async (req,res) => {
+  try {
+    const id = req.params.id;
+    const getCommit = await Paper.findByIdAndUpdate(id,{
+      $set:{
+        committees:req.body.commit
+      }
+    })
+    res.status(200).json(getCommit)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+app.post('/committees-update/:id', async (req,res) => {
+  try {
+    const id = req.params.id;
+    const getCommit = await Committee.findByIdAndUpdate(id,{
+      $set:{
+        fname:req.body.fname,
+        lname:req.body.lname,
+        topic:req.body.topic
+      }
+    })
+    res.status(200).json(getCommit)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
 /* app.get('/admin', async (req,res) => {
     try {
         const user = await User.find({});

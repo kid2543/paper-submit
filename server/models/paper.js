@@ -13,7 +13,8 @@ const paperSchema = mongoose.Schema(
         owner:String,
         keyword:[String],
         stauts:Number,
-        rank:Number
+        rank:Number,
+        committees:[String]
     }
 )
 

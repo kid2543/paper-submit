@@ -1,8 +1,7 @@
 import {
   Container,
   Button,
-  Box,
-
+  Box
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -41,9 +40,9 @@ function HostUpdate() {
   useEffect(() => {
     fetchData();
   }, []);
-
   return (
     <Container>
+          
       {state ? (
         <div>
           <h2>รายละเอียดข้อมูลของงานประชุม {data[0].confr_code}</h2>
@@ -73,8 +72,12 @@ function HostUpdate() {
           <hr />
           <Box>
             <h5>Category code</h5>
-            {data[2].map((item) => (
-              <p key={item._id}>{item.name}</p>
+            {data[2].map((item,index) => (
+              <div key={item._id}>
+                <h5>อันดับ: {index + 1}</h5>
+                <p>ชื่อ: {item.name}</p>
+                Code: {item.category_code}
+              </div>
             ))}
             <Button variant="outlined" onClick={() => handleClick("category")}>
               Edit

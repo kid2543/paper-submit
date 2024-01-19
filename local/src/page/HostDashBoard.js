@@ -2,13 +2,6 @@
 import {
   Box,
   Typography,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Button
 } from "@mui/material";
 
@@ -57,39 +50,36 @@ function HostDashBoard() {
         <Typography variant="h4">รายการงานประชุม</Typography>
       </Box>
       <Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell align="right">Owner</TableCell>
-                <TableCell align="right">Code</TableCell>
-                <TableCell align="right">Tools</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Owner</th>
+                <th>Code</th>
+                <th>Tools</th>
+              </tr>
+            </thead>
+            <tbody>
               {data.map((datas) => (
-                <TableRow
+                <tr
                   key={datas._id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <td>
                     {datas._id}
-                  </TableCell>
-                  <TableCell>{datas.title}</TableCell>
-                  <TableCell align="right">{datas.owner}</TableCell>
-                  <TableCell align="right">{datas.confr_code}</TableCell>
-                  <TableCell align="right">
+                  </td>
+                  <td>{datas.title}</td>
+                  <td >{datas.owner}</td>
+                  <td >{datas.confr_code}</td>
+                  <td >
                     <Button variant="outlined" sx={{mr:1}} onClick={() => handleUpdate(datas._id)}>Edit</Button>
                     <Button variant="outlined" sx={{mr:1}} onClick={() => handleAssign(datas._id)}>assign</Button>
                     <Button color="error" onClick={() => handleDel(datas._id)}>DELETE</Button>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            </tbody>
+          </table>
       </Box>
     </div>
   );

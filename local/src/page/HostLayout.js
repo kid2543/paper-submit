@@ -56,6 +56,12 @@ function Host() {
               </ListItemIcon>
               <ListItemText primary="สร้างงานประชุม" />
             </ListItemButton>
+            <ListItemButton component="a" href="/host/reviewer">
+              <ListItemIcon>
+                <CreateIcon />
+              </ListItemIcon>
+              <ListItemText primary="Reviwer" />
+            </ListItemButton>
           </List>
         </SwipeableDrawer>
       </Container>

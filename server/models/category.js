@@ -2,22 +2,27 @@ const mongoose = require('mongoose')
 
 const categorySchema = mongoose.Schema(
     {
-        c_code : {
+        category_code : {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
-
         name: {
             type:String,
             required: true
         },
-
         icon: {
             type: String
         },
         desc: {
             type: String
+        },
+        confr_code : {
+            type: String,
+            required : true
+        },
+        topic : {
+            type : String,
+            required:true
         }
     }
 )

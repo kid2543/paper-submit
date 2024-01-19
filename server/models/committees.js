@@ -19,11 +19,13 @@ const committeeSchema = mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
-            min: [10, 'Must be at least 10,got {VALUE}']
+            required: true
         },
-        add_by:{type:mongoose.Schema.Types.ObjectId,ref:'host'},
-        confr_code:String
+        add_by:{
+            type:String,
+            required: true
+        },
+        topic:[String],
     }
 )
 

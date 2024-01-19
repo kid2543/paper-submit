@@ -11,18 +11,6 @@ import {
 import axios from "axios";
 import Cookies from "universal-cookie";
 
-function createData(no, title, cat, code, status) {
-  return { no, title, cat, code, status };
-}
-
-const rows = [
-  createData(1, "หัวข้อที่ 1", ["BEEE", "ABCD"], "ART2023", 0),
-  createData(2, "หัวข้อที่ 2", ["AFCE", "BECE"], "ART2023", 1),
-  createData(3, "หัวข้อที่ 3", ["CCID", "BECE"], "ART2023", 1),
-  createData(4, "หัวข้อที่ 4", ["BEEE", "KKCI"], "ART2023", 0),
-  createData(5, "หัวข้อที่ 5", ["FFOI", "BECE"], "ART2023", 0),
-];
-
 function createStatus(n, text) {
   if (n === 0) {
     text = "รอดำเนินการ";
