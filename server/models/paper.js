@@ -2,19 +2,15 @@ const mongoose = require('mongoose')
 
 const paperSchema = mongoose.Schema(
     {
-        title:{
-            type:String,
-            required:true
-        },
-        comment:[{type:mongoose.Schema.Types.ObjectId,ref:'commnet'}],
-        confr_code:String,
+        title:String,
+        paper_code:String,
+        author_name:String,
         file:String,
-        category_name:[String],
+        submit_code:String,
         owner:String,
         keyword:[String],
         stauts:Number,
         rank:Number,
-        committees:[String]
     }
 )
 

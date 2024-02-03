@@ -1,10 +1,9 @@
-GET http://localhost:4000/committees-get/6566484708b7bb08b7b97e13
-
+GET http://localhost:4000/get/committees/65af68905016705862ba2ac9
 ###
 
-POST http://localhost:4000/committees-update/65986d571b61e67f139dff8a
+POST http://localhost:4000/assign/657c1deac731b182069e237c/65af68905016705862ba2ac9
 Content-Type: application/json
 
 {
-    "topic":["กฏหมาย"]
+    "commit":["1234","65986d411b61e67f139dff88","65986d571b61e67f139dff8a"]
 }

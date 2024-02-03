@@ -14,6 +14,7 @@ const conferencesSchema = mongoose.Schema({
   logo: {type:String},
   brochure: {type:String},
   presentation_guide: { header: {type:String}, detail: [{type:String}], remark: {type:String} },
+  committees: [{name:String,belogn_to: String}],
   regis: {
     remark: {type:String},
     early_bird_date: {type:Date},
