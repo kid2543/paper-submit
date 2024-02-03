@@ -5,42 +5,47 @@ import {
 from '@mui/material'
 import axios from 'axios'
 import { useParams, useNavigate } from 'react-router-dom'
+import PaperConfr from '../components/Host/PaperConfr'
 
 function HostAssign() {
 
     const {id} = useParams();
-    const [data, setData] = useState();
+    const [data, setData] = useState()
+    const [length, setLength] = useState();
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const fethConfr = async () => {
-            await axios.get('/conferences-paper/' + id)
-            .then(res => setData(res.data))
-            .catch(err => console.log(err))
+    const fethConfr = async () => {
+        try {
+            const res = await axios.get('/get-category-code/' + id)
+            setData(res.data)
+            setLength(res.data.length)
+        } catch (error) {
+            console.log(error)
         }
+    }
+
+    useEffect(() => {
         fethConfr();
     },[])
-
-    const addCommittees = (paper) => {
-        navigate(`/host/${id}/view/${paper}`)
-    } 
 
   return (
     <Box>
         <h1>บทความที่ส่งเข้ามา</h1>
         {data ? (
             <div>
+                <p>หัวข้อทั้งหมด {length}</p>
+                {length === 0 ? (
+                    <>
+                        <h3>No Data</h3>
+                        <Button variant='outlined' onClick={() => navigate(-1)}>Back</Button>
+                    </>
+                ): (null)}
                 {data.map((item) => (
                     <List key={item._id}>
-                    <h3>{item.title}</h3>
-                    <ListItem>
-                        <ListItemText>{item.owner}</ListItemText>
-                        <ListItemText>{item.category_name}</ListItemText>
-                        <a href={"http://localhost:4000/pdf/" + item.file} target='_blank' rel='noreferrer'>{item.file}</a>
-                        <Button onClick={() => addCommittees(item._id)}>เพิ่มกรรมการ</Button>
-                    </ListItem>
-                    <hr/>
-                </List>
+                        <h3>{item.name}</h3>
+                        <hr/>
+                        <PaperConfr code={item.category_code} />
+                    </List>
                 ))}
             </div>
         ):(<h2>Loading....</h2>)}

@@ -10,9 +10,13 @@ import {
   Container,
   Link,
 } from "@mui/material";
+
+//icon
 import DescriptionIcon from "@mui/icons-material/Description";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import GroupIcon from '@mui/icons-material/Group';
 import CreateIcon from '@mui/icons-material/Create';
+
 import { Outlet } from "react-router-dom";
 
 function Host() {
@@ -58,9 +62,9 @@ function Host() {
             </ListItemButton>
             <ListItemButton component="a" href="/host/reviewer">
               <ListItemIcon>
-                <CreateIcon />
+                <GroupIcon />
               </ListItemIcon>
-              <ListItemText primary="Reviwer" />
+              <ListItemText primary="กรรมการ" />
             </ListItemButton>
           </List>
         </SwipeableDrawer>

@@ -1,21 +1,18 @@
 import { Button,Box } from '@mui/material';
 import React from 'react'
 import Cookies from 'universal-cookie'
-import { useNavigate } from 'react-router-dom';
 
 function LogoutComponent() {
 
-    const navigate = useNavigate();
     const cookies = new Cookies();
 
     const logout = () => {
-        cookies.set('token',null)
-        navigate("/")
+      cookies.set('token',null)
     }
 
   return (
-    <Box>
-        <Button onClick={logout}>Log out</Button>
+    <Box component='form' onSubmit={logout}>
+        <Button type="submit" onSubmit={logout}>Log out</Button>
     </Box>
   )
 }

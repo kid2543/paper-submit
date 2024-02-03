@@ -18,8 +18,10 @@ function AnnCard() {
 
   useEffect(() => {
     const fethConfr = async () => {
+      setLoading(false)
       const getConfr = await axios.get("/conferences")
       setData(getConfr.data)
+      setLoading(true)
     }
     fethConfr();
   },[])

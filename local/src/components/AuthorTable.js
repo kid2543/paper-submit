@@ -26,13 +26,16 @@ function AuthorTable() {
   const token = cookies.get("token");
   const [data, setData] = useState([]);
 
+  const fethPaper = async () => {
+    try {
+      const res = await axios.get('/paper-table/' + token)
+      setData(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
   useEffect(() => {
-    const fethPaper = async () => {
-      await axios
-        .post("/paper-table", { owner: token })
-        .then((res) => setData(res.data))
-        .catch((err) => console.log(err));
-    };
     fethPaper();
   }, []);
 
@@ -59,7 +62,7 @@ function AuthorTable() {
                     {item._id}
                   </TableCell>
                   <TableCell align="right">{item.title}</TableCell>
-                  <TableCell align="right">{item.confr_code}</TableCell>
+                  <TableCell align="right">{item.submit_code}</TableCell>
                   <TableCell align="right">
                     {createStatus(item.status)}
                   </TableCell>

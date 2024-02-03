@@ -1,79 +1,138 @@
+import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import {
-    FormGroup,
-    FormControlLabel,
-    Checkbox,
-    Button,
-    Box,
+import { useNavigate, useParams } from 'react-router-dom'
+
+function AmountPaperForCommittee(id) {
+
+    const [amount, setAmount] = useState();
+
+    const fethAmount = async () => {
+        const getAmount = await axios.get("/amount/committees/" + id.id)
+        setAmount(getAmount.data)
+    }
+
+    useEffect(() => {
+        fethAmount();
+    },[id])
+
+  return (
+    <>
+        {amount ? (
+            <>
+                : {amount.length}
+            </>
+        ):(
+            <>0</>
+        )}
+    </>
+  )
 }
-from '@mui/material'
 
 function AddReviewer() {
 
-    const {id,paper} = useParams()
-    const [title, setTitle] = useState()
-    const [committees, setCommittees] = useState([])
-    const [reviewer, setReviewer] = useState([]);
+    const {id,paperid} = useParams();
+    const navigate = useNavigate();
+
+    const [paper, setPaper] = useState();
+    const [commit, setCommit] = useState();
+    const [confr, setConfr] = useState();
+    const [arrCommit, setArrCommit] = useState([]);
+    const [check, setCheck] = useState([]);
 
     const fethPaper = async () => {
-        await axios.get('/paper-get/' + paper)
-        .then(res => setTitle(res.data.title))
-        .catch(err => console.log(err))
+        try {
+                const getPaper = await axios.get("/get/paper/" + paperid)
+                setPaper(getPaper.data)
+                const getCommit = await axios.get("/committee/paper/" + getPaper.data.submit_code)
+                setCommit(getCommit.data)
+
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    const fethCommittees = async () => {
-        await axios.get('/committees-get/' + id)
-        .then(res => setCommittees(res.data))
-        .catch(err => console.log(err))
+    const fethCommit = async () => {
+        try {
+            let res = await axios.get("/get/committees/" + paperid)
+            setArrCommit(res.data.committees_list)
+            setCheck(new Set(res.data.committees_list))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const fethConfr = async () => {
+        try {
+            const getConfr = await axios.get('/conferences-get/' + id)
+            setConfr(getConfr.data.confr_code)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            if(arrCommit.length !== 0) {
+                const submit = await axios.post(`/assign/${id}/${paperid}`,{
+                    commit: arrCommit
+                })
+                alert("บันทึกสำเร็จ " + submit.status)
+                navigate(-1)
+            }else {
+                alert("กรุณาเลือกกรรมการ")
+            }
+        } catch (error) {
+            console.log("ล้มเหลว")
+            console.log(error)
+        }
+    }
+
+    const handleCheckbox = (e) => {
+        const item = e.target.value
+        const check = e.target.checked
+        if(check) {
+            setArrCommit([...arrCommit,item])
+        }else {
+          setArrCommit(arrCommit.filter(id => id !== item))
+        }
+        
     }
 
     useEffect(() => {
         fethPaper();
-        fethCommittees();
+        fethConfr();
+        fethCommit();
     },[])
-
-    const handleChange = (e) => {
-        const value = e.target.value
-        const checked = e.target.checked
-        if(checked) {
-            setReviewer([...reviewer, value])
-        }else{
-            setReviewer(reviewer.filter((v) => v !== e.target.value))
-        }
-    }
     
-    const handleAssing =  (e) => {
-        e.preventDefault();
-        if(reviewer.length !== 0) {
-            for(let i = 0; i < reviewer.length ; i++) {
-                console.log(reviewer[i])
-                axios.post('/committees-assign/'+ reviewer[i],{paper:[...committees[i].review,paper]})
-                .then(res => console.log(res.data))
-                .catch(err => console.log(err))
-            }
-        } else{
-            console.log("please select")
-        }
-    }
-
-    console.log()
-
   return (
     <div>
-        <h2>{title}</h2>
-
-        <Box component='form' onSubmit={handleAssing}>
-        <FormGroup>
-        {committees.map((item) => (
-            <FormControlLabel key={item._id} control={<Checkbox />} label={item.fname} value={item._id} onChange={handleChange} />
-        ))}
-        <Button type='submit' onSubmit={handleAssing}>Assign</Button>
-        </FormGroup>
-        </Box>
+        <h3><u>รายละเอียดบทความ</u></h3>
+        {paper ? (
+            <div>
+                <p>Code: <b>{paper.paper_code}</b></p>
+                <p>Title: {paper.title}</p>
+            </div>
+        ):(null)}
+        <h3><u>รายละเอียดกรรมการ</u></h3>
+        {commit ? (
+            <Box component="form" onSubmit={handleSubmit}>
+                {commit.length === 0 ? (<>ไม่มีกรรมการของหัวข้อนี้</>):(null)}
+                <FormGroup>
+                {commit.map((item) => (
+                    <div key={item._id}>
+                        <FormControlLabel control={<Checkbox size='small' value={item._id} defaultChecked={check.has(item._id)} onChange={handleCheckbox}/>} label={`${item.fname} ${item.lname}`} />
+                        <AmountPaperForCommittee id={item._id} />
+                    </div>
+                ))}
+                </FormGroup>
+                <Button variant='contained' type='submit' onSubmit={handleSubmit}>Submit</Button>
+            </Box>
+        ):(null)}
     </div>
   )
 }
 
 export default AddReviewer
+

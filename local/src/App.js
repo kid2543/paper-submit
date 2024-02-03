@@ -259,7 +259,7 @@ export default function App() {
             }
           />
           <Route
-            path=":id/view/:paper"
+            path=":id/view/:paperid"
             element={
               <PrivateRoute>
                 <AddReviewer />
