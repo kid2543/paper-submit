@@ -1,7 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;500;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=Noto+Sans+Thai:wght@300;500;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap');
 
 body {
-  margin:0;
-  font-family:'Noto Sans Thai', 'Inter' ;
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'Noto Sans Thai', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+:root {
+  --bs-body-font-family: 'Noto Sans Thai', 'sans-serif' !important;
+}
+
+.form-control {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+ion-icon {
+  font-size: 24px;
+}
+
+.tabs-text .nav-item .nav-link {
+  color: #000;
+}
+
+.nav-item .nav-link {
+  color: #FFF;
 }

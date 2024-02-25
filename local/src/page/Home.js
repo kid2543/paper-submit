@@ -1,41 +1,25 @@
-import React from "react";
-import { Typography, Container, Box, Link,Button } from "@mui/material";
-import Hero from "../asset/herobanner.jpeg";
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import Card from '../components/Card';
 
 function Home() {
+
+  const navigate = useNavigate();
   return (
-    <div style={{height:'100vh'}}>
-      <Box sx={{ display: "flex"}}>
-        <section>
-        <Container sx={{mt:8}}>
-          <Box>
-            <Typography variant="h3" gutterBottom>
-              <span style={{ color: "#00A5FF" }}>PAPERSS</span>
-              <br />
-              เว็บไซต์สำหรับรับส่งบทความวิชาการ
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Papers Submission (PAPERSS)
-              เป็นเว็บไซต์สำหรับจัดการหน้าเว็บไซต์สำหรับผู้ที่ต้องการสร้างประกาศรับบทความ
-              และสำหรับผู้ที่ต้องการส่งบทความวิชาการ
-            </Typography>
-            <Box sx={{mt:3}}>
-              <Link href="/host">
-                <Button variant="contained" sx={{mr:2}}>สร้างงานประชุม</Button>
-              </Link>
-              <Link href="/ann">
-                <Button variant="outlined">ส่งบทความ</Button>
-              </Link>
-            </Box>
-          </Box>
-        </Container>
-        </section>
-        <Box sx={{mt:8}}>
-          <img src={Hero} alt="Hero Banner" style={{height:"100%", maxWidth:600}} />
-        </Box>
-      </Box>
+    <div className='container-fluid'>
+      <div className='row'>
+        <div className='col-md'>
+          <Card title="สำหรับผู้จัดงานประชุม" subtitle="เพื่อสร้างบทความงานประชุม" link1="/host" textlink1="สร้างงานประชุม" />
+        </div>
+        <div className='col-md'>
+          <Card title="สำหรับผู้ส่งบทความ" subtitle="เพื่อส่งบทความวิชาการเข้าสู่งานประชุมต่างๆ" link1="/submit" textlink1="ส่งบทความ" />
+        </div>
+        <div className='col-md'>
+          <Card title="สำหรับกรรมการตรวจบทความ" subtitle="เพื่อตรวจบทความวิชาการที่ส่งเข้ามา" link1="/committee" textlink1="ตรวจบทความ" />
+        </div>
+      </div>
     </div>
-  );
+  )
 }
 
-export default Home;
+export default Home

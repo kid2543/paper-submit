@@ -1,6 +1,6 @@
 {
-  "short_name": "Paperss",
-  "name": "Paper submission",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "logo.png",
