@@ -8,6 +8,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const shortid = require("shortid");
 const port = 4000;
+require('dotenv').config()
 
 //midleware
 const Host = require("./models/host");
@@ -21,16 +22,12 @@ const UploadFile = require("./models/uploadfile");
 const InvSpeaker = require("./models/inv_speaker");
 const Topic = require("./models/topic");
 const ListOfCommittees = require("./models/committees_list");
-const { error } = require("console");
+
+const cloudinary = require('./cloudinary')
 
 app.use(express.json());
 app.use(express.static("public"));
-app.use(
-  cors({
-    credentials: true,
-    origin: ["http://localhost:3000/"],
-  })
-);
+app.use(cors())
 app.use(cookieParser());
 
 //storage for upload Image
@@ -58,6 +55,14 @@ const storagePdf = multer.diskStorage({
   },
 });
 
+const cloud = multer.diskStorage({
+  filename: function(req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({storage:cloud})
+
 const uploadPdf = multer({
   storage: storagePdf,
 });
@@ -72,6 +77,13 @@ app.get("/", (req, res) => {
 app.get("/test", (req, res) => {
   console.log(shortid.generate());
 });
+
+
+//test for host image upload
+app.post("/test/upload", upload.single('image'), async (req, res) => {
+    const test = await cloudinary.uploader.upload(req.file.path)
+    console.log(test.url)
+})
 
 //-----------------------get All data--------------------------//
 
@@ -225,10 +237,10 @@ app.get("/category-for-confr/:id", async (req, res) => {
   }
 });
 
-app.get("/get-category-code/:id", async (req, res) => {
+app.get("/get-category-code/:code", async (req, res) => {
   try {
-    const id = req.params.id;
-    const resConfr = await Conferences.findById(id);
+    const code = req.params.code;
+    const resConfr = await Conferences.findOne({confr_code: code});
     const getCategory = await Category.find({
       confr_code: resConfr.confr_code,
     });
@@ -238,9 +250,10 @@ app.get("/get-category-code/:id", async (req, res) => {
   }
 });
 
-app.post("/inv-speaker-get", async (req, res) => {
+app.get("/get/inv-speaker/:code", async (req, res) => {
   try {
-    const getData = await InvSpeaker.find({ confr_code: req.body.confr_code });
+    const code = req.params.code
+    const getData = await InvSpeaker.find({ confr_code: code });
     res.status(200).json(getData);
   } catch (error) {
     console.log(error);
@@ -255,7 +268,6 @@ app.post("/create/host", async (req, res) => {
     const host = await Host.create(req.body);
     res.status(201).json(host);
   } catch (error) {
-    console.log(error);
     res.status(500).json(error);
   }
 });
@@ -331,16 +343,7 @@ app.post("/create/comment", async (req, res) => {
 
 app.post("/create/paper", uploadPdf.single("file"), async (req, res) => {
   try {
-    const paper = await Paper.create({
-      title: req.body.title,
-      author_name: req.body.author_name,
-      keyword: req.body.keyword,
-      submit_code: req.body.submit_code,
-      paper_code: req.body.submit_code + "-" + shortid.generate(),
-      owner: req.body.owner,
-      status: req.body.status,
-      rank: req.body.rank,
-    });
+    const paper = await Paper.create(req.body)
     res.status(201).json(paper);
   } catch (error) {
     console.log(error);
@@ -380,7 +383,7 @@ app.post("/login", async (req, res) => {
       res.status(200).json({
         fname: check.fname,
         lname: check.lname,
-        token: check.username,
+        token: check._id,
       });
     } else {
       res.status(400).send("Wrong password");
@@ -412,35 +415,100 @@ app.post("/author-login", async (req, res) => {
 
 // ----------------------------------update-----------------------------------
 
-app.put("/conferences-update/:id", async (req, res) => {
+app.patch("/update/conferences/:id", async (req, res) => {
   try {
-    const confrId = req.params.id;
     const userInput = req.body;
-    const confUpdate = await Conferences.findByIdAndUpdate(confrId, {
+    const confUpdate = await Conferences.findByIdAndUpdate(req.params.id, {
       $set: {
         title: userInput.title,
+        sub_title: userInput.subtitle,
+        confr_desc: userInput.confr_desc,
         confr_code: userInput.code,
-        confr_desc: userInput.desc,
         category_code: userInput.topic,
-        presentation_guide: userInput.present,
-        regis: userInput.regis,
         important_date: userInput.important_date,
         publication: userInput.pub,
       },
     });
     res.status(200).json(confUpdate);
   } catch (error) {
-    console.log(error);
+    res.status(500).json(error)
+  }
+});
+
+app.patch("/update/conferences/:id/present", async (req, res) => {
+  try {
+
+    const userInput = req.body;
+    const confUpdate = await Conferences.findByIdAndUpdate(req.params.id, {
+      $set: {
+        presentation_guide: {
+          remark: userInput.remark,
+          detail: userInput.detail,
+          for_presenters: userInput.present,
+          for_session_chair: userInput.chair,
+          for_audience: userInput.audience,
+        }
+      },
+    });
+    res.status(200).json(confUpdate);
+  } catch (error) {
+    res.status(500).json(error)
+  }
+});
+
+app.patch("/update/conferences/:id/regis", async (req, res) => {
+  try {
+
+    const userInput = req.body;
+    const regisUpdate = await Conferences.findByIdAndUpdate(req.params.id, {
+      $set: {
+        regis: {
+          remark: userInput.remark,
+          early_bird_date: userInput.eb_date,
+          regular_date: userInput.r_date,
+          bank_name: userInput.bank_name,
+          ac_name: userInput.ac_name,
+          ac_type: userInput.ac_type,
+          ac_no: userInput.ac_no,
+        }
+      },
+    });
+    res.status(200).json(regisUpdate);
+  } catch (error) {
+    res.status(500).json(error)
+  }
+});
+
+app.patch("/update/conferences/:id/regis-type", async (req, res) => {
+  try {
+
+    const regisUpdate = await Conferences.findByIdAndUpdate(req.params.id, {
+      $set: {
+        regis_type: req.body
+      },
+    });
+    res.status(200).json(regisUpdate);
+  } catch (error) {
+    res.status(500).json(error)
   }
 });
 
 //-------------------------------get by id------------------------------
 
-app.get("/conferences-get/:id", async (req, res) => {
+app.get("/get/confr/:id", async (req, res) => {
   try {
-    const confrId = req.params.id;
-    const getConfr = await Conferences.findById(confrId);
+    const getConfr = await Conferences.findById(req.params.id);
     res.status(200).json(getConfr);
+  } catch (error) {
+    res.status(500).json(error)
+  }
+});
+
+app.get("/get/host/confr/:id", async (req, res) => {
+  try {
+    const getHost = await Host.findById(req.params.id);
+    const getConfr = await Conferences.find({owner: getHost.username})
+    res.status(200).json(getConfr)
   } catch (error) {
     console.log(error);
   }
@@ -458,8 +526,7 @@ app.get("/list/committees/:code", async (req, res) => {
 
 app.get("/amount/committees/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getList = await ListOfCommittees.find({ committees_list: id });
+    const getList = await ListOfCommittees.find({ committees_list: req.params.id });
     res.status(200).json(getList);
   } catch (error) {
     console.log(error);
@@ -468,8 +535,7 @@ app.get("/amount/committees/:id", async (req, res) => {
 
 app.get("/get/committees/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getList = await ListOfCommittees.findOne({ paper_id: id });
+    const getList = await ListOfCommittees.findOne({ paper_id: req.params.id });
     res.status(200).json(getList);
   } catch (error) {
     console.log(error);
@@ -478,10 +544,8 @@ app.get("/get/committees/:id", async (req, res) => {
 
 app.post("/assign/:confr/:paper", async (req, res) => {
   try {
-    const confr = req.params.confr;
-    const paper = req.params.paper;
-    const getCode = await Conferences.findById(confr);
-    const getPaper = await Paper.findById(paper);
+    const getCode = await Conferences.findById(req.params.confr);
+    const getPaper = await Paper.findById(req.params.paper);
     const createList = await ListOfCommittees.updateOne(
       { paper_id: getPaper._id },
       {
@@ -500,8 +564,7 @@ app.post("/assign/:confr/:paper", async (req, res) => {
 
 app.get("/inv-speaker-get/:id", async (req, res) => {
   try {
-    const invId = req.params.id;
-    const getConfr = await InvSpeaker.findById(invId);
+    const getConfr = await InvSpeaker.findById(req.params.id);
     res.status(200).json(getConfr);
   } catch (error) {
     res.status(500).json(error);
@@ -549,8 +612,7 @@ app.post("/conferences/paper", async (req, res) => {
 
 app.get("/paper-get/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getPaper = await Paper.findById(id);
+    const getPaper = await Paper.findById(req.params.id);
     res.status(200).json(getPaper);
   } catch (error) {
     res.status(500).send(error);
@@ -559,8 +621,7 @@ app.get("/paper-get/:id", async (req, res) => {
 
 app.get("/committees-get/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getCommit = await Committee.findById(id);
+    const getCommit = await Committee.findById(req.params.id);
     res.status(200).json(getCommit);
   } catch (error) {
     res.status(500).send(error);
@@ -569,8 +630,7 @@ app.get("/committees-get/:id", async (req, res) => {
 
 app.post("/committees-assign/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getCommit = await Paper.findByIdAndUpdate(id, {
+    const getCommit = await Paper.findByIdAndUpdate(req.params.id, {
       $set: {
         committees: req.body.commit,
       },
@@ -583,8 +643,7 @@ app.post("/committees-assign/:id", async (req, res) => {
 
 app.post("/committees-update/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const getCommit = await Committee.findByIdAndUpdate(id, {
+    const getCommit = await Committee.findByIdAndUpdate(req.params.id, {
       $set: {
         fname: req.body.fname,
         lname: req.body.lname,
@@ -596,100 +655,7 @@ app.post("/committees-update/:id", async (req, res) => {
     res.status(500).send(error);
   }
 });
-/* app.get('/admin', async (req,res) => {
-    try {
-        const user = await User.find({});
-        res.status(200).json(user)
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}) */
 
-//Find by ID
-
-/* app.get('/product/:id', async (req,res) => {
-    try {
-        const {id} = req.params;
-        const product = await Product.findById(id);
-        res.status(200).json(product)
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}) */
-
-/* app.post('/product', async (req,res) => {
-    try{
-        const product = await Product.create(req.body)
-        res.status(200).json(product)
-    } catch (error) {
-        console.log(error)
-        res.status(500).json(error)
-    }
-}) */
-
-//test Create Page
-/* 
-app.post('/create/page', async (req, res) => {
-    try {
-        const page = await Page.create(req.body)
-        res.json(200).json(page)
-    } catch (error) {
-        console.log(error)
-        res.status(500).json(error)
-    }
-}) */
-
-//loging and register
-/* 
-app.post('/register', async (req,res) => {
-    try{
-        const check = await User.findOne({email: req.body.email})
-        if(check != req.body.mail && check != []){
-            res.status(200).send("Email is already existed")
-        }else {
-            const user = await User.create(req.body)
-            res.status(201).json(user)
-            console.log("User Create Sucess!")
-        }
-    } catch (error) {
-        res.status(500).send(error.errors)   
-    }
-}) */
-/* 
-app.get('/users', async (req,res) => {
-    try {
-        const user = await User.find({});
-        res.status(200).json(user)
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}) */
-
-/* app.post('/login', async (req,res) => {
-    try {
-        const check = await User.findOne({email:req.body.email})
-        if (!check) {
-            res.status(404).send("Not Found")
-        }
-        if (check.password === req.body.password) {
-            res.status(200).json({name:check.name, token: check.id})
-        } else {
-            res.status(400).send("Wrong password")
-        }
-    } catch (error) {
-        res.status(500)
-    }
-}) */
-
-/* app.get('/get-user/:id', async (req, res) => {
-    try {
-        const {id} = req.params
-        const getUser = await User.findById(id);
-        res.status(200).json(getUser)
-    } catch (error) {
-        res.status(500).json({message: error.message})
-    }
-}) */
 //-----------------------------upload file---------------------------
 
 app.post(
@@ -697,8 +663,7 @@ app.post(
   uploadImage.single("image"),
   async (req, res) => {
     try {
-      const confrId = req.params.id;
-      const getConfr = await Conferences.findByIdAndUpdate(confrId, {
+      const getConfr = await Conferences.findByIdAndUpdate(req.params.id, {
         $set: {
           logo: req.file.filename,
         },
@@ -712,8 +677,7 @@ app.post(
 
 app.post("/inv-speaker-update", async (req, res) => {
   try {
-    const invId = req.body.id;
-    const UpdateInv = await InvSpeaker.findByIdAndUpdate(invId, {
+    const UpdateInv = await InvSpeaker.findByIdAndUpdate(req.body.id, {
       $set: {
         name: req.body.name,
         desc: req.body.desc,
@@ -765,8 +729,7 @@ app.put(
   uploadPdf.single("file"),
   async (req, res) => {
     try {
-      const invId = req.body.id;
-      const UplaodFile = await InvSpeaker.findByIdAndUpdate(invId, {
+      const UplaodFile = await InvSpeaker.findByIdAndUpdate(req.body.id, {
         $set: {
           name: req.body.name,
           desc: req.body.desc,
@@ -788,12 +751,11 @@ app.put(
   uploadImage.array("image", 10),
   async (req, res) => {
     try {
-      const id = req.params.id;
       let fileName = [];
       for (let x in req.files) {
         fileName = [...fileName, req.files[x].filename];
       }
-      const uploadPartner = await Conferences.findByIdAndUpdate(id, {
+      const uploadPartner = await Conferences.findByIdAndUpdate(req.params.id, {
         $set: {
           partner: fileName,
         },
@@ -808,8 +770,7 @@ app.put(
 
 app.post("/venue-update/:id", async (req, res) => {
   try {
-    const id = req.params.id;
-    const uploadVenue = await Conferences.findByIdAndUpdate(id, {
+    const uploadVenue = await Conferences.findByIdAndUpdate(req.params.id, {
       $set: {
         venue: {
           name: req.body.name,
@@ -831,8 +792,7 @@ app.post(
   uploadImage.single("image"),
   async (req, res) => {
     try {
-      const id = req.params.id;
-      const uploadVenue = await Conferences.findByIdAndUpdate(id, {
+      const uploadVenue = await Conferences.findByIdAndUpdate(req.params.id, {
         $set: {
           venue: {
             name: req.body.name,
@@ -852,8 +812,7 @@ app.post(
 
 app.post("/schedule-upload/:id", uploadPdf.single("file"), async (req, res) => {
   try {
-    const id = req.params.id;
-    const upload = await Conferences.findByIdAndUpdate(id, {
+    const upload = await Conferences.findByIdAndUpdate(req.params.id, {
       $set: {
         schedule: req.file.filename,
       },
@@ -869,8 +828,7 @@ app.post(
   uploadImage.single("image"),
   async (req, res) => {
     try {
-      const id = req.params.id;
-      const upload = await Conferences.findByIdAndUpdate(id, {
+      const upload = await Conferences.findByIdAndUpdate(req.params.id, {
         $set: {
           brochure: req.file.filename,
         },
@@ -897,6 +855,18 @@ app.post("/upload/pdf", uploadPdf.single("file"), async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+//----------------------------Del------------------------------//
+
+app.delete('/delete/confr/:id', async (req, res) => {
+  try {
+    const del = await Conferences.deleteOne({_id:req.params.id})
+    res.status(202).json(del)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+})
+
 
 mongoose
   .connect("mongodb://127.0.0.1/paper_submition")
