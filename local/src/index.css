@@ -19,19 +19,51 @@ code {
   --bs-body-font-family: 'Noto Sans Thai', 'sans-serif' !important;
 }
 
-.form-control {
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-ion-icon {
-  font-size: 24px;
-}
-
 .tabs-text .nav-item .nav-link {
   color: #000;
 }
 
-.nav-item .nav-link {
-  color: #FFF;
+textarea {
+  min-height: 100px !important;
+}
+
+ion-icon {
+  display: inline-block;
+  font-size: 24px;
+  vertical-align: middle;
+ }
+
+.form-floating {
+  margin-bottom: 16px;
+}
+
+.text-danger:active {
+  background-color: red !important;
+  color: #FFF !important;
+}
+
+.table-ell td {
+  max-width: 600px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main {
+  transition: all .2s ease-out;
+}
+
+.el-text {
+  width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+ 
+.dropdown-toggle::after {
+  display: none !important; 
+}
+
+.dropstart .dropdown-toggle::before {
+  display: none !important;
 }

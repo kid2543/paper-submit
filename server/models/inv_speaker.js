@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Conferences = require('../models/conferences')
 
 const invSpeakerSchema = mongoose.Schema(
     {
@@ -17,8 +18,9 @@ const invSpeakerSchema = mongoose.Schema(
         cv:{
             type:String,
         },
-        confr_code:{
-            type:String,
+        confr_id:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: Conferences
         },
     }
 )

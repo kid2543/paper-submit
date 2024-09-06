@@ -1,12 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '../components/Card'
+import bookCover from '../asset/book.png'
+import dayjs from 'dayjs'
+import axios from 'axios'
+import { useParams } from 'react-router-dom'
+
+const mockPaper = {
+  title: "ชื่อบทความ",
+  desc: "รายละเอียดบทความ",
+  create_date: Date("12-12-2024"),
+  image: bookCover,
+}
 
 function PaperDetail() {
+
+  const api = process.env.REACT_APP_API_URL
+  const {id} = useParams()
+
+  const [paper, setPaper] = useState({})
+
+  const fethPaper = async () => {
+    try {
+      const res = await axios.get(api + "/get/paper/" + id)
+      setPaper(res.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    fethPaper()
+  },[])
+
   return (
-    <div className='container-fluid my-4'>
-        <h2 className='text-center'>Vol. 16 No. 1 (2024): Journal of liberal Arts , Prince of Songkla University (In progress)</h2>
-        <h6 className='text-center'>วันที่เผยแพร่: 12/12/12</h6>
-        <Card title="เกี่ยวกับบทความ" text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." />
+    <div className='container py-3'>
+      <section className='my-4'>
+        <h2>{paper?.title}</h2>
+        <p className='text-muted'><ion-icon name="time-outline"></ion-icon>เผยแพร่เมื่อ {dayjs(paper?.create_date).format("DD/MM/YYYY")}</p>
+      </section>
+      <section className='container-fluid my-4'>
+        <div className='row'>
+          <div className='col-lg-4 my-3'>
+            <img src={mockPaper.image} alt='cover-book' height={300} width={200} />
+          </div>
+          <div className='col-lg-8 my-3'>
+            <button type='button' className='btn btn-primary' onClick={() => window.open(api + "/pdf/" + paper?.paper_file)}>ดูบทความฉบับเต็ม</button>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

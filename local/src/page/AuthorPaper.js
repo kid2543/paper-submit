@@ -1,53 +1,69 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import PaperStatus from '../components/PaperStatus'
+import PaymentStatus from '../components/PaymentStatus'
 
 function AuthorPaper() {
 
-    const navigate = useNavigate();
+    const {id} = useParams()
+    const api = process.env.REACT_APP_API_URL
+    const navigate = useNavigate()
+
+    const [data, setData] = useState({})
+
+    const fethPaper = async () => {
+        try {
+            const res = await axios.get(api + "/get/paper/" + id)
+            setData(res.data)
+            console.log("paper_data:",res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const regisDetail = () => {
+        localStorage.setItem("paper_id", data._id)
+        navigate("/regis/" + data.confr_code?._id)
+    }
+
+    useEffect(() => {
+        fethPaper()
+    },[])
 
     return (
-        <div className='container-fluid my-4'>
-            <div className='card'>
-                <div className='card-header'>
-                    <h4>รายละเอียดผู้ส่งบทความ</h4>
-                </div>
-                <div className='card-body d-flex'>
-                    <div className='me-4'>
-                        <ion-icon name="person-outline"></ion-icon>
-                    </div>
-                    <div>
-                        <span className='card-title'>อาทิตย์ พิทักษ์ช่วงชู</span><br />
-                        <span className='card-subtitle mb-2 text-muted'>arthit@gmail.com</span>
-                    </div>
-                </div>
-                <div className='card-header'>
-                    <h4>ประเภทการส่งบทความ</h4>
-                </div>
-                <div className='card-body'>
-                    <span className='card-title'>คอมพิวเตอร์</span>
-                </div>
-                <div className='card-header'>
-                    <h4>รายละเอียดบทความ</h4>
-                </div>
-                <ul className='list-group list-group-flush'>
-                    <li className='list-group-item'>Code: รหัสบทความ</li>
-                    <li className='list-group-item'>File: File บทความ</li>
-                    <li className='list-group-item'>Status: สถานะบทความ</li>
-                    <li className='list-group-item'>Title: ชื่อบทความ</li>
-                    <li className='list-group-item'>ค่าธรรมเนียมการลงทะเบียน: early bird 2000:regular 2500</li>
-                    <li className='list-group-item'>ผลลัพธ์บทความ: สถานะบทความ</li>
-                    <li className='list-group-item'><button onClick={() => navigate('/author/result/1')} className='btn btn-secondary'>ดูข้อแนะนำ</button></li>
-                </ul>
+        <div className='container'>
+            <div>
+                <h4 className='fw-bold mb-3'>รายละเอียดผู้ส่งบทความ</h4>
+                <p>ชื่อ: {data?.owner?.fname} {data?.owner?.lname}</p>
+                <p>Email: {data?.owner?.email}</p>
             </div>
-            <form className='form'>
-                <label className='mt-3'>ส่งบทความ</label>
-                <input className='form-control' type='file' />
-                <span className='form-text'>(กรณีผ่านแล้วมีการแก้ไข)</span>
-                <div className='mt-3'>
-                    <button type='submit' className='btn btn-primary me-2' onClick={() => alert("Submit")}>Submit</button>
-                    <button type='button' className='btn btn-secondary' onClick={() => navigate(-1)}>Back</button>
-                </div>
-            </form>
+            <hr/>
+            <div>
+                <h4 className='fw-bold mb-3'>ประเภทการลงทะเบียน</h4>
+                <p>Regular: <PaymentStatus status={data.payment_status} /></p>
+                <p>หลักฐานการชำระเงิน: {data.payment_image ? <a href={api + "/image/" + data.payment_image} target='_blank'>ดูรูป</a> : "ไม่พบข้อมูล"}</p>
+                {data.status === 2 || data.status === 3 ? (
+                    <div>
+                        <button type='button' onClick={regisDetail} className='btn btn-primary'>ลงทะเบียน</button>
+                    </div>
+                ): null}
+            </div>
+            <hr/>
+            <div>
+                <h5>รายละเอียดบทความ</h5>
+                <p>Paper Code: {data?.paper_code}</p>
+                <p>Title: {data?.title}</p>
+                <p>Topic: {data?.cate_code?.name}</p>
+                <p>Conferences Code: {data?.confr_code?.confr_code}</p>
+                <p>Conferences name: {data?.confr_code?.title}</p>
+                <p>Publication Option: {data?.publication?.name}</p>
+                <p>File: <button type='button' onClick={() => window.open(api + "/pdf/" + data?.paper_file, "blank")} className='btn btn-primary'>{data?.paper_file}</button></p>
+                <p>Status: <PaperStatus status={data?.status} /></p>
+                <p>Result: <PaperStatus status={data?.result} /></p>
+                <button type='button' onClick={() => navigate("/author/result/" + id)} className='btn btn-secondary'>ดูผลตรวจจากกรรมการ</button>
+            </div>
+            <hr/>
         </div>
     )
 }

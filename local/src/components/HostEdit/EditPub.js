@@ -1,0 +1,156 @@
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+
+const api = process.env.REACT_APP_API_URL
+
+function EditPub() {
+
+    const [pub, setPub] = useState([])
+    const [pubList, setPubList] = useState([])
+    const [pubChecked, setPubChecked] = useState([])
+
+    const id = sessionStorage.getItem("confr")
+
+
+    const fethPub = async () => {
+        try {
+            const res = await axios.get(api + "/all/pub")
+            setPub(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleCheck = (e) => {
+        if (e.target.checked) {
+            setPubList([...pubList, e.target.value])
+        } else {
+            setPubList(pubList.filter((item) => item !== e.target.value))
+        }
+    }
+
+    const fethConfrPub = async () => {
+        try {
+            const res = await axios.get(api + "/get/pub/" + id)
+            setPubChecked(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const searchPub = async (e) => {
+        e.preventDefault()
+        try {
+          if (e.target.pub_name.value) {
+            const res = await axios.get(api + "/search/pub/" + e.target.pub_name.value)
+            setPub(res.data)
+          } else {
+            fethPub()
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+    const savePub = async (e) => {
+        e.preventDefault()
+        try {
+            await axios.patch(api + "/update/conferences/" + id, {
+                publication: pubList,
+            })
+            alert("เพิ่มข้อมูลสำเร็จ")
+        } catch (error) {
+            console.log(error)
+            alert("เกิดข้อผิดพลาด: " + error.status)
+        } finally {
+            fethConfrPub()
+        }
+    }
+
+    useEffect(() => {
+        fethPub()
+        fethConfrPub()
+    }, [])
+    
+    if(!id || id === "undefined") {
+        return (
+            <div>
+                <button className='btn btn-primary'>สร้างงานประชุม</button>
+            </div>
+        )
+    }
+
+    return (
+        <div className='container my-5'>
+            <div>
+                <h4 className='fw-bold mb-5'>วารสาร</h4>
+                <div>
+                    <div>
+                        <p>
+                            วารสารที่เลือกตอนนี้:
+                        </p>
+                        {pubChecked.length > 0 ? (
+                            <ul>
+                                {pubChecked?.map((item) => (
+                                    <li key={item._id} className='mb-3'>
+                                        {item.en_name} ({item.th_name}) <br />
+                                        <small className='text-muted'>สาขา: {item.branch}</small>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : <p>ไม่พบข้อมูล</p>}
+
+                    </div>
+                    <div className='d-md-flex justify-content-between mb-3'>
+                        <form onSubmit={searchPub} className='col-md-4 mb-3'>
+                            <div className='input-group'>
+                                <input name='pub_name' type='search' className='form-control' placeholder='ค้นหาจากชื่อวารสาร EN' />
+                                <button type='submit' className='btn btn-outline-secondary btn-sm'>
+                                    <ion-icon name="search"></ion-icon>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className='table-responsive'>
+                        {pub.length > 0 ? (
+                            <table className='table table-hover text-nowrap'>
+                                <thead className='table-secondary'>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ชื่อภาษาไทย</th>
+                                        <th>ชื่อภาษาอังกฤษ</th>
+                                        <th>สาขา</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pub?.map((item) => (
+                                        <tr key={item._id}>
+                                            <td>
+                                                <input onChange={handleCheck} type='checkbox' value={item._id} />
+                                            </td>
+                                            <td>
+                                                {item.th_name}
+                                            </td>
+                                            <td>
+                                                {item.en_name}
+                                            </td>
+                                            <td>
+                                                {item.branch}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : <p className='text-center'>ไม่พบวารสาร</p>}
+
+                        <div>
+                            <button type='button' onClick={savePub} className='btn btn-success'>บันทึก</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default EditPub

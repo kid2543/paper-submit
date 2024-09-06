@@ -1,17 +1,23 @@
-import React from 'react'
-import Navbar from './Navbar'
-import Card from './Card'
-import Footer from './Footer'
-import TabsEx from './TabsEx'
+import React, { useState } from 'react'
+import SideBar from './SideBar'
+
+
 
 function TestComponent() {
+
+
+
   return (
-    <>
-     <Navbar />
-     <Card />   
-     <TabsEx />
-     <Footer />
-    </>
+    <section>
+      <div className='row main'>
+        <div className='col-2 col-md-4 col-lg-2'>
+          <SideBar />
+        </div>
+        <div className='col p-3'>
+          Content
+        </div>
+      </div>
+    </section>
   )
 }
 

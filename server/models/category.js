@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
+const Conferences = require('../models/conferences')
+const User = require('../models/user')
 
 const categorySchema = mongoose.Schema(
     {
         category_code : {
             type: String,
-            required: true
+            required: true,
         },
         name: {
             type:String,
@@ -16,16 +18,21 @@ const categorySchema = mongoose.Schema(
         desc: {
             type: String
         },
-        confr_code : {
-            type: String,
+        confr_id : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: Conferences,
             required : true
         },
-        topic : {
-            type : String,
-            required:true
-        }
+        reviewer_list: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: User
+            }
+        ],
     }
 )
+
+categorySchema.index({confr_id: 1, name: 'text'})
 
 const Category = mongoose.model("category",categorySchema)
 

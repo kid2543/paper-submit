@@ -1,17 +1,17 @@
 import React from 'react'
-import Navbar from './Navbar'
+import NavbarComponent from './Navbar'
 import Footer from './Footer'
 
 function Layout({ children }) {
     return (
         <>
             <div>
-                <Navbar />
+                <NavbarComponent />
             </div>
-            <main>
+            <main style={{minHeight: "100vh"}}>
                 {children}
             </main>
-            <div>
+            <div className='container'>
                 <Footer />
             </div>
         </>

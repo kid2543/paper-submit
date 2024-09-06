@@ -1,35 +1,111 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import LoadingPage from '../components/LoadingPage'
+
+const api = process.env.REACT_APP_API_URL
 
 function Committee() {
 
-    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true)
+    const [paper, setPaper] = useState([])
+
+    const navigate = useNavigate()
+
+
+    const reviewStatus = (status) => {
+        switch(status) {
+            case 0 : return <span className="badge rounded-pill bg-primary">รอดำเนินการ</span>
+            case 1 : return <span className="badge rounded-pill bg-success">ตรวจแล้ว</span>
+            case 2 : return <span className="badge rounded-pill bg-danger">ยกเลิก</span>
+            default : return <span className="badge rounded-pill bg-secondary">ไม่ระบุ</span>
+        }
+    }
+
+    const handleReviewStatus = (status, id) => {
+        switch(status) {
+            case 0 : return <button onClick={() => navigate("/committee/review/" + id)} type='button' className='btn btn-primary'>ให้คะแนน</button>
+            case 1 : return <button onClick={() => navigate("/committee/review/result/" + id)} type='button' className='btn btn-primary'>ดูการให้คะแนน</button>
+            case 2 : return "-"
+            default : return "ไม่ระบุ"
+        }
+    }
+
+    useEffect(() => {
+
+        const id = sessionStorage.getItem("token")
+
+        const fethData = async () => {
+            setLoading(true)
+            try {
+                const res = await axios.get(api + "/get/review/" + id)
+                console.log("paper_data: ", res.data)
+                setPaper(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        setTimeout(() => {
+            setLoading(false)
+        }, 1000)
+
+        fethData()
+    }, [])
+
+    if(loading) {
+        return (
+            <LoadingPage />
+        )
+    }
 
     return (
-        <div className='container-fluid my-4'>
-            <h2>รายการบทความ</h2>
-            <table className='table'>
-                <thead className='table-dark'>
-                    <tr>
-                        <th>ลำดับ</th>
-                        <th>ชื่อบทความ</th>
-                        <th>ประเภทบทความ</th>
-                        <th>วันที่ แก้ไข/ส่ง ล่าสุด</th>
-                        <th>การจัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>ชื่อบทความ...</td>
-                        <td>วิทยาศาสตร์</td>
-                        <td>12/12/2023</td>
-                        <td>
-                            <button className='btn btn-outline-primary' onClick={() => navigate('/committee/review/1')}>ตรวจ</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div className='container my-5'>
+            <div className='mb-5'>
+                <h4>ตรวจบทความ</h4>
+            </div>
+            <section>
+                    <div className='mb-5'>
+                        <p className='text-muted'>รายการบทความ</p>
+                        {paper.length > 0 ? (
+                            <div>
+                                <div className='table-responsive'>
+                                    <table className='table text-nowrap table-hover'>
+                                        <thead className='fw-bold'>
+                                            <tr>
+                                                <th>รหัสบทความ</th>
+                                                <th>ชื่อบทความ</th>
+                                                <th>ไฟล์บทความ</th>
+                                                <th>สถานะ</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {paper?.map((paperList) => (
+                                                <tr key={paperList._id}>
+                                                    <td>{paperList.paper_id?.paper_code}</td>
+                                                    <td>{paperList.paper_id?.title}</td>
+                                                    <td>
+                                                        {paperList.paper_id?.close_name_file ? (
+                                                            <a href={api + "/pdf/" + paperList.paper_id?.close_name_file} target='_blank' rel='noreferrer'>{paperList.paper_id?.paper_code}</a>
+                                                        ) : "-"}
+                                                    </td>
+                                                    <td>
+                                                        {reviewStatus(paperList.status)}
+                                                    </td>
+                                                    <td>
+                                                        {handleReviewStatus(paperList.status, paperList._id)}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ) : "ไม่พบรายการที่ต้องตรวจ"}
+
+                    </div>
+                </section>
         </div>
     )
 }

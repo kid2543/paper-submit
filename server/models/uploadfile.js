@@ -1,9 +1,17 @@
 const mongoose = require('mongoose')
+const Conferences = require("../models/conferences")
 
 const uploadSchema = mongoose.Schema(
     {
-        image : {
+        name : {
             type: String
+        },
+        file: {
+            type: String
+        },
+        confr_id : {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: Conferences
         }
     }
 )
