@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
 import axios from 'axios'
 import Modal from 'react-bootstrap/Modal';
+import ConfirmModal from '../components/ConfirmModal';
+import SearchItemNotFound from '../components/SearchItemNotFound';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const api = process.env.REACT_APP_API_URL
 
@@ -11,6 +13,13 @@ function HostCateList() {
     const [searchData, setSearchData] = useState([])
     const [id, setId] = useState("")
     const [show, setShow] = useState(false);
+    const [createCateData, setCreateCateData] = useState({
+        cate_name: "",
+        cate_code: "",
+        cate_desc: "",
+        cate_icon: null
+    })
+    const [showCM, setShowCM] = useState(false)
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -19,7 +28,9 @@ function HostCateList() {
         if (window.confirm("ต้องการจะลบหรือไม่ ?")) {
             try {
                 const del = await axios.delete(api + "/delete/cate/" + cate_id + "/" + icon)
-                setData(data.filter((item) => item._id !== cate_id))
+                let filterData = data.filter((item) => item._id !== cate_id)
+                setData(filterData)
+                setSearchData(filterData)
                 alert("ลบผู้ใช้งานสำเร็จ: " + del.data)
             } catch (error) {
                 console.log(error)
@@ -41,9 +52,32 @@ function HostCateList() {
         }
     }
 
+    const handleChangeCreate = (e) => {
+        setCreateCateData({ ...createCateData, [e.target.name]: e.target.value })
+    }
+
+    const handleCreate = async (e) => {
+        e.preventDefault()
+        try {
+            const formData = new FormData()
+            formData.append("name", createCateData.cate_name)
+            formData.append("cate_code", createCateData.cate_code)
+            formData.append("desc", createCateData.cate_desc)
+            formData.append("confr_id", id)
+            formData.append("image", createCateData.cate_icon)
+            const res = await axios.post(api + "/create/category", formData)
+            setShowCM(true)
+            handleClose()
+            setData(prev => [res.data, ...prev])
+            setSearchData(prev => [res.data, ...prev])
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
 
-        const confr_id = sessionStorage.getItem("confr")
+        const confr_id = sessionStorage.getItem("host_confr")
         setId(confr_id)
 
         const fethCate = async () => {
@@ -57,18 +91,12 @@ function HostCateList() {
         }
 
         fethCate()
-
-        if (!confr_id || confr_id === "undefined") {
-            return (
-                <div>
-                    <button className='btn btn-primary'>สร้างงานประชุม</button>
-                </div>
-            )
-        }
     }, [])
+
 
     return (
         <div className='container my-5'>
+            <ConfirmModal show={showCM} setShow={setShowCM} noReturn={true} />
             <div className='mb-3'>
                 <h4 className='m-0 fw-bold'>หัวข้องานประชุม</h4>
             </div>
@@ -86,23 +114,23 @@ function HostCateList() {
                         <Modal.Header closeButton>
                             <Modal.Title>Create Category</Modal.Title>
                         </Modal.Header>
-                        <form>
+                        <form onSubmit={handleCreate}>
                             <Modal.Body className='row g-3 align-items-center'>
                                 <div className='col-12'>
-                                    <label className='col-form-label'>รหัสงานประชุม</label>
-                                    <input className='form-control' />
+                                    <label className='col-form-label'>รหัสหัวข้อ</label>
+                                    <input className='form-control' name='cate_code' onChange={handleChangeCreate} />
                                 </div>
                                 <div className='col-12'>
                                     <label className='col-form-label'>ชื่อหัวข้อ</label>
-                                    <input className='form-control' />
+                                    <input className='form-control' name='cate_name' onChange={handleChangeCreate} />
                                 </div>
                                 <div className='col-12'>
                                     <label className='col-form-label'>รายละเอียด</label>
-                                    <input className='form-control' placeholder='desc' />
+                                    <textarea className='form-control' name='cate_desc' onChange={handleChangeCreate} />
                                 </div>
                                 <div className='col-12'>
                                     <label className='col-form-label'>รูป</label>
-                                    <input className='form-control' type='file' />
+                                    <input className='form-control' type='file' name='cate_icon' onChange={e => setCreateCateData({ ...createCateData, cate_icon: e.target.files[0] })} />
                                 </div>
                             </Modal.Body>
                             <Modal.Footer>
@@ -115,7 +143,7 @@ function HostCateList() {
                             </Modal.Footer>
                         </form>
                     </Modal>
-                    <button type='button' onClick={handleShow} className='btn btn-primary'>Create New +</button>
+                    <button type='button' onClick={handleShow} className='btn btn-outline-primary btn-sm'><ion-icon name="add-circle-outline"></ion-icon> New</button>
                 </div>
             </div>
             {data.length > 0 ? (
@@ -141,8 +169,22 @@ function HostCateList() {
                                     <td>{cate.reviewer_list.length}</td>
                                     <td>
                                         <div className='d-flex'>
-                                            <NavLink to={cate._id}><ion-icon name="create"></ion-icon></NavLink>
-                                            <button type='button' onClick={() => deleteCate(cate._id, cate.icon)} className='btn btn-sm text-decoration-none text-danger'><ion-icon name="trash-bin"></ion-icon></button>
+                                            <Dropdown drop='down-centered'>
+                                                <Dropdown.Toggle variant="btn">
+                                                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                                </Dropdown.Toggle>
+
+                                                <Dropdown.Menu>
+                                                    <Dropdown.Item href={"/host/cate/" + cate._id}>
+                                                        <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
+                                                        Edit
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => deleteCate(cate._id, cate.icon)}>
+                                                        <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                        Delete
+                                                    </Dropdown.Item>
+                                                </Dropdown.Menu>
+                                            </Dropdown>
                                         </div>
                                     </td>
                                 </tr>
@@ -150,11 +192,7 @@ function HostCateList() {
                         </tbody>
                     </table>
                 </div>
-            ) : (
-                <div className='text-center'>
-                    ไม่พบข้อมูล
-                </div>
-            )}
+            ) : <SearchItemNotFound />}
         </div>
     )
 }

@@ -22,7 +22,6 @@ function AdminSignIn() {
                 sessionStorage.setItem("lname", res.data.lname)
                 sessionStorage.setItem("token", res.data.token)
                 sessionStorage.setItem("role", res.data.role)
-                sessionStorage.setItem("confr", res.data.confr_id)
                 navigate("/admin")
             } catch (error) {
                 console.log(error)

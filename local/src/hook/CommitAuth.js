@@ -4,8 +4,8 @@ import CloseIcon from "../asset/close.png"
 
 function CommitAuth({ children }) {
 
-  const role = sessionStorage.getItem("role")
   const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState("")
   const navigate = useNavigate()
 
   const SignOut = () => {
@@ -14,14 +14,17 @@ function CommitAuth({ children }) {
   }
 
   useEffect(() => {
-    if (!role) {
-      navigate("/sign-in")
+
+  const Role = sessionStorage.getItem("role")
+  setRole(Role)
+    if (!Role) {
+      window.location.href("/sign-in")
     }
     setLoading(false)
   }, [])
 
   if (!loading) {
-    if (role === "Committee") {
+    if (role === "committee") {
       return (
         <div>
           {children}

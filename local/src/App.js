@@ -1,5 +1,4 @@
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Route, Routes } from 'react-router-dom'
 
@@ -22,7 +21,6 @@ import Author from './page/Author';
 import HostEdit from './page/HostEdit';
 import Committee from './page/Committee';
 import Review from './page/Review';
-import HostPaper from './page/HostPaper';
 import HostAssign from './page/HostAssign'
 import HostReview from './page/HostReview';
 import HostOverAll from './page/HostOverAll';
@@ -53,9 +51,7 @@ import HostUpdateCommittee from './page/HostUpdateCommittee';
 import RegisConfr from './page/RegisConfr';
 import Admin from './page/Admin';
 import AdminLayout from './components/AdminLayout';
-import AdminCreateHost from './page/AdminCreateHost';
 import AdminUserDetail from './page/AdminUserDetail';
-import AdminPub from './page/AdminPub';
 import AdminAuth from './hook/AdminAuth';
 import HostEditCate from './page/HostEditCate';
 import HostDashboard from './page/HostDashboard';
@@ -63,6 +59,11 @@ import HostCateList from './page/HostCateList';
 import HostCommitList from './page/HostCommitList';
 import EditPub from './components/HostEdit/EditPub';
 import ReviewResult from './page/ReviewResult';
+import Host from './page/Host'
+import HostDashLayout from './components/HostDashLayout';
+import ConfrPub from './page/ConfrPub';
+import ConfrPartner from './page/ConfrPartner';
+import AdminEditConfr from './page/AdminEditConfr';
 
 function App() {
 
@@ -156,6 +157,18 @@ function App() {
           </ConfrLayout>
         }
         />
+        <Route path='/confr/:id/pub' element={
+          <ConfrLayout>
+            <ConfrPub />
+          </ConfrLayout>
+        }
+        />
+        <Route path='/confr/:id/partner' element={
+          <ConfrLayout>
+            <ConfrPartner />
+          </ConfrLayout>
+        }
+        />
         <Route path='/paper' element={
           <Layout>
             <Paper />
@@ -184,8 +197,15 @@ function App() {
         {/* host */}
         <Route path='/host' element={
           <HostAuth>
-            <HostLayout>
+            <HostDashLayout>
               <HostDashboard />
+            </HostDashLayout>
+          </HostAuth>
+        } />
+        <Route path='/host/confr' element={
+          <HostAuth>
+            <HostLayout>
+              <Host />
             </HostLayout>
           </HostAuth>
         } />
@@ -228,13 +248,6 @@ function App() {
           <HostAuth>
             <HostLayout>
               <HostEdit />
-            </HostLayout>
-          </HostAuth>
-        } />
-        <Route path='/host/paper/:id' element={
-          <HostAuth>
-            <HostLayout>
-              <HostPaper />
             </HostLayout>
           </HostAuth>
         } />
@@ -329,13 +342,6 @@ function App() {
             </AdminLayout>
           </AdminAuth>
         } />
-        <Route path='/admin/create' element={
-          <AdminAuth>
-            <AdminLayout>
-              <AdminCreateHost />
-            </AdminLayout>
-          </AdminAuth>
-        } />
         <Route path='/user/:id' element={
           <AdminAuth>
             <AdminLayout>
@@ -343,10 +349,10 @@ function App() {
             </AdminLayout>
           </AdminAuth>
         } />
-        <Route path='/admin/publication' element={
+        <Route path='/admin/confr/:id' element={
           <AdminAuth>
             <AdminLayout>
-              <AdminPub />
+                <AdminEditConfr />
             </AdminLayout>
           </AdminAuth>
         } />

@@ -10,37 +10,33 @@ import NotificationCard from './NotificationCard';
 
 const api = process.env.REACT_APP_API_URL
 
-
+const SignOut = () => {
+    if (window.confirm("ต้องการออกจากระบบหรือไม่?")) {
+        sessionStorage.clear()
+        localStorage.clear()
+        window.location.href = '/'
+    }
+}
 
 function NavbarComponent() {
 
 
     const token = sessionStorage.getItem('token')
 
-    function signOut() {
-        if (window.confirm("ต้องการออกจากระบบหรือไม่ ?")) {
-            sessionStorage.clear()
-            localStorage.clear()
-            window.location.reload()
-        } else {
-            return false
-        }
-    }
-
-    console.log("pathname", window.location.pathname)
-
     return (
-        <Navbar variant="dark" bg="dark" expand="lg">
+        <Navbar variant="light" bg="light" expand="lg" className='shadow-sm fixed-top w-100'>
             <Container>
                 <Navbar.Brand href="/">
                     <img className='me-2' src={Logo} alt='paper-submission' height={32} width={32} />
-                    PAPERSS
+                    <span className='fw-bold'>PAPERSS</span>
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbar-dark-example" />
-                <Navbar.Collapse id="navbar-dark-example" className='justify-content-end'>
+                <Navbar.Collapse id="navbar-dark-example" className='justify-content-between'>
                     <Nav variant='underline' activeKey={window.location.pathname}>
                         <Nav.Link href="/confr">งานประชุม</Nav.Link>
                         <Nav.Link href="/paper">บทความ</Nav.Link>
+                    </Nav>
+                    <div>
                         {token ? (
                             <NavDropdown
                                 id="nav-dropdown-dark-example"
@@ -53,7 +49,7 @@ function NavbarComponent() {
                                     Setting
                                 </NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item type='button' onClick={signOut}>
+                                <NavDropdown.Item type='button' onClick={SignOut}>
                                     <span className='me-3'><ion-icon name="log-out-outline"></ion-icon></span>
                                     Log out
                                 </NavDropdown.Item>
@@ -63,7 +59,7 @@ function NavbarComponent() {
                                 <button className='btn btn-primary'>เข้าสู่ระบบ</button>
                             </a>
                         )}
-                    </Nav>
+                    </div>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
@@ -72,30 +68,29 @@ function NavbarComponent() {
 
 export default NavbarComponent
 
-export function NavbarConfr({ id }) {
+export function NavbarConfr({ id, name }) {
 
     return (
-        <Navbar expand="lg" bg='light' className='bg-body-tertiary shadow p-3'>
-            <Container>
+        <Navbar expand="lg" bg='light' variant='light'>
+            <Container fluid="md">
                 <Navbar.Brand>
-                    <a href={"/confr/" + id} className='btn btn-outline-primary'>หน้าแรก</a>
+                    <a href={"/confr/" + id} className='btn btn-outline-primary'>{name}</a>
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
+                    <Nav className="me-auto" activeKey={window.location.pathname} >
                         <Nav.Link href={"/confr/" + id + "/committees"}>รายชื่อกรรมการ</Nav.Link>
                         <Nav.Link href={"/confr/" + id + "/template"}>เทมเพลท</Nav.Link>
-                        <Nav.Link href={"/confr/" + id + "/guideline"}>แนวทาง</Nav.Link>
-                        <NavDropdown className='text-dark' title="รายละเอียดเพิ่มเติม" id="basic-nav-dropdown">
+                        <Nav.Link href={"/confr/" + id + "/guideline"}>แนวทางการเข้าร่วมงานประชุม</Nav.Link>
+                        <NavDropdown className='text-dark' title={<span>รายละเอียดเพิ่มเติม <ion-icon name="chevron-down-outline"></ion-icon></span>} id="basic-nav-dropdown" data-bs-theme="dark">
                             <NavDropdown.Item href={"/confr/" + id + "/present-guideline"}>แนวทางการนำเสนอ</NavDropdown.Item>
                             <NavDropdown.Item href={"/confr/" + id + "/inv-speaker"}>พิธีกร</NavDropdown.Item>
                             <NavDropdown.Item href={"/confr/" + id + "/registration"}>
                                 การลงทะเบียน
                             </NavDropdown.Item>
                             <NavDropdown.Item href={"/confr/" + id + "/venue"}>สถานที่จัดงานประชุม</NavDropdown.Item>
-                            <NavDropdown.Item href="#pub">วารสาร</NavDropdown.Item>
-                            <NavDropdown.Item href="#partner">ผู้สนับสนุน</NavDropdown.Item>
-                            <NavDropdown.Divider />
+                            <NavDropdown.Item href={"/confr/" + id + "/pub"}>วารสาร</NavDropdown.Item>
+                            <NavDropdown.Item href={"/confr/" + id + "/partner"}>ผู้สนับสนุน</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
@@ -107,16 +102,7 @@ export function NavbarConfr({ id }) {
 export function NavbarAuthor() {
 
     const [noti, setNoti] = useState([])
-
-    console.log("noti", noti)
-
-    const signOut = () => {
-        if (window.confirm("ต้องการออกจากระบบหรือไม่?")) {
-            sessionStorage.clear()
-            localStorage.clear()
-            window.location.reload()
-        }
-    }
+    const [newNoti, setNewNoti] = useState([])
 
     useEffect(() => {
 
@@ -125,10 +111,15 @@ export function NavbarAuthor() {
         const fethNoti = async () => {
             try {
                 const res = await axios.get(api + '/get/notification/' + token)
-                console.log(res)
                 let arr = res.data
-                arr.sort((a, b) => new Date(a.time) - new Date(b.time))
-                setNoti(arr)
+                setNoti(arr.sort((a, b) => new Date(a.time) - new Date(b.time)))
+                let newItem = []
+                for (let i in arr) {
+                    if (arr[i].read_status === false) {
+                        newItem.push(arr[i])
+                    }
+                }
+                setNewNoti(newItem)
             } catch (error) {
                 console.log(error)
             }
@@ -136,16 +127,44 @@ export function NavbarAuthor() {
         fethNoti()
     }, [])
 
+    const readNotification = async () => {
+        if (newNoti.length > 0) {
+            try {
+                const res = await axios.patch(api + "/update/notification/status/" + sessionStorage.getItem("token"))
+                console.log("notification update: ", res)
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            return false
+        }
+    }
+
+    const handleClearNotification = async () => {
+        if (window.confirm("ต้องการล้างข้อมูลการแจ้งเตือนหรือไม่")) {
+            try {
+                await axios.delete(api + "/clear/notification/" + sessionStorage.getItem("token"))
+                setNoti([])
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
+
+    const handleDismiss = (notiId) => {
+        setNoti(noti.filter((item) => item._id !== notiId))
+    }
+
     return (
-        <Navbar variant="dark" bg="dark" expand="lg">
+        <Navbar variant="light" bg="light" expand="lg" className='shadow-sm py-3'>
             <Container>
                 <Navbar.Brand href="/">
                     <img className='me-2' src={Logo} alt='paper-submission' height={32} width={32} />
-                    PAPERSS
+                    <span className='fw-bold'>PAPERSS</span>
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="navbar-dark-example" />
                 <Navbar.Collapse id="navbar-dark-example" className='justify-content-end'>
-                    <Nav>
+                    <Nav activeKey={window.location.pathname}>
                         <Nav.Link href="/author">บทความ</Nav.Link>
                         <Nav.Link href="/confr">ส่งบทความ</Nav.Link>
                         <NavDropdown
@@ -157,7 +176,7 @@ export function NavbarAuthor() {
                             }
                             menuVariant="dark"
                             drop='start'
-
+                            onClick={readNotification}
                         >
                             <div className='p-3 overflow-auto' style={{ height: "560px", minWidth: "400px" }}>
                                 <div className='row align-items-center'>
@@ -165,7 +184,7 @@ export function NavbarAuthor() {
                                         แจ้งเตือน
                                     </div>
                                     <div className='col-6 text-end'>
-                                        <button type='button' className='btn btn-link text-decoration-none text-secondary' disabled={noti.length < 1}>Mark all read</button>
+                                        <button type='button' onClick={handleClearNotification} className='btn btn-sm btn-outline-info' disabled={noti.length < 1}>Clear all</button>
                                     </div>
                                 </div>
                                 <hr />
@@ -173,7 +192,14 @@ export function NavbarAuthor() {
                                     {noti.length > 0 ? (
                                         <>
                                             {noti?.map((item, index) => (
-                                                <NotificationCard key={index} header={item.header} desc={item.form} date={item.time} />
+                                                <NotificationCard
+                                                    key={index}
+                                                    header={item.header}
+                                                    desc={item.form}
+                                                    date={item.time}
+                                                    status={item.read_status}
+                                                    handleDelNoti={handleDismiss}
+                                                />
                                             ))}
                                         </>
                                     ) : (
@@ -196,7 +222,7 @@ export function NavbarAuthor() {
                                 Setting
                             </NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item type='button' onClick={signOut}>
+                            <NavDropdown.Item type='button' onClick={SignOut}>
                                 <span className='me-3'>
                                     <ion-icon name="log-out-outline"></ion-icon>
                                 </span>
@@ -212,12 +238,8 @@ export function NavbarAuthor() {
 
 export function NavbarCommit() {
 
-    const signOut = () => {
-        console.log("sign out")
-    }
-
     return (
-        <Navbar variant='dark' bg='dark' expand='lg'>
+        <Navbar variant='light' bg='light' expand='lg' className='shadow-sm py-3'>
             <Container>
                 <Navbar.Brand href="/"><img src={Logo} alt='paper submit' height={48} width={48} /> <span className='fw-bold'>PAPERSS</span></Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -237,7 +259,7 @@ export function NavbarCommit() {
                                 Setting
                             </NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item type='button' onClick={signOut}>
+                            <NavDropdown.Item type='button' onClick={SignOut}>
                                 <span className='me-3'>
                                     <ion-icon name="log-out-outline"></ion-icon>
                                 </span>
@@ -253,25 +275,18 @@ export function NavbarCommit() {
 
 export function NavbarHost() {
 
-    const signOut = () => {
-        if (window.confirm("ต้องการออกจากระบบหรือไม่?")) {
-            sessionStorage.clear()
-            localStorage.clear()
-            window.location.reload()
-        }
-    }
-
     return (
-        <Navbar variant="dark" bg="dark" expand="lg">
+        <Navbar variant="light" bg="light" expand="lg" className='shadow-sm py-3'>
             <Container>
                 <Navbar.Brand href="/">
                     <img className='me-2' src={Logo} alt='paper-submission' height={32} width={32} />
-                    PAPERSS
+                    <span className='fw-bold'>PAPERSS</span>
                 </Navbar.Brand>
                 <Navbar.Toggle />
                 <Navbar.Collapse className='justify-content-end'>
-                    <Nav>
-                        <Nav.Link href="/host">บทความ</Nav.Link>
+                    <Nav activeKey={window.location.pathname} >
+                        <Nav.Link href="/host">Dashboard</Nav.Link>
+                        <Nav.Link href="/host/confr">บทความ</Nav.Link>
                         <Nav.Link href="/host/cate">หัวข้องานประชุม</Nav.Link>
                         <Nav.Link href="/host/committee">กรรมการ</Nav.Link>
                         <Nav.Link href="/host/pub">วารสาร</Nav.Link>
@@ -288,7 +303,7 @@ export function NavbarHost() {
                                 Setting
                             </NavDropdown.Item>
                             <NavDropdown.Divider />
-                            <NavDropdown.Item type='button' onClick={signOut}>
+                            <NavDropdown.Item type='button' onClick={SignOut}>
                                 <span className='me-3'>
                                     <ion-icon name="log-out-outline"></ion-icon>
                                 </span>
@@ -304,31 +319,77 @@ export function NavbarHost() {
 
 export function NavbarAdmin() {
 
-    const singOut = () => {
-        if (window.confirm("ต้องการออกจากระบบหรือไม่?")) {
-            sessionStorage.clear()
-            window.location.reload()
-        } else {
-            return false
-        }
-    }
-
     return (
-        <Navbar expand="lg" className="bg-body-tertiary shadow">
-            <Container>
+        <Navbar expand="lg" variant='light' bg='light' className='shadow-sm'>
+            <Container fluid="md">
                 <Navbar.Brand href="/">
-                    <img src={Logo} alt='paper submit' className='me-2' height={48} width={48} />
-                    <span className='fs-4 fw-bold'>PAPERSS</span>
+                    <img src={Logo} alt='paper submit' className='me-2' height={32} width={32} />
+                    <span className='fw-bold'>PAPERSS</span>
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                        <Nav.Link href="/admin">Dashboard</Nav.Link>
-                        <Nav.Link href="/admin/publication">วารสาร</Nav.Link>
+                <Navbar.Collapse className='justify-content-end'>
+                    <Nav>
+                        <Nav.Link onClick={() => console.log("Notification")}><ion-icon name="notifications-outline"></ion-icon></Nav.Link>
+                        <NavDropdown
+                            id="nav-dropdown-dark-example"
+                            title={<ion-icon name="person-circle"></ion-icon>}
+                            menuVariant="dark"
+                            drop='start'
+                        >
+                            <NavDropdown.Item href="/user-profile">
+                                <span className='me-3'>
+                                    <ion-icon name="settings-outline"></ion-icon>
+                                </span>
+                                Setting
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item type='button' onClick={SignOut}>
+                                <span className='me-3'>
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </span>
+                                Log out
+                            </NavDropdown.Item>
+                        </NavDropdown>
                     </Nav>
-                    <div className='justify-content-end'>
-                        <button className='btn btn-sm btn-danger' type='button' onClick={singOut}>Sign out</button>
-                    </div>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
+    )
+}
+
+export function NavbarDashboard() {
+
+    return (
+        <Navbar expand="lg" variant='light' bg='light' className='shadow-sm py-3'>
+            <Container>
+                <Navbar.Brand href="/">
+                    <img src={Logo} alt='paper submit' className='me-2' height={32} width={32} />
+                    <span className='fw-bold'>PAPERSS</span>
+                </Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse className='justify-content-end'>
+                    <Nav>
+                        <NavDropdown
+                            id="nav-dropdown-dark-example"
+                            title={<ion-icon name="person-circle"></ion-icon>}
+                            menuVariant="dark"
+                            drop='start'
+                        >
+                            <NavDropdown.Item href="/user-profile">
+                                <span className='me-3'>
+                                    <ion-icon name="settings-outline"></ion-icon>
+                                </span>
+                                Setting
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item type='button' onClick={SignOut}>
+                                <span className='me-3'>
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </span>
+                                Log out
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
                 </Navbar.Collapse>
             </Container>
         </Navbar>

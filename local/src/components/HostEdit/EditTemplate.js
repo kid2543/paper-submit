@@ -1,22 +1,25 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import SearchItemNotFound from '../SearchItemNotFound'
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import Dropdown from 'react-bootstrap/Dropdown'
+import pdfIcon from '../../asset/pdf.png'
+
 
 const api = process.env.REACT_APP_API_URL
 
-function EditTemplate({id}) {
+function EditTemplate() {
 
+    const [id, setId] = useState("")
     const [templateUpload, setTemplateUpload] = useState(null)
     const [templateData, setTemplateData] = useState([])
+    const [show, setShow] = useState(false)
 
-    const fethTemplate = async () => {
-        try {
-            const res = await axios.get(api + "/get/template/" + id)
-            setTemplateData(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
+
+
 
     const deleteTemplate = async (templateId, filename) => {
         if (window.confirm("ต้องการจะลบหรือไม่ ?")) {
@@ -42,7 +45,7 @@ function EditTemplate({id}) {
             const res = await axios.post(api + "/upload/template/" + id, formData)
             alert("อัพโหลดข้อมูลสำเร็จ")
             setTemplateData([...templateData, res.data])
-            console.log(res)
+            handleClose()
         } catch (error) {
             console.log(error)
         } finally {
@@ -52,43 +55,100 @@ function EditTemplate({id}) {
     }
 
     useEffect(() => {
+
+        const confr_id = sessionStorage.getItem("host_confr")
+        setId(confr_id)
+
+        const fethTemplate = async () => {
+            try {
+                const res = await axios.get(api + "/get/template/" + confr_id)
+                setTemplateData(res.data)
+                console.log("template", res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         fethTemplate()
     }, [])
 
     return (
-        <div className='mb-3'>
-            <div className='mb-5'>
-                <h4 className='text-primary'>อัพโหลด Template </h4>
-                <hr />
-            </div>
-            <form onSubmit={uploadTemplate}>
-                <div className='row'>
-                    <div className='col-12 col-md-6 mb-3'>
-                        <label className='form-label text-muted'>ชื่อไฟล์</label>
-                        <input name='name' className='form-control' required />
-                    </div>
-                    <div className='col-12 col-md-6 mb-3'>
-                        <label className='form-label text-muted'>เลือกไฟล์</label>
-                        <input name='file' accept='application/pdf' type='file' className='form-control' onChange={e => setTemplateUpload(e.target.files[0])} required />
-                    </div>
+        <div className='mb-5'>
+            <CreateTemplateModal show={show} handleClose={handleClose} uploadTemplate={uploadTemplate} setTemplateUpload={setTemplateUpload} />
+            <div className='mb-3'>
+                <div className='d-flex justify-content-between align-items-center mb-3'>
+                    <h4 className='fw-bold'>อัพโหลด Template </h4>
+                    <button className='btn btn-outline-primary btn-sm' onClick={handleShow}>New template +</button>
                 </div>
-
-                <button type='submit' className='btn btn-primary'>Upload template</button>
-            </form>
+            </div>
             <div>
-                {templateData ? (
-                    <div className='row my-3'>
-                        {templateData?.map((item) => (
-                            <div key={item._id} className='col-12 col-md-4 border rounded p-3 text-center position-relative'>
-                                <NavLink to={api + "/pdf/" + item.file} target='_blank'><span className='me-2'><ion-icon name="document-text"></ion-icon></span> {item.name}</NavLink>
-                                <button type='button' onClick={() => deleteTemplate(item._id, item.file)} className='btn position-absolute top-0 start-100 translate-middle badge btn-danger'>ลบ</button>
-                            </div>
-                        ))}
-                    </div>
-                ) : <p>กรุณาอัพโหลดข้อมูล</p>}
+                {templateData.length > 0 ? (
+                    <ul className='list-group'>
+                        {templateData.map((item) => (
+                            <li className='list-group-item d-flex justify-content-between align-items-center' key={item._id}>
+                                <div>
+                                    <img src={pdfIcon} alt='pdf' height={32} width={32} className='me-2' />
+                                    <small>{item.name}</small>
+                                </div>
+                                <div>
+                                    <Dropdown>
+                                        <Dropdown.Toggle variant="btn">
+                                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={() => window.open(api + "/pdf/" + item.file)}>
+                                                <span className='me-2'><ion-icon name="eye-outline"></ion-icon></span>
+                                                <small>View</small>
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => deleteTemplate(item._id, item.file)}>
+                                                <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                <small>Delete</small>
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </div>
+                            </li>
+                        )
+                        )}
+                    </ul>
+                ) : (
+                    <SearchItemNotFound />
+                )}
             </div>
         </div>
     )
 }
 
 export default EditTemplate
+
+
+function CreateTemplateModal({ show, handleClose, uploadTemplate, setTemplateUpload }) {
+    return (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Modal heading</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={uploadTemplate}>
+                <Modal.Body>
+                    <div className='mb-3'>
+                        <label className='form-label text-muted'>ชื่อไฟล์</label>
+                        <input name='name' className='form-control' required />
+                    </div>
+                    <div className='mb-3'>
+                        <label className='form-label text-muted'>เลือกไฟล์</label>
+                        <input name='file' accept='application/pdf' type='file' className='form-control' onChange={e => setTemplateUpload(e.target.files[0])} required />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" type='submit'>
+                        Upload template
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}

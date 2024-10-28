@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Bin from '../../asset/bin.png'
 import Modal from 'react-bootstrap/Modal'
-import { useNavigate } from 'react-router-dom'
 
 function EditCate({ cate, setCate }) {
 
@@ -82,9 +81,6 @@ function EditCate({ cate, setCate }) {
 export default EditCate
 
 function ModalHostCreateCate({ show, handleClose, setCateCode, setName, setDesc, setIcon, createCate }) {
-
-
-
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>

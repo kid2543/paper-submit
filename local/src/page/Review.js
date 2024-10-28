@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import LoadingPage from '../components/LoadingPage'
 
@@ -15,6 +15,8 @@ function Review() {
     const [totalArr, setTotalArr] = useState([])
     const [totalNumber, setTotalNumber] = useState(0)
     const [loading, setLoading] = useState(true)
+
+    const navigate = useNavigate()
 
     const reviewerName = sessionStorage.getItem("fname") + " " + sessionStorage.getItem("lname")
 
@@ -35,7 +37,8 @@ function Review() {
                     total: totalNumber,
                     result: input.result.value,
                 })
-                console.log(comment)
+                alert("ให้คะแนนสำเร็จ:" + comment.status)
+                navigate(-1)
             } catch (error) {
                 console.log(error)
             }

@@ -1,23 +1,24 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import Dropdown from 'react-bootstrap/Dropdown'
+import SearchItemNotFound from '../SearchItemNotFound'
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 const api = process.env.REACT_APP_API_URL
 
-function EditQuestion({ id }) {
+function EditQuestion() {
 
+    const [id, setId] = useState("")
     const [q, setQ] = useState([])
     const [text, setText] = useState("")
     const [editText, setEditText] = useState("")
     const [editIndex, setEditIndex] = useState(null)
+    const [show, setShow] = useState(false)
 
-    const fethQna = async () => {
-        try {
-            const res = await axios.get(api + "/get/question/" + id)
-            setQ(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
+
 
     const handleAdd = (e) => {
         e.preventDefault()
@@ -25,6 +26,7 @@ function EditQuestion({ id }) {
             setQ([...q, text])
             setText("")
             e.target.question.value = ""
+            handleClose()
         } else {
             alert("กรุณากรอกคำถาม")
         }
@@ -32,10 +34,10 @@ function EditQuestion({ id }) {
 
     const handleSave = async () => {
         try {
-            const update = await axios.patch(api + "/update/conferences/" + id, {
+            await axios.patch(api + "/update/conferences/" + id, {
                 question: q
             })
-            console.log(update)
+            alert("อัพเดทข้อมูลสำเร็จ")
         } catch (error) {
             console.log(error)
         }
@@ -57,30 +59,42 @@ function EditQuestion({ id }) {
     const updateEditStatus = (index, text) => {
         setEditIndex(index)
         setEditText(text)
-    } 
+    }
 
 
     useEffect(() => {
+
+        const confr_id = sessionStorage.getItem("host_confr")
+        setId(confr_id)
+
+        const fethQna = async () => {
+            try {
+                const res = await axios.get(api + "/get/question/" + confr_id)
+                setQ(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         fethQna()
     }, [])
 
     return (
-        <div className='mb-5'>
-            <form onSubmit={handleAdd} className='mb-3'>
-                <label className='form-label text-muted'>คำถาม</label>
-                <div className='mb-3 input-group'>
-                    <input name='question' onChange={e => setText(e.target.value)} className='form-control' />
-                    <button type='submit' className='btn btn-primary'>Add +</button>
-                </div>
-            </form>
-            <h4 className='mt-5'>รายการคำถาม</h4>
-            <hr />
-            <div className='table-responsive'>
-                {q.length === 0 ? "ยังไม่มีรายการคำถาม" : (
-                    <table className='table table-hover'>
-                        <thead className='table-primary'>
+        <div>
+            <NewQuestion show={show} handleClose={handleClose} setText={setText} handleAdd={handleAdd} />
+            <div className='mb-3 d-flex justify-content-between align-items-center'>
+                <h4 className='fw-bold'>แบบประเมิน</h4>
+                <button className='btn btn-outline-primary btn-sm' type='button' onClick={handleShow}>New Question +</button>
+            </div>
+            <p className='text-muted'>รายการคำถาม</p>
+            {q.length > 0 ? (
+                <div className='table-responsive' style={{ minHeight: "480px" }}>
+                    <div className='mb-3'>
+                        <button type='button' onClick={handleSave} className='btn btn-outline-success btn-sm'>Save</button>
+                    </div>
+                    <table className='table table-hover h-100'>
+                        <thead>
                             <tr>
-                                <th>อันดับ</th>
                                 <th>คำถาม</th>
                                 <th>tools</th>
                             </tr>
@@ -90,7 +104,6 @@ function EditQuestion({ id }) {
                                 <tr key={index}>
                                     {editIndex === index ? (
                                         <>
-                                            <td>{index + 1}</td>
                                             <td>
                                                 <input onChange={e => setEditText(e.target.value)} defaultValue={item} className='form-control' />
                                             </td>
@@ -100,11 +113,24 @@ function EditQuestion({ id }) {
                                         </>
                                     ) : (
                                         <>
-                                            <td>{index + 1}</td>
                                             <td>{item}</td>
                                             <td>
-                                                <button className='btn text-secondary' type='button' onClick={() => updateEditStatus(index, item)}><ion-icon name="create"></ion-icon></button>
-                                                <button type='button' onClick={() => handleDel(index)} className="btn text-danger"><ion-icon name="trash-bin"></ion-icon></button>
+                                                <Dropdown>
+                                                    <Dropdown.Toggle variant="btn">
+                                                        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item onClick={() => updateEditStatus(index, item)}>
+                                                            <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
+                                                            Edit
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => handleDel(index)}>
+                                                            <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
                                             </td>
                                         </>
                                     )}
@@ -113,14 +139,36 @@ function EditQuestion({ id }) {
                             ))}
                         </tbody>
                     </table>
-                )
-                }
-                <div>
-                    <button type='button' onClick={handleSave} className='btn btn-success'>Save</button>
-                </div>
-            </div >
+                </div >
+            ) :
+                <SearchItemNotFound />
+            }
         </div >
     )
 }
 
 export default EditQuestion
+
+function NewQuestion({ show, handleClose, setText, handleAdd }) {
+    return (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>New Question</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleAdd}>
+                <Modal.Body>
+                    <label className='form-label text-muted'>คำถาม</label>
+                    <input name='question' onChange={e => setText(e.target.value)} className='form-control' />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" type='submit'>
+                        Add +
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}

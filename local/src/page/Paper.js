@@ -1,53 +1,75 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
-import dayjs from 'dayjs';
+import OpenBook from '../asset/logo.png'
+import LoadingPage from '../components/LoadingPage';
+import SearchItemNotFound from '../components/SearchItemNotFound';
+import { useNavigate } from 'react-router-dom';
 
-import OpenBook from '../asset/open-book.png'
+const api = process.env.REACT_APP_API_URL
 
 function Paper() {
 
-  const api = process.env.REACT_APP_API_URL
 
   const [paper, setPaper] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const fethPaper = async () => {
-    try {
-      let res = await axios.get(api + "/paper")
-      setPaper(res.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const navigate = useNavigate()
 
   useEffect(() => {
+
+    const fethPaper = async () => {
+      try {
+        let res = await axios.get(api + "/paper")
+        setPaper(res.data)
+        console.log("paper", res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     fethPaper()
+
+    setLoading(false)
+
   }, [])
 
-  console.log(paper)
+  if (loading) {
+    return (
+      <LoadingPage />
+    )
+  }
 
-  const navigate = useNavigate();
+
   return (
     <div className='container my-5'>
-      <section className='my-4'>
-        <h4 className='mb-3 fw-bold'>รวมบทความ</h4>
-        <form>
-          <input type='search' className='form-control text-center my-5' placeholder='Search Conference...' autoComplete='off' />
-        </form>
-        <div className='row'>
-          {paper?.map((item) => (
-            <div key={item._id} className='col-lg-4 text-center'>
-            <a href={"/paper/" + item._id}>
-              <img src={OpenBook} alt='cover-confer' height={300} width={200} />
-            </a>
-              <div className='mt-3'>
-                <p>{item.title}</p>
-                <small className='text-muted'><ion-icon name="time-outline"></ion-icon>{dayjs(item.create_date).format("DD/MM/YYYY")}</small>
-              </div>
-
+      <section>
+        <form className='d-md-flex justify-content-between align-items-center mb-5'>
+          <h4 className='fw-bold'>รวมบทความ</h4>
+          <div>
+            <input type='search' className='form-control' placeholder='ค้นหาบทความ' autoComplete='off' />
           </div>
-          ))}
-        </div>
+        </form>
+        {paper.length > 0 ? (
+          <div className='row'>
+            {paper?.map((item) => (
+              <div className='col-md-6 col-lg-3' key={item._id}>
+                <div className='card h-100'>
+                  <div className='text-center p-3 mb-3'>
+                    <img src={OpenBook} className='img-fluid' width={96} height={96} alt='...' />
+                  </div>
+                  <div className='card-body'>
+                    <h5 className='card-title mb-3'>{item.title}</h5>
+                    <div>
+                      <button type='button' className='btn btn-outline-secondary' onClick={() => navigate(item._id)}>ดูเพิ่มเติม</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <SearchItemNotFound />
+        )}
       </section>
     </div>
   )

@@ -1,19 +1,14 @@
 import React from 'react'
 import { NavbarAdmin } from './Navbar'
-import Footer from './Footer'
 
-function AdminLayout({children}) {
+function AdminLayout({ children }) {
+
   return (
     <div>
-      <section>
-        <NavbarAdmin />
-      </section>
-      <section style={{ minHeight: "100vh" }}>
+      <NavbarAdmin />
+      <div className='my-5'>
         {children}
-      </section>
-      <section>
-        <Footer />
-      </section>
+      </div>
     </div>
   )
 }

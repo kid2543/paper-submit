@@ -16,14 +16,6 @@ function RegisConfr() {
 
     const paperId = localStorage.getItem("paper_id")
 
-    const fethConfr = async () => {
-        try {
-            const res = await axios.get(api + "/get/confr/" + id)
-            setConfr(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     const paymentUpload = async (e) => {
         e.preventDefault()
@@ -41,21 +33,32 @@ function RegisConfr() {
     }
 
     useEffect(() => {
+
+        
+    const fethConfr = async () => {
+        try {
+            const res = await axios.get(api + "/get/confr/" + id)
+            setConfr(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
         fethConfr()
-    }, [])
+    }, [id])
 
     return (
-        <div className='container'>
+        <div className='container my-5'>
             <div className='mb-5'>
                 <h4 className='fw-bold'>รายละเอียดการลงทะเบียน</h4>
             </div>
             <div className='mb-3'>
                 <p className='fw-bold'>โปรดชำระเงินระหว่างวันที่ด้านล่าง</p>
                 <div>
-                    Early Bird Registration: {dayjs(confr?.regis_eb_start_date).format("DD-MMM-YYYY")} ถึง {dayjs(confr?.regis_eb_end_date).format("DD-MMM-YYYY")}
+                    Early Bird Registration: <strong>{dayjs(confr?.regis_eb_start_date).format("DD/MMM/YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_eb_end_date).format("DD/MMM/YYYY")}</strong>
                 </div>
                 <div>
-                    Regular Registration : {dayjs(confr?.regis_rl_start_date).format("DD-MMM-YYYY")} ถึง {dayjs(confr?.regis_rl_end_date).format("DD-MMM-YYYY")}
+                    Regular Registration : <strong>{dayjs(confr?.regis_rl_start_date).format("DD/MMM/YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_rl_end_date).format("DD/MMM/YYYY")}</strong>
                 </div>
             </div>
             <div className='mb-3'>
@@ -101,8 +104,8 @@ function RegisConfr() {
             <form onSubmit={paymentUpload}>
                 <p className='fw-bold'>แนบหลักฐานการชำระเงิน</p>
                 <div className='input-group'>
-                    <input required onChange={e => setPaymentImage(e.target.files[0])} type='file' className='form-control' />
-                    <button type='submit' className="btn btn-success">Upload</button>
+                    <input accept='image/*' required onChange={e => setPaymentImage(e.target.files[0])} type='file' className='form-control' />
+                    <button type='submit' className="btn btn-outline-primary btn-sm">Upload</button>
                 </div>
             </form>
         </div>

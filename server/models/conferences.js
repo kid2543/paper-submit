@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Publication = require("../models/publication")
+const User = require("./user")
 
 const conferencesSchema = mongoose.Schema({
   title: {
@@ -8,9 +9,13 @@ const conferencesSchema = mongoose.Schema({
   },
   sub_title: { type: String },
   confr_code: { type: String, required: true, unique: true },
-  confr_desc: { type: String },
+  confr_desc: [{type: String}],
   important_date: [{ name: { type: String }, start_date: { type: Date }, end_date: { type: Date } }],
-  schedule: { type: String },
+  schedule: [{
+    start: String,
+    end: String,
+    items: [String]
+  }],
   publication: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: Publication
@@ -37,10 +42,17 @@ const conferencesSchema = mongoose.Schema({
   regis_type: [{ name: String, price_1: { type: String }, price_2: { type: String } }],
   venue: { name: { type: String }, desc: { type: String }, remark: { type: String }, travel: { type: String } },
   venue_image: {type: String},
-  confr_start_date: {type: Date},
+  confr_start_date: {
+    type: Date,
+    default: Date.now()
+  },
   confr_end_date: {type: Date},
   status: {type: Boolean, default: false},
   question: [String],
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User
+  }
 });
 
 const Conferences = mongoose.model("conferences", conferencesSchema);

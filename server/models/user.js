@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Conferences = require("../models/conferences")
 
 const userSchema = mongoose.Schema(
     {
@@ -16,9 +15,6 @@ const userSchema = mongoose.Schema(
             type: String,
         },
         phone: {
-            type: String,
-        },
-        gender: {
             type: String,
         },
         role: {
@@ -55,14 +51,10 @@ const userSchema = mongoose.Schema(
         zip_code: {
             type:String,
         },
-        confr_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: Conferences
-        },
     }
 )
 
-userSchema.index({fname: 'text', lname: 'text'})
+userSchema.index({fname: 1, lname: 1})
 
 const User = mongoose.model("User", userSchema)
 

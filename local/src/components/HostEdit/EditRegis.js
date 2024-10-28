@@ -5,33 +5,36 @@ function EditRegis({ handleChange, data }) {
   return (
     <div className='mb-5'>
       <div className='mb-3'>
-        <h4 className='text-primary'>รายละเอียดการลงทะเบียน</h4>
-        <hr />
+        <h4 className='fw-bold'>รายละเอียดการลงทะเบียน</h4>
       </div>
       <div>
-        <div className='mb-5'>
-          <p className='text-success'>Early Bird Registration</p>
-          <div className='row'>
-            <div className='col-12 col-md-6 mb-3'>
-              <label className='form-label text-muted'>Start</label>
-              <input defaultValue={dayjs(data?.regis_eb_start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_eb_start_date' type='date' className='form-control' />
+        <div className='row g-3'>
+          <div className='col-md-6'>
+            <div className='mb-5'>
+              <p className='text-success'>Early Bird Registration</p>
+                <div className='mb-3'>
+                  <label className='form-label text-muted'>Start</label>
+                  <input defaultValue={dayjs(data?.regis_eb_start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_eb_start_date' type='date' className='form-control' />
+                </div>
+                <div className='mb-3'>
+                  <label className='form-label text-muted'>End</label>
+                  <input defaultValue={dayjs(data?.regis_eb_end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_eb_end_date' type='date' className='form-control' />
+                </div>
             </div>
-            <div className='col-12 col-md-6 mb-3'>
-              <label className='form-label text-muted'>End</label>
-              <input defaultValue={dayjs(data?.regis_eb_end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_eb_end_date' type='date' className='form-control' />
-            </div>
+
           </div>
-        </div>
-        <div className='mb-5'>
-          <p className='text-success'>Regular Registration</p>
-          <div className='row'>
-            <div className='col-12 col-md-6 mb-3'>
-              <label className='form-label text-muted'>Start</label>
-              <input defaultValue={dayjs(data?.regis_rl_start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_rl_start_date' type='date' className='form-control' />
-            </div>
-            <div className='col-12 col-md-6 mb-3'>
-              <label className='form-label text-muted'>End</label>
-              <input defaultValue={dayjs(data?.regis_rl_end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_rl_end_date' type='date' className='form-control' />
+          <div className='col-md-6'>
+
+            <div className='mb-5'>
+              <p className='text-success'>Regular Registration</p>
+                <div className='mb-3'>
+                  <label className='form-label text-muted'>Start</label>
+                  <input defaultValue={dayjs(data?.regis_rl_start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_rl_start_date' type='date' className='form-control' />
+                </div>
+                <div className='mb-3'>
+                  <label className='form-label text-muted'>End</label>
+                  <input defaultValue={dayjs(data?.regis_rl_end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e)} name='regis_rl_end_date' type='date' className='form-control' />
+                </div>
             </div>
           </div>
         </div>

@@ -17,27 +17,28 @@ function ConfrVenue() {
 
     const { id } = useParams()
 
-    const fethVenue = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(api + "/get/confr/" + id)
-            setVenueImage(res.data.venue_image)
-            setVenueDetail({
-                name: res.data.venue?.name,
-                desc: res.data.venue?.desc,
-                remark: res.data.venue?.remark,
-                travel: res.data.venue?.travel
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+
+        const fethVenue = async () => {
+            setLoading(true)
+            try {
+                const res = await axios.get(api + "/get/confr/" + id)
+                setVenueImage(res.data.venue_image)
+                setVenueDetail({
+                    name: res.data.venue?.name,
+                    desc: res.data.venue?.desc,
+                    remark: res.data.venue?.remark,
+                    travel: res.data.venue?.travel
+                })
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fethVenue()
-    }, [])
+    }, [id])
 
     if (loading) {
         return (

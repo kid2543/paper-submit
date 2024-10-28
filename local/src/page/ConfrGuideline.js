@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { NavbarConfr } from '../components/Navbar'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import LoadingPage from '../components/LoadingPage'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -13,32 +13,27 @@ function ConfrGuideline() {
     const [forAudience, setForAudience] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const fethGuiline = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(api + "/get/confr/" + id)
-            setForPresenter(res.data.guide_for_presenter)
-            setForSessionChair(res.data.guide_for_chair)
-            setForAudience(res.data.guide_for_audience)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+
+        const fethGuiline = async () => {
+            setLoading(true)
+            try {
+                const res = await axios.get(api + "/get/confr/" + id)
+                setForPresenter(res.data.guide_for_presenter)
+                setForSessionChair(res.data.guide_for_chair)
+                setForAudience(res.data.guide_for_audience)
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fethGuiline()
-    }, [])
+    }, [id])
 
     if (loading) {
-        return (
-            <div className='my-5 p-5 text-center'>
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        )
+        return <LoadingPage />
     }
 
     return (
@@ -52,7 +47,7 @@ function ConfrGuideline() {
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
-                    ) : <p>ไม่พบข้อเสนอแนะ</p>}
+                    ) : "-"}
                 </div>
             </div>
             <div className='mb-5'>
@@ -64,7 +59,7 @@ function ConfrGuideline() {
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
-                    ) : <p>ไม่พบข้อเสนอแนะ</p>
+                    ) : "-"
                     }
                 </div>
 
@@ -78,7 +73,8 @@ function ConfrGuideline() {
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
-                    ) : <p>ไม่พบข้อเสนอแนะ</p>}
+                    ) : "-"
+                    }
                 </div>
             </div>
         </div>

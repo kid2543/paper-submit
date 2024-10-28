@@ -1,42 +1,68 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import Modal from 'react-bootstrap/Modal';
-import CheckIcon from '../asset/checked.png'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+
+const api = process.env.REACT_APP_API_URL
 
 function HostCreate() {
 
-  const api = process.env.REACT_APP_API_URL
-
   const navigate = useNavigate()
   const token = sessionStorage.getItem("token")
-
+  const notify = () => {
+    toast.success("สร้างงานประชุมสำเร็จ", {
+      position: "bottom-right"
+    })
+  }
 
   const [validate, setValidate] = useState(false)
-  const [modalShow, setModalShow] = useState(false)
+  const [previewText, setPreviewText] = useState({
+    title: "ชื่อหัวข้องานประชุม",
+    sub_title: "หัวข้อรองงานประชุม",
+    confr_desc: "รายละเอียดงานประชุม",
+    confr_code: "โค้ดงานประชุม ใช้สำหรับค้นหางานประชุม",
+  })
+  const [invConfrCode, setInvConfrCode] = useState(false)
+
 
   const checkPattern = (value) => {
     return /^[0-9a-zA-Z_]{4,12}$/.test(value)
   }
 
+  const handleChangePreview = (e) => {
+    setInvConfrCode(false)
+    setPreviewText({ ...previewText, [e.target.name]: e.target.value })
+  }
+
   const createConfr = async (e) => {
     e.preventDefault()
     const input = e.target
-    console.log(checkPattern(input.confr_code.value))
     setValidate(true)
-    if (input.title.value !== "" && input.sub_title.value !== "" && input.confr_desc !== "" && input.confr_code.value !== "" && checkPattern(input.confr_code.value)) {
+    if (input.title.value !== "" && input.sub_title.value !== "" && input.confr_desc !== "" && input.confr_code.value !== "" && checkPattern(input.confr_code.value) && input.confr_end_date.value !== "") {
       try {
-        const create = await axios.post(api + "/create/conferences/" + token, {
+        await axios.post(api + "/create/conferences", {
           title: input.title.value,
           sub_title: input.sub_title.value,
           confr_desc: input.confr_desc.value,
           confr_code: input.confr_code.value.toUpperCase(),
+          owner: token,
+          confr_end_date: input.confr_end_date.value,
         })
-        sessionStorage.setItem("confr", create.data._id)
-        handleShow()
+        notify()
+        setTimeout(() => {
+          navigate("/host")
+        }, 1000)
       } catch (error) {
-        alert("เกิดข้อผิดพลาด")
-        console.log(error)
+        if (error.response.data?.code === 11000) {
+          alert("มีงานประชุมวิชาการที่ใช้รหัสนี้แล้ว")
+          const input = document.getElementById("confr_code")
+          input.focus()
+          setInvConfrCode(true)
+          console.log(error)
+        } else {
+          alert("เกิดข้อผิดพลาด")
+          console.log(error)
+        }
       }
     } else {
       alert("แบบฟอร์มไม่ถูกต้อง")
@@ -44,64 +70,72 @@ function HostCreate() {
   }
 
   const handleOnFocus = () => setValidate(false)
-  const handleShow = () => setModalShow(true)
-  const handleClose = () => setModalShow(false)
 
-  useEffect(() => {
-
-    const confr_id = sessionStorage.getItem("confr")
-    if (confr_id && confr_id !== "undefined" && confr_id !== undefined && confr_id !== null) {
-      alert("ท่านได้ทำการสร้างงานประชุมแล้ว")
-      window.location.href("/host")
-    }
-  }, [])
 
   return (
     <div className='container py-5'>
-      <Modal show={modalShow} onHide={handleClose}>
-        <Modal.Body>
-          <div className='p-5 text-center'>
-            <div className='mb-3'>
-              <img src={CheckIcon} alt='check-icon' className='img-fluid' width={64} height={64} />
+      <ToastContainer />
+      <h2 className='text-center mb-5'>สร้างงานประชุม</h2>
+      <div className='row'>
+        <form className={validate ? "col-md-6 mb-3 was-validated" : "mb-3 col-md-6 needs-validation"} noValidate onSubmit={createConfr}>
+          <div className='row gy-3'>
+            <div>
+              <label className='form-label text-muted' htmlFor="confr-name">ชื่องานประชุม</label>
+              <textarea className='form-control form-control-lg' type='text' name="title" onFocus={handleOnFocus} required onChange={handleChangePreview} />
             </div>
-            <div className='text-success'>
-              <h2>สร้างงานประชุมสำเร็จ</h2>
+            <div>
+              <label className='form-label text-muted' htmlFor="sub-title">หัวข้อรอง</label>
+              <textarea className='form-control form-control-lg' type='text' name="sub_title" required onFocus={handleOnFocus} onChange={handleChangePreview} />
             </div>
-            <div className='mt-5'>
-              <button type='button' onClick={() => navigate("/host")} className='btn btn-success'>Next</button>
+            <div>
+              <label className='form-label text-muted'>รายละเอียดงานประชุม</label>
+              <textarea className='form-control form-control-lg' style={{ height: "200px" }} name="confr_desc" required onFocus={handleOnFocus} onChange={handleChangePreview} />
+            </div>
+            <div>
+              <label className='form-label text-muted' htmlFor="confr-code">รหัสงานประชุม</label>
+              <input className='form-control form-control-lg' type='text' name="confr_code" id='confr_code' required onFocus={handleOnFocus} onChange={handleChangePreview} pattern='[0-9a-zA-Z]{4,12}' />
+              <div className='mt-2'>
+                {invConfrCode ? (
+                  <div className="text-danger">
+                    <small>มีงานประชุมอื่นใช้รหัสนี้แล้ว</small>
+                  </div>
+                ) : (
+                  <div>
+                    <small className='text-muted'>ตัวอักษรและตัวเลขเท่านั้น ตั้งแต่ 4-12 ตัวอักษร</small>
+                  </div>
+                )}
+
+              </div>
+
+            </div>
+            <div>
+              <label className='form-label text-muted' htmlFor="confr-code">วันสิ้นสุดงานประชุม</label>
+              <input className='form-control form-control-lg' type='date' name="confr_end_date" required onFocus={handleOnFocus} />
+            </div>
+            <div>
+              <button type='submit' className='btn btn-primary'>Create Conference</button>
             </div>
           </div>
-        </Modal.Body>
-      </Modal>
-      <h2 className='text-center mb-3'>สร้างงานประชุม</h2>
-      <form className={validate ? "mb-3 was-validated" : "mb-3 needs-validation"} noValidate onSubmit={createConfr}>
-        <div className='form-floating'>
-          <input className='form-control' type='text' placeholder='ชื่องานประชุม' name="title" onFocus={handleOnFocus} required />
-          <label className='form-label text-muted' htmlFor="confr-name">ชื่องานประชุม</label>
-        </div>
-        <div className='form-floating'>
-          <input className='form-control' type='text' placeholder='หัวข้อรอง' name="sub_title" required onFocus={handleOnFocus} />
-          <label className='form-label text-muted' htmlFor="sub-title">หัวข้อรอง</label>
-        </div>
-        <div className='form-floating'>
-          <textarea className='form-control' placeholder='รายละเอียดงานประชุม' style={{ height: "200px" }} name="confr_desc" required onFocus={handleOnFocus} />
-          <label className='form-label text-muted'>รายละเอียดงานประชุม</label>
-        </div>
-        <div className='form-floating'>
-          <input className='form-control' type='text' placeholder='รหัสงานประชุม' name="confr_code" required onFocus={handleOnFocus} pattern='[0-9a-zA-Z]{4,12}' />
-          <label className='form-label text-muted' htmlFor="confr-code">รหัสงานประชุม</label>
-          <div className='mt-2'>
-            <small className='text-muted'>ตัวอักษรและตัวเลขเท่านั้น ตั้งแต่ 4-12 ตัวอักษร</small>
+
+        </form>
+        <div className='col-md-6 mb-3'>
+          <div className='card p-5 h-100'>
+            <div className='mb-5'>
+              <div>
+                <h4>{previewText?.title}</h4>
+                <p>"{previewText?.confr_code.toUpperCase()}"</p>
+                <p className='text-muted'>{previewText?.sub_title}</p>
+              </div>
+            </div>
+            <div>
+              <h4>ABOUT THE CONFERENCE</h4>
+              <div>
+                {previewText?.confr_desc}
+              </div>
+            </div>
           </div>
         </div>
-        <div className='row'>
-          <div className='col col-md-4 d-none d-md-block'>
-          </div>
-          <div className='col col-md-4'>
-            <button type='submit' className='btn btn-primary mt-4 w-100'>Create</button>
-          </div>
-        </div>
-      </form>
+      </div>
     </div>
   )
 }

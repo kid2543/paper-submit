@@ -1,25 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import SearchItemNotFound from '../SearchItemNotFound'
 
 const api = process.env.REACT_APP_API_URL
 
 function EditPub() {
 
+    const [id, setId] = useState("")
     const [pub, setPub] = useState([])
     const [pubList, setPubList] = useState([])
+    const [sPub, setSPub] = useState([])
     const [pubChecked, setPubChecked] = useState([])
-
-    const id = sessionStorage.getItem("confr")
-
-
-    const fethPub = async () => {
-        try {
-            const res = await axios.get(api + "/all/pub")
-            setPub(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
 
     const handleCheck = (e) => {
         if (e.target.checked) {
@@ -29,23 +20,14 @@ function EditPub() {
         }
     }
 
-    const fethConfrPub = async () => {
-        try {
-            const res = await axios.get(api + "/get/pub/" + id)
-            setPubChecked(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     const searchPub = async (e) => {
         e.preventDefault()
         try {
           if (e.target.pub_name.value) {
             const res = await axios.get(api + "/search/pub/" + e.target.pub_name.value)
-            setPub(res.data)
+            setSPub(res.data)
           } else {
-            fethPub()
+            setSPub(pub)
           }
         } catch (error) {
           console.log(error)
@@ -58,39 +40,55 @@ function EditPub() {
             await axios.patch(api + "/update/conferences/" + id, {
                 publication: pubList,
             })
+            const res = await axios.get(api + "/get/pub/" + id)
+            setPubChecked(res.data)
             alert("เพิ่มข้อมูลสำเร็จ")
         } catch (error) {
             console.log(error)
             alert("เกิดข้อผิดพลาด: " + error.status)
-        } finally {
-            fethConfrPub()
         }
     }
 
     useEffect(() => {
+
+        const confr_id = sessionStorage.getItem("host_confr")
+        setId(confr_id)
+
+        const fethPub = async () => {
+            try {
+                const res = await axios.get(api + "/all/pub")
+                setPub(res.data)
+                setSPub(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        const fethConfrPub = async () => {
+            try {
+                const res = await axios.get(api + "/get/pub/" + confr_id)
+                setPubChecked(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         fethPub()
         fethConfrPub()
     }, [])
-    
-    if(!id || id === "undefined") {
-        return (
-            <div>
-                <button className='btn btn-primary'>สร้างงานประชุม</button>
-            </div>
-        )
-    }
+
 
     return (
         <div className='container my-5'>
             <div>
                 <h4 className='fw-bold mb-5'>วารสาร</h4>
                 <div>
-                    <div>
-                        <p>
+                    <div className='mb-3'>
+                        <p className='text-muted mb-0'>
                             วารสารที่เลือกตอนนี้:
                         </p>
                         {pubChecked.length > 0 ? (
-                            <ul>
+                            <ul className='mt-3'>
                                 {pubChecked?.map((item) => (
                                     <li key={item._id} className='mb-3'>
                                         {item.en_name} ({item.th_name}) <br />
@@ -98,7 +96,7 @@ function EditPub() {
                                     </li>
                                 ))}
                             </ul>
-                        ) : <p>ไม่พบข้อมูล</p>}
+                        ) : "-" }
 
                     </div>
                     <div className='d-md-flex justify-content-between mb-3'>
@@ -123,7 +121,7 @@ function EditPub() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {pub?.map((item) => (
+                                    {sPub?.map((item) => (
                                         <tr key={item._id}>
                                             <td>
                                                 <input onChange={handleCheck} type='checkbox' value={item._id} />
@@ -135,13 +133,19 @@ function EditPub() {
                                                 {item.en_name}
                                             </td>
                                             <td>
-                                                {item.branch}
+                                                {item.branch?.map((list, index) => (
+                                                    <small key={index} className='text-muted'>{list},</small>
+                                                ))}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                        ) : <p className='text-center'>ไม่พบวารสาร</p>}
+                        ) : (
+                            <div className='col-md-2 mb-5'>
+                                <SearchItemNotFound />
+                            </div>
+                        ) }
 
                         <div>
                             <button type='button' onClick={savePub} className='btn btn-success'>บันทึก</button>

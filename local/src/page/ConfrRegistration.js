@@ -2,6 +2,7 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import LoadingPage from '../components/LoadingPage'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -24,41 +25,37 @@ function ConfrRegistration() {
 
     const { id } = useParams()
 
-    const fethRegis = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(api + "/get/confr/" + id)
-            setRegisDate({
-                eb_start: res.data.regis_eb_start_date,
-                eb_end: res.data.regis_eb_end_date,
-                rl_start: res.data.regis_rl_start_date,
-                rl_end: res.data.regis_rl_end_date
-            })
-            setBankDetail({
-                bank_name: res.data.bank_name,
-                bank_type: res.data.bank_type,
-                ac_no: res.data.acc_no,
-                ac_name: res.data.acc_name
-            })
-            setRegisType(res.data.regis_type)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+
+        setLoading(true)
+        const fethRegis = async () => {
+            try {
+                const res = await axios.get(api + "/get/confr/" + id)
+                setRegisDate({
+                    eb_start: res.data.regis_eb_start_date,
+                    eb_end: res.data.regis_eb_end_date,
+                    rl_start: res.data.regis_rl_start_date,
+                    rl_end: res.data.regis_rl_end_date
+                })
+                setBankDetail({
+                    bank_name: res.data.bank_name,
+                    bank_type: res.data.bank_type,
+                    ac_no: res.data.acc_no,
+                    ac_name: res.data.acc_name
+                })
+                setRegisType(res.data.regis_type)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        
         fethRegis()
-    }, [])
+        setLoading(false)
+    }, [id])
 
     if (loading) {
         return (
-            <div className="my-5 p-5 text-center">
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            <LoadingPage />
         )
     }
 

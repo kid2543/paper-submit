@@ -12,6 +12,8 @@ import fileIcon from '../asset/file.png'
 import clockIcon from '../asset/wall-clock.png'
 import NotificationCard from '../components/NotificationCard';
 import LoadingPage from '../components/LoadingPage';
+import SearchItemNotFound from '../components/SearchItemNotFound';
+import Dropdown from 'react-bootstrap/Dropdown';
 
 const api = process.env.REACT_APP_API_URL
 
@@ -31,7 +33,7 @@ function Host() {
   const [showNoti, setShowNoti] = useState(false)
   const [notiData, setNotiData] = useState([])
   const [remarkNoti, setRemarkNoti] = useState(false)
-  const [loading ,setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
 
   const handleShow = () => setShow(true)
   const handleClose = () => setShow(false)
@@ -129,7 +131,7 @@ function Host() {
     }
   }
 
-  const handleDelNoti = (item_id) => {
+  const handleDelNoti = async (item_id) => {
     setNotiData(notiData.filter((item) => item._id !== item_id))
   }
 
@@ -146,7 +148,7 @@ function Host() {
 
   useEffect(() => {
 
-    const confr_id = sessionStorage.getItem("confr")
+    const confr_id = sessionStorage.getItem("host_confr")
 
     const fethConfr = async () => {
       try {
@@ -208,10 +210,10 @@ function Host() {
     fethCateNumber()
     fethUnreadNoti()
 
-    setTimeout(() => setLoading(false), 1000)
+    setTimeout(() => setLoading(false), 500)
   }, [])
 
-  if(loading) {
+  if (loading) {
     return <LoadingPage />
   }
 
@@ -258,20 +260,20 @@ function Host() {
         </section>
         <section className='mb-5'>
           <div className='d-flex justify-content-between mb-5'>
-            <button className='btn btn-primary me-3' type='button' onClick={() => navigate("/host/edit")}>
+            <button className='btn btn-outline-primary me-3' type='button' onClick={() => navigate("/host/edit")}>
               <span className='me-2'>
                 <ion-icon name="brush"></ion-icon>
               </span>
-              <span className='d-none d-md-inline-block'>แก้ไขรายละเอียดงานประชุม</span>
+              <span className=''>ปรับแต่ง</span>
             </button>
             <div className='d-flex align-items-center'>
               {statusConfr ? (
-                <button className='btn btn-success me-3' type='button' onClick={inActiveConfrStatus}>ACTIVE</button>
+                <button className='btn btn-outline-success me-3' type='button' onClick={inActiveConfrStatus}>ACTIVE</button>
               ) : (
-                <button className='btn btn-secondary me-3' type='button' onClick={activeConfrStatus}>INACTIVE</button>
+                <button className='btn btn-outline-secondary me-3' type='button' onClick={activeConfrStatus}>INACTIVE</button>
               )}
               <div>
-                <button className='btn p-0 position-relative' type='button' onClick={handleShowNoti}>
+                <button className='btn position-relative' type='button' onClick={handleShowNoti}>
                   <ion-icon name="notifications-outline"></ion-icon>
                   {remarkNoti ? (
                     <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
@@ -291,7 +293,7 @@ function Host() {
 
               {notiData.length > 0 ? (
                 <div>
-                  <div className='d-flex justify-content-end'>
+                  <div className='d-flex justify-content-end mb-3'>
                     <button type='button' className='btn btn-sm btn-outline-secondary' onClick={clearNotification}>Clear all</button>
                   </div>
                   <div className='row gy-3'>
@@ -373,24 +375,24 @@ function Host() {
             </div>
           </div>
         </section>
-        <section className='mb-5'>
+        <section className='mb-5 card p-3 p-md-5'>
           <div className='mb-3'>
             <h4 className='fw-bold mb-3'>รายการบทความ</h4>
             <form onSubmit={searchPaper} className='col-md-4 mb-3'>
               <div className='input-group'>
-                <input className='form-control' name='paper_list' type='search' placeholder='ค้นหาจากชื่อบทความ' />
+                <input className='form-control' name='paper_list' type='search' placeholder='ค้นหา' />
                 <button className='btn btn-outline-secondary btn-sm' type='submit'><ion-icon name="search"></ion-icon></button>
               </div>
             </form>
           </div>
           {paperFilter.length > 0 ? (
             <div>
-              <div className='table-responsive'>
-                <table className='table table-hover text-nowrap'>
-                  <thead className='table-secondary'>
+              <div className='table-responsive-md'>
+                <table className='table table-hover align-middle'>
+                  <thead>
                     <tr>
                       <th>รหัสบทความ</th>
-                      <th style={{ width: "200px" }}>ชื่อบทความ</th>
+                      <th style={{ minWidth: "200px" }}>ชื่อบทความ</th>
                       <th>หัวข้อ</th>
                       <th>สถานะบทความ</th>
                       <th>ผลลัพธ์</th>
@@ -411,23 +413,28 @@ function Host() {
                         <td className='text-center'>
                           {paper.close_name_file ? (
                             <a target='_blank' rel='noreferrer' href={api + "/pdf/" + paper.close_name_file}>File</a>
-                          ):(
+                          ) : (
                             <div className='badge bg-warning'>
                               ไม่พบข้อมูล
                             </div>
                           )}
                         </td>
                         <td>
-                          <div>
-                            <a href={"/host/assign/" + paper._id} className='text-secondary text-decoration-none me-2' >
-                              <span className='me-2'><ion-icon name="document-text"></ion-icon></span>
-                              Assign
-                            </a>
-                            <a href={"/host/over-all/" + paper._id} className='text-decoration-none text-success' type='button'>
-                              <span className='me-2'><ion-icon name="checkmark-done"></ion-icon></span>
-                              Approve
-                            </a>
-                          </div>
+                          <Dropdown>
+                            <Dropdown.Toggle variant="btn" id="dropdown-basic">
+                              <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item href={"/host/assign/" + paper._id}>
+                                <span className='me-2'><ion-icon name="document-text"></ion-icon></span>
+                                Assign
+                              </Dropdown.Item>
+                              <Dropdown.Item href={"/host/over-all/" + paper._id}>
+                                <span className='me-2'><ion-icon name="checkmark-done"></ion-icon></span>
+                                Approve
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
                         </td>
                       </tr>
                     ))}
@@ -435,7 +442,9 @@ function Host() {
                 </table>
               </div>
             </div>
-          ) : "ไม่พบรายการบทความ"}
+          ) : (
+            <SearchItemNotFound />
+          )}
 
         </section>
       </div>

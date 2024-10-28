@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-bootstrap/Modal'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import Dropdown from 'react-bootstrap/Dropdown'
+import Button from 'react-bootstrap/Button'
+import SearchItemNotFound from '../SearchItemNotFound'
+import UserIcon from '../../asset/user.png'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -82,8 +85,10 @@ function CreateInvModal({ show, handleClose, createInv }) {
     )
 }
 
-function EditInv({id}) {
+function EditInv() {
 
+
+    const [id, setId] = useState("")
     const [show, setShow] = useState(false)
     const [uploadImageShow, setUploadImageShow] = useState(false)
     const [invImage, setInvImage] = useState(null)
@@ -91,16 +96,18 @@ function EditInv({id}) {
     const [invSpeaker, setInvSpeaker] = useState([])
     const [uploadCV, setUploadCV] = useState(null)
     const [uploadCVShow, setUploadCVShow] = useState(false)
-    const [editId, setEditId] = useState("")
     const [invDetail, setInvDetail] = useState({
         name: "",
         desc: "",
         keynote: "",
 
     })
+    const [showEdit, setShowEdit] = useState(false)
 
     const handleClose = () => setShow(false)
     const handleShow = () => setShow(true)
+    const handleShowEdit = () => setShowEdit(true)
+    const handleCloseEdit = () => setShowEdit(false)
 
     //uploadImage
     const showUploadImage = (invId) => {
@@ -116,16 +123,6 @@ function EditInv({id}) {
     }
     const closeUploadCV = () => setUploadCVShow(false)
 
-
-    const fethInv = async () => {
-        try {
-            const res = await axios.get(api + "/get/inv/" + id)
-            setInvSpeaker(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     const createInv = async (e) => {
         e.preventDefault()
         const input = e.target
@@ -137,11 +134,12 @@ function EditInv({id}) {
                 confr_id: id
             })
             alert("เพิ่มพิธีกรสำเร็จ")
-            setInvSpeaker(res.data)
+            let newItem = [...invSpeaker]
+            newItem.push(res.data)
+            setInvSpeaker(newItem)
+            handleClose()
         } catch (error) {
             console.log(error)
-        } finally {
-            handleClose()
         }
     }
 
@@ -150,13 +148,22 @@ function EditInv({id}) {
         const formData = new FormData()
         formData.append("image", invImage)
         try {
-            await axios.patch(api + "/upload/image/inv/" + invId, formData)
+            const res = await axios.patch(api + "/upload/image/inv/" + invId, formData)
             alert("อัพโหลดข้อมูลสำเร็จ")
+            const newItem = invSpeaker.map(item => {
+                if (item._id === invId) {
+                    return {
+                        ...item,
+                        img: res.data
+                    }
+                } else {
+                    return item
+                }
+            })
+            setInvSpeaker(newItem)
+            closeUploadImage()
         } catch (error) {
             console.log(error)
-        } finally {
-            fethInv()
-            closeUploadImage()
         }
     }
 
@@ -170,27 +177,26 @@ function EditInv({id}) {
         } catch (error) {
             console.log(error)
         } finally {
-            fethInv()
             closeUploadCV()
         }
     }
 
     const handleEdit = (invId, name, desc, keynote) => {
-        setEditId(invId)
         setInvDetail({
+            _id: invId,
             name: name,
             desc: desc,
             keynote: keynote
         })
+        handleShowEdit()
     }
 
-    const invDetailUpdate = async (e, invId) => {
+    const invDetailUpdate = async (e) => {
         e.preventDefault()
         if (invDetail.name !== "" && invDetail.desc !== "" && invDetail.keynote !== "") {
             try {
-                const res = await axios.patch(api + "/update/inv/" + invId, invDetail)
+                const res = await axios.patch(api + "/update/inv/" + invDetail._id, invDetail)
                 alert("บันทึกสำเร็จ:" + res.data)
-                setEditId("")
             } catch (error) {
                 console.log(error)
             }
@@ -213,88 +219,125 @@ function EditInv({id}) {
     }
 
     useEffect(() => {
+
+        const confr_id = sessionStorage.getItem("host_confr")
+        setId(confr_id)
+
+        const fethInv = async () => {
+            try {
+                const res = await axios.get(api + "/get/inv/" + confr_id)
+                setInvSpeaker(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         fethInv()
     }, [])
 
     return (
         <div>
+            <EditInvDetail show={showEdit} handleClose={handleCloseEdit} data={invDetail} setData={setInvDetail} handleUpdate={invDetailUpdate} />
             <CreateInvModal show={show} handleClose={handleClose} createInv={createInv} />
             <UploadInvImage show={uploadImageShow} handleClose={closeUploadImage} invId={invSpeakerId} uploadImage={invImageUpload} setImage={setInvImage} />
             <UploadCV show={uploadCVShow} handleClose={closeUploadCV} invId={invSpeakerId} uploadCV={invCVUpload} setCV={setUploadCV} />
-            <div className='mb-5'>
-                <h4 className='text-primary'>รายละเอียดวิทยากรรับเชิญ</h4>
-                <hr />
-            </div>
             <div className='mb-3'>
-                <button className='btn btn-primary' type='button' onClick={handleShow}>Create New +</button>
+                <div className='d-flex justify-content-between mb-3 align-items-center'>
+                    <h4 className='fw-bold'>รายละเอียดวิทยากรรับเชิญ</h4>
+                    <button className='btn btn-outline-primary btn-sm' type='button' onClick={handleShow}>Create New +</button>
+                </div>
             </div>
             {invSpeaker.length > 0 ? (
-                <div className='table-responsive'>
-                    <table className='table table-hover'>
-                        <thead className='table-dark'>
-                            <tr>
-                                <th>Icon</th>
-                                <th>ชื่อ</th>
-                                <th>รายละเอียด</th>
-                                <th>Keynote</th>
-                                <th>CV</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {invSpeaker?.map((item) => {
-                                return (
-                                    <tr key={item._id}>
-                                        {editId === item._id ? (
-                                            <>
-                                                <td>
-                                                    <button type='button' onClick={() => showUploadImage(item._id)} className='btn btn-primary'>Upload</button>
-                                                </td>
-                                                <td>
-                                                    <textarea onChange={e => setInvDetail({ ...invDetail, name: e.target.value })} className='form-control' defaultValue={item.name} />
-                                                </td>
-                                                <td>
-                                                    <textarea onChange={e => setInvDetail({ ...invDetail, desc: e.target.value })} className='form-control' defaultValue={item.desc} />
-                                                </td>
-                                                <td>
-                                                    <textarea onChange={e => setInvDetail({ ...invDetail, keynote: e.target.value })} className='form-control' defaultValue={item.keynote} />
-                                                </td>
-                                                <td>
-                                                    <button type='button' onClick={() => showUploadCV(item._id)} className='btn btn-primary'>Upload</button>
-                                                </td>
-                                                <td className='text-nowrap'>
-                                                    <button onClick={e => invDetailUpdate(e, item._id)} type='button' className='btn btn-success me-2'>บันทึก</button>
-                                                    <button onClick={() => setEditId("")} type='button' className='btn btn-secondary'>ยกเลิก</button>
-                                                </td>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <td>
-                                                    {item.img ? <img src={api + "/image/" + item.img} height={128} width={128} />: <button type='button' onClick={() => showUploadImage(item._id)} className='btn btn-primary'>Upload</button>}
-                                                </td>
-                                                <td>{item.name}</td>
-                                                <td>{item.desc}</td>
-                                                <td>{item.keynote}</td>
-                                                <td>
-                                                    {item.cv ? <a href={api + "/pdf/" + item.cv} target='_blank'>CV: {item.name}</a> : <button type='button' onClick={() => showUploadCV(item._id)} className='btn btn-primary'>Upload</button>}
-                                                </td>
-                                                <td className='text-nowrap'>
-                                                    <button onClick={() => handleEdit(item._id, item.name, item.desc, item.keynote)} type='button' className='btn btn-primary me-2'>แก้ไข</button>
-                                                    <button onClick={() => handleDelInv(item._id, item.img, item.cv)} type='button' className='btn btn-danger'>ลบ</button>
-                                                </td>
-                                            </>
-                                        )}
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div >
-            ) : <h4 className='fw-bold text-center'>ไม่พบข้อมูล กรุณาเพิ่มข้อมูลรายชื่อพิธีกร</h4>}
+                <div className='row gy-5'>
+                    {invSpeaker.map((item) => (
+                        <div key={item._id} className='col-12 col-md-6 col-lg-4'>
+                            <div className='card p-3 h-100'>
+                                <div className='text-end mb-2'>
+                                    <Dropdown drop='down-centered'>
+                                        <Dropdown.Toggle variant="btn" id="dropdown-basic">
+                                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item onClick={() => handleEdit(item._id, item.name, item.desc, item.keynote)}>
+                                                <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
+                                                Edit
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handleDelInv(item._id, item.img, item.cv)}>
+                                                <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                Delete
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => showUploadImage(item._id)}>
+                                                <span className='me-2'><ion-icon name="image-outline"></ion-icon></span>
+                                                Upload Image
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => showUploadCV(item._id)}>
+                                                <span className='me-2'><ion-icon name="document-outline"></ion-icon></span>
+                                                Upload Cv
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </div>
+                                {item.img ? <img src={api + "/image/" + item.img} alt={"invite speaker " + item.img} className='card-img-top' /> : <img src={UserIcon} alt="inv" className='card-img-top' />}
+                                <div className='card-body'>
+                                    <h5 className='card-title'>
+                                        {item.name}
+                                    </h5>
+                                    <p className='card-text'>{item.desc}</p>
+                                    <div>
+                                        {item.cv ?
+                                            <a href={api + "/pdf/" + item.cv} target='_blank' className='btn btn-outline-secondary' rel='noreferrer'>
+                                                <span className='me-2'><ion-icon name="document-outline"></ion-icon> CV</span>
+                                                CV
+                                            </a> : null}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : <SearchItemNotFound />}
 
         </div >
     )
 }
 
 export default EditInv
+
+function EditInvDetail({ show, handleClose, data, setData, handleUpdate }) {
+
+    return (
+        <div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{data.name}</Modal.Title>
+                </Modal.Header>
+                <form onSubmit={handleUpdate}>
+                    <Modal.Body>
+                        <div className='mb-3'>
+                            <label className='form-label text-muted'>ชื่อ</label>
+                            <input className='form-control' onChange={e => setData({ ...data, name: e.target.value })} defaultValue={data.name} required />
+                        </div>
+                        <div className='mb-3'>
+                            <label className='form-label text-muted'>รายละเอียด</label>
+                            <textarea className='form-control' onChange={e => setData({ ...data, desc: e.target.value })} defaultValue={data.desc} required />
+                        </div>
+                        <div className='mb-3'>
+                            <label className='form-label text-muted'>Keynote</label>
+                            <input className='form-control' onChange={e => setData({ ...data, keynote: e.target.value })} defaultValue={data.keynote} required />
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        <Button variant="primary" type='submit' >
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+        </div>
+    )
+}
 

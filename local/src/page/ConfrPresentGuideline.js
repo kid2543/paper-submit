@@ -1,6 +1,8 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import LoadingPage from '../components/LoadingPage'
+import SearchItemNotFound from '../components/SearchItemNotFound'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -11,31 +13,25 @@ function ConfrPresentGuideline() {
     const [remark ,setRemark] = useState("")
     const [loading, setLoading] = useState(true)
 
-    const fethData = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(api + "/get/confr/" + id)
-            setPresentData(res.data.presentation_guideline)
-            setRemark(res.data.presentation_remark)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
+
+        setLoading(true)
+        const fethData = async () => {
+            try {
+                const res = await axios.get(api + "/get/confr/" + id)
+                setPresentData(res.data.presentation_guideline)
+                setRemark(res.data.presentation_remark)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         fethData()
-    }, [])
+    }, [id])
 
     if (loading) {
-        return (
-            <div className='my-5 p-5 text-center'>
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        )
+        return <LoadingPage />
     }
 
     return (
@@ -49,7 +45,7 @@ function ConfrPresentGuideline() {
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
-                    ):null}
+                    ): <SearchItemNotFound />}
                 </div>
             </div>
             {remark && 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { NavbarConfr } from '../components/Navbar'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import LoadingPage from '../components/LoadingPage'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -13,47 +13,42 @@ function ConfrTemplate() {
     const [submitDetail, setSubmitDetail] = useState([])
     const [loading, setLoading] = useState(true)
 
-    const fethTemplate = async () => {
-        setLoading(true)
-        try {
-            const res = await axios.get(api + "/get/template/" + id)
-            setTemplate(res.data)
-            console.log("template data: ", res.data)
-            const confrData = await axios.get(api + "/get/confr/" + id)
-            setSubmitDetail(confrData.data.submit_detail)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    console.log("Submit Detail", submitDetail)
-
     useEffect(() => {
+        const fethTemplate = async () => {
+            setLoading(true)
+            try {
+                const res = await axios.get(api + "/get/template/" + id)
+                setTemplate(res.data)
+                console.log("template data: ", res.data)
+                const confrData = await axios.get(api + "/get/confr/" + id)
+                setSubmitDetail(confrData.data.submit_detail)
+            } catch (error) {
+                console.log(error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         fethTemplate()
-    }, [])
+    }, [id])
 
     if (loading) {
         return (
-            <div className='my-5 p-5 text-center'>
-                <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            <LoadingPage />
         )
     }
 
     return (
         <div className='container'>
             <div className='mb-5'>
-                <h4 className='mb-3'>เทมเพลท</h4>
+                <h4 className='fw-bold'>เทมเพลท</h4>
+                <p className='text-muted'>กดปุ่มเพื่อดู template</p>
                 {template.length > 0 ? (
                     <div className='row'>
                         {template?.map((item) => (
-                            <div className='col-12 col-md-3'>
+                            <div className='col-12 col-md-3' key={item._id}>
                                 <div>
-                                    <button className='btn btn-outline-dark'>{item.name}</button>
+                                    <button type='button' onClick={() => window.open(api + "/pdf/" + item.file)} className='btn btn-outline-dark'>{item.name}</button>
                                 </div>
                             </div>
                         ))}
@@ -61,14 +56,14 @@ function ConfrTemplate() {
                 ) : "ไม่พบเทมเพลท"}
             </div>
             <div className='mb-5'>
-                <h4 className='mb-3'>ข้อแนะนำการส่งบทความ</h4>
+                <p className='fw-bold'>ข้อแนะนำการส่งบทความ</p>
                 {submitDetail.length > 0 ? (
                     <ol>
                         {submitDetail?.map((item, index) => (
                             <li key={index}>{item}</li>
                         ))}
                     </ol>
-                ) : "ไม่พบข้อมูล"}
+                ) : "-"}
             </div>
         </div>
     )

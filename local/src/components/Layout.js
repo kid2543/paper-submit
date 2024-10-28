@@ -8,7 +8,7 @@ function Layout({ children }) {
             <div>
                 <NavbarComponent />
             </div>
-            <main style={{minHeight: "100vh"}}>
+            <main style={{minHeight: "100vh", marginTop: "120px"}}>
                 {children}
             </main>
             <div className='container'>

@@ -1,4 +1,5 @@
-export default ({status}) => {
+
+const PaymentStatus = ({status}) => {
     switch (status) {
         case 0:
             return <span className='badge bg-secondary'>รอดำเนินการ</span>
@@ -12,3 +13,5 @@ export default ({status}) => {
             return <span className='badge bg-dark'>ไม่ระบุ</span>
     }
 }
+
+export default PaymentStatus

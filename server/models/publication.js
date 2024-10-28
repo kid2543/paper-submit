@@ -4,7 +4,8 @@ const pubSchema = mongoose.Schema(
     {
         th_name: String,
         en_name: String,
-        branch: String,
+        branch: [String],
+        
     }
 )
 

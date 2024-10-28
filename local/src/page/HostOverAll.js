@@ -1,10 +1,9 @@
 import axios from 'axios'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import PaperStatus from '../components/PaperStatus'
 import PaymentStatus from '../components/PaymentStatus'
 import PaperResult from '../components/PaperResult'
-
 import emailjs from 'emailjs-com';
 
 const api = process.env.REACT_APP_API_URL
@@ -20,23 +19,9 @@ function HostOverAll() {
   const [reviewer, setReviewer] = useState([])
   const [paperResult, setPaperResult] = useState(0)
   const [owner, setOwner] = useState({})
-  const from = useRef()
 
   const { id } = useParams()
 
-  const fethComment = async () => {
-    try {
-      const reviewerRes = await axios.get(api + "/get/review/host/" + id)
-      console.log("feth Comment: ", reviewerRes.data)
-      setReviewer(reviewerRes.data)
-      const paperRes = await axios.get(api + "/get/paper/" + id)
-      console.log("paper data", paperRes.data)
-      setPaper(paperRes.data)
-      setOwner(paperRes.data.owner)
-    } catch (error) {
-      console.log("feth Commment Error", error)
-    }
-  }
 
   const submitPaperStatus = async (e) => {
     e.preventDefault()
@@ -56,6 +41,7 @@ function HostOverAll() {
     switch (status) {
       case 0: return <span className='ms-2 badge bg-warning'>Pending</span>
       case 1: return <span className='ms-2 badge bg-success'>Sucess</span>
+      default: return <span className='ms-2 badge bg-secondary'>ไม่ระบุ</span>
     }
   }
 
@@ -106,66 +92,99 @@ function HostOverAll() {
   };
 
   useEffect(() => {
+
+    const fethComment = async () => {
+      try {
+        const reviewerRes = await axios.get(api + "/get/review/host/" + id)
+        console.log("feth Comment: ", reviewerRes.data)
+        setReviewer(reviewerRes.data)
+        const paperRes = await axios.get(api + "/get/paper/" + id)
+        console.log("paper data", paperRes.data)
+        setPaper(paperRes.data)
+        setOwner(paperRes.data.owner)
+      } catch (error) {
+        console.log("feth Commment Error", error)
+      }
+    }
+
     fethComment()
-  }, [])
+
+  }, [id])
 
   return (
     <div className='container my-5'>
       <div className='mb-5'>
         <h4 className='fw-bold'>ผลลัพธ์การตรวจบทความ</h4>
       </div>
-      <div className='mb-5'>
-        <p className='fw-bold'>รายละเอียดบทความ</p>
-        <p>
-          Code: <b>{paper?.paper_code}</b><br />
-          Title: <b>{paper?.title}</b><br />
-          File : <a href={api + "/pdf/" + paper?.paper_file} target='_blank'>{paper?.paper_code}</a><br />
-          ผู้แต่ง: <b>{paper?.owner?.fname} {paper?.owner?.lname}</b><br />
-          email ผู้แต่ง: <b>{paper?.owner?.email}</b><br />
-          สถานะปัจจุบัน: <b><PaperStatus status={paper?.status} /></b><br />
-          ผลลัพธ์บทความ: <b><PaperResult status={paper?.result} /></b><br />
-          สถานะการชำระค่าลงทะเบียน: <b><PaymentStatus status={paper?.payment_status} /></b><br />
-          หลักฐานการชำระเงิน: <a href={api + "/image/" + paper?.payment_image} target='_blank'>ดูหลักฐาน</a><br />
-        </p>
-      </div>
-      <div className='mb-5 col-md-4'>
-        <form onSubmit={checkPayment}>
-          <div>
-            <label className="form-label text-muted">หลักฐานการชำระเงินถูกต้องไหม ?</label>
-            <select name='payment_status' className='form-select' required>
-              <option value="">--</option>
-              <option value="2">หลักฐานการชำระเงินถูกต้อง</option>
-              <option value="3">หลักฐานการชำระเงินไม่ถูกต้อง</option>
-            </select>
-            <div className='mt-2'>
-              <button className="btn btn-primary">Submit</button>
+      <div className='row g-3 mb-5'>
+        <div className='col-md-6'>
+          <div className='card h-100'>
+            <div className='card-body'>
+              <h6 className='fw-bold card-title'>รายละเอียดบทความ</h6>
+              Code: <b>{paper?.paper_code}</b><br />
+              Title: <b>{paper?.title}</b><br />
+              File : <a className='text-success' href={api + "/pdf/" + paper?.paper_file} target='_blank' rel='noreferrer'>{paper?.paper_code}</a><br />
+              ผู้แต่ง: <b>{paper?.owner?.fname} {paper?.owner?.lname}</b><br />
+              email ผู้แต่ง: <b>{paper?.owner?.email}</b><br />
+              สถานะปัจจุบัน: <b><PaperStatus status={paper?.status} /></b><br />
+              ผลลัพธ์บทความ: <b><PaperResult status={paper?.result} /></b><br />
+            <div className='mt-3'>
+              <form onSubmit={submitPaperStatus}>
+                <label className='form-label text-muted'>สรุปผลลัพธ์</label>
+                <select className='form-select form-select-sm' required onChange={e => setPaperResult(parseInt(e.target.value))}>
+                  <option value="" >--</option>
+                  <option value={1}>Accept submission (ผ่าน)</option>
+                  <option value={2}>Revisions required (ผ่านแบบมีเงื่อนไข)</option>
+                  <option value={3}>Resubmit for review (ส่งใหม่เพื่อให้พิจารณาอีกครั้ง)</option>
+                  <option value={4}>Decline submission (ไม่ผ่าน)</option>
+                </select>
+                <div className='mt-2'>
+                  <button className='btn btn-outline-primary btn-sm'>ยืนยัน</button>
+                </div>
+              </form>
+            </div>
             </div>
           </div>
-        </form>
-      </div>
-      <div className='mb-5 col-md-4'>
-        <div>
-          <form onSubmit={submitPaperStatus}>
-            <p className='fw-bold me-3'>สรุปผลลัพธ์</p>
-            <select className='form-select' required onChange={e => setPaperResult(parseInt(e.target.value))}>
-              <option value="" >--</option>
-              <option value={1}>Accept submission (ผ่าน)</option>
-              <option value={2}>Revisions required (ผ่านแบบมีเงื่อนไข)</option>
-              <option value={3}>Resubmit for review (ส่งใหม่เพื่อให้พิจารณาอีกครั้ง)</option>
-              <option value={4}>Decline submission (ไม่ผ่าน)</option>
-            </select>
-            <button className='btn btn-primary my-2'>Submit</button>
-          </form>
+        </div>
+        <div className='col-md-6'>
+          <div className='card h-100'>
+            <div className='card-body'>
+              <h6 className='fw-bold card-tite'>หลักฐานการชำระเงิน</h6>
+              <div className='mb-3'>
+                สถานะ: <PaymentStatus status={paper?.payment_status} />
+                {paper?.payment_image &&
+                  <p>
+                    หลักฐานการชำระเงิน: <a href={api + "/image/" + paper?.payment_image} target='_blank' rel='noreferrer'>ดูหลักฐาน</a><br />
+                  </p>
+                }
+              </div>
+              <div>
+                <form onSubmit={checkPayment}>
+                  <div>
+                    <label className="form-label text-muted">หลักฐานการชำระเงิน</label>
+                    <select name='payment_status' className='form-select form-select-sm' required>
+                      <option value="">--</option>
+                      <option value="2">หลักฐานการชำระเงินถูกต้อง</option>
+                      <option value="3">หลักฐานการชำระเงินไม่ถูกต้อง</option>
+                    </select>
+                    <div className='mt-2'>
+                      <button className="btn btn-outline-primary btn-sm">ยืนยัน</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div className='mb-5 row'>
         <div className='col'>
           <p className='fw-bold'>ส่งจดหมายเข้าร่วมงานประชุม</p>
-          <button className='btn btn-success' onClick={sendEmail} type='button'>Send Email</button>
+          <button className='btn btn-outline-success btn-sm' onClick={sendEmail} type='button'>ส่งจดหมายเชิญ</button>
         </div>
         <div className='col'>
           <p className='fw-bold'>Certificate</p>
-          <a href={"mailto:" + paper?.owner?.email + "?subject=คุณได้รับใบรับรอง&body=คุณได้รับใบรับรอง"} className='btn btn-success'>Sent</a>
+          <a href={"mailto:" + paper?.owner?.email + "?subject=คุณได้รับใบรับรอง&body=คุณได้รับใบรับรอง"} className='btn btn-outline-success btn-sm'>มอบใบรับรอง</a>
         </div>
       </div>
       <div className='mb-5'>
@@ -189,7 +208,7 @@ function HostOverAll() {
                   <div className='mt-3'>
                     <span className='text-muted'>ไฟล์: </span>
                     {item.suggestion_file &&
-                      <a href={api + "/pdf/" + item.suggestion_file} target='_blank'>ข้อแนะนำ</a>
+                      <a href={api + "/pdf/" + item.suggestion_file} target='_blank' rel='noreferrer'>ข้อแนะนำ</a>
                     }
                   </div>
                 </div>

@@ -25,6 +25,9 @@ const notification = require("./models/notification")
 const cloudinary = require('./cloudinary');
 const Publication = require("./models/publication");
 
+const bcrypt = require('bcrypt')
+const saltRounds = 10;
+
 app.use(express.json());
 app.use(express.static("public"));
 app.use(cors())
@@ -86,6 +89,43 @@ app.post("/test/upload", upload.single('image'), async (req, res) => {
 })
 
 
+// pagiantion
+
+function paginatedResults(model, pageNumber, limitNumber, fieldName) {
+  return async (req, res, next) => {
+    const page = parseInt(pageNumber) || 1
+    const limit = parseInt(limitNumber) || 10
+
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+
+    const result = {}
+
+    if (endIndex < model.length) {
+      result.next = {
+        page: page + 1,
+        limit: limit
+      }
+    }
+
+    if (startIndex > 0) {
+      result.previous = {
+        page: page - 1,
+        limit: limit
+      }
+    }
+
+    result.result = model.slice(startIndex, endIndex)
+  }
+}
+
+app.get('/test/pagination', (req, res) => {
+  res.json(paginatedResults([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 2))
+})
+
+// end pagiantion
+
+
 
 //-----------------------get All data--------------------------//
 
@@ -99,9 +139,19 @@ app.get("/all/confr", async (req, res) => {
   }
 })
 
+app.get("/all/paper", async (req, res) => {
+  try {
+    const paperData = await Paper.find({})
+    res.status(200).json(paperData)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
 app.get("/all/host", async (req, res) => {
   try {
-    const host = await User.find({ role: "Host" }).select({ password: 0 }).populate("confr_id")
+    const host = await User.find({ role: "host" }).select({ password: 0 })
     res.status(200).json(host)
   } catch (error) {
     console.log(error)
@@ -112,6 +162,16 @@ app.get('/get/comment/:id', async (req, res) => {
   try {
     const comment = await paperAssign.find({ paper_id: req.params.id })
     res.status(200).json(comment)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.get('/get/committee/detail/:id', async (req, res) => {
+  try {
+    const commitDetail = await User.findById(req.params.id).select({ username: 0, password: 0 })
+    res.status(200).json(commitDetail)
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
@@ -140,9 +200,19 @@ app.get("/get/assign/:id", async (req, res) => {
   }
 })
 
+app.get("/get/assigned/:paper", async (req, res) => {
+  try {
+    const assigned = await paperAssign.find({ paper_id: req.params.paper, status: { $ne: 5 } }).populate("reviewer", "fname lname")
+    res.status(200).json(assigned)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
 app.get("/all/committee", async (req, res) => {
   try {
-    const committee = await User.find({ role: "Committee" }).select({ username: 0, password: 0 })
+    const committee = await User.find({ role: "committee" }).select({ password: 0 })
     res.status(200).json(committee);
   } catch (error) {
     console.log(error);
@@ -260,7 +330,23 @@ app.get("/get/user/byid/:id", async (req, res) => {
   }
 })
 
+
 //----------------------Create Data--------------------------//
+
+app.post("/create/notification/:id", async (req, res) => {
+  try {
+    const input = req.body
+    await notification.create({
+      owner: req.params.id,
+      header: input.header,
+      form: input.form,
+    })
+    res.status(201).send("Notification is Created")
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
 
 app.post("/create/inv", async (req, res) => {
   try {
@@ -292,7 +378,7 @@ app.post("/assign/:paper", async (req, res) => {
     await notification.create({
       owner: req.body.reviewer,
       header: "มีบทความรอการตรวจ",
-      form: "บทความ " + req.body.paper_code + " ได้ถูกมอบหมายให้คุณ" 
+      form: "บทความ " + req.body.paper_code + " ได้ถูกมอบหมายให้คุณ"
     })
     res.status(200).json(create)
   } catch (error) {
@@ -322,13 +408,38 @@ app.get("/get/reviewer/list/:paper", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   try {
-    await User.create(req.body);
-    res.status(201).send("Success")
+    const newData = req.body
+    const passwordHash = bcrypt.hashSync(newData.password, saltRounds)
+    newData.password = passwordHash
+    const newUser = await User.create(newData)
+    res.status(201).send(newUser)
   } catch (error) {
     if (error.code === 11000) {
       res.status(400).send("มีผู้ใช้งานนี้แล้ว")
     } else {
       res.status(500).json(error)
+      console.log(error)
+    }
+  }
+})
+
+app.post('/signup/committee', async (req, res) => {
+  try {
+    const resData = await User.create(req.body);
+    const sendBackData = {
+      _id: resData._id,
+      fname: req.body.fname,
+      lname: req.body.lname,
+      email: req.body.email,
+      university: req.body.university,
+      username: req.body.username
+    }
+    res.status(201).json(sendBackData)
+  } catch (error) {
+    if (error.code === 11000) {
+      res.status(400).send("มีผู้ใช้งานแล้ว")
+    } else {
+      res.status(500).send(error)
     }
   }
 })
@@ -377,14 +488,14 @@ app.post("/create/paper", uploadPdf.single("file"), async (req, res) => {
 app.post("/create/category", uploadImage.single("image"), async (req, res) => {
   try {
     const input = req.body
-    const category = await Category.create({
+    const create = await Category.create({
       name: input.name,
-      category_code: input.cate_code,
+      category_code: input.cate_code.toUpperCase(),
       desc: input.desc,
       confr_id: input.confr_id,
       icon: req.file.filename
     });
-    res.status(201).json(category);
+    res.status(201).json(create);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -408,18 +519,16 @@ app.post("/upload/category", uploadImage.single('image'), async (req, res) => {
   }
 });
 
-app.post("/create/conferences/:id", async (req, res) => {
+app.post("/create/conferences", async (req, res) => {
   try {
     const conferences = await Conferences.create(req.body);
-    await User.findByIdAndUpdate({ _id: req.params.id }, {
-      $set: {
-        confr_id: conferences._id
-      }
-    })
     res.status(201).json(conferences);
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    if (error.code === 11000) {
+      res.status(400).json({ message: error.message })
+    } else {
+      res.status(500).json({ message: error.message })
+    }
   }
 });
 
@@ -431,7 +540,7 @@ app.post("/signin", async (req, res) => {
     if (!check) {
       res.status(404).send("Not Found");
     }
-    if (check.password === req.body.password) {
+    if (bcrypt.compareSync(req.body.password, check.password)) {
       res.status(200).json({
         fname: check.fname,
         lname: check.lname,
@@ -513,7 +622,7 @@ app.patch("/upload/image/inv/:id", uploadImage.single('image'), async (req, res)
       }
     })
     console.log(result)
-    res.status(200).json(result)
+    res.status(200).json(req.file.filename)
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
@@ -522,13 +631,35 @@ app.patch("/upload/image/inv/:id", uploadImage.single('image'), async (req, res)
 
 app.patch('/update/notification/status/:id', async (req, res) => {
   try {
-    const readStatus = await notification.updateMany({ owner: req.params.id }, {
+    const readStatus = await notification.updateMany({ owner: req.params.id, read_status: false }, {
       $set: {
         read_status: true,
       }
     },
     )
     res.status(200).json(readStatus)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.patch('/cancel/paper/assign', async (req, res) => {
+  try {
+    const input = req.body
+    for (let i in input.list) {
+      await paperAssign.updateMany({ paper_id: input.paper_id, reviewer: input.list[i] }, {
+        $set: {
+          status: 5
+        }
+      })
+      await notification.create({
+        owner: input.list[i],
+        header: "ยกเลิกการตรวจบทความ",
+        form: "ผู้จัดงานได้ทำการยกเลิกการตรวจบทความ: " + input.paper_code + " แล้ว",
+      })
+    }
+    res.status(200).send("Cancel Success!")
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
@@ -619,57 +750,57 @@ app.patch("/update/paper/:id", async (req, res) => {
   }
 })
 
-app.patch("/update/cate/:id/:filename", uploadImage.single('image'), async (req, res) => {
-  if (req.file) {
-    try {
-      const uploadCate = await Category.findByIdAndUpdate(req.params.id, {
-        $set: {
-          category_code: req.body.cate_code,
-          name: req.body.name,
-          desc: req.body.desc,
-          reviewer_list: req.body.reviewer,
-          icon: req.file.filename
-        }
-      })
-      fs.unlink('../server/public/image/' + req.params.filename, (err) => {
-        if (err) console.log(err)
-        else {
-          console.log("file is deleted")
-        }
-      })
-      res.status(200).json(uploadCate)
-    } catch (error) {
-      console.log(error)
-      res.status(500).send(error)
-    }
-  } else {
-    try {
-      const updateCate = await Category.findByIdAndUpdate(req.params.id, {
-        $set: {
-          category_code: req.body.cate_code,
-          name: req.body.name,
-          desc: req.body.desc,
-          reviewer_list: req.body.reviewer
-        }
-      })
-      res.status(200).json(updateCate)
-    } catch (error) {
-      console.log(error)
-      res.status(500).send(error)
-    }
+app.patch('/update/cate/:id', async (req, res) => {
+  try {
+    const updateCate = await Category.findByIdAndUpdate(req.params.id, {
+      $set: {
+        category_code: req.body.cate_code,
+        name: req.body.name,
+        desc: req.body.desc,
+        reviewer_list: req.body.reviewer
+      }
+    })
+    res.status(200).json(updateCate)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.patch("/upload/cate/:id/:filename", uploadImage.single('image'), async (req, res) => {
+  try {
+    fs.unlink('../server/public/image/' + req.params.filename, (err) => {
+      if (err) console.log(err)
+      else {
+        console.log("file is deleted")
+      }
+    })
+    const uploadCate = await Category.findByIdAndUpdate(req.params.id, {
+      $set: {
+        category_code: req.body.cate_code,
+        name: req.body.name,
+        desc: req.body.desc,
+        reviewer_list: req.body.reviewer,
+        icon: req.file.filename
+      }
+    })
+    res.status(200).json(uploadCate)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
   }
 })
 
 app.patch("/update/pub/:id", async (req, res) => {
   try {
-    const updatePub = await Publication.findByIdAndUpdate(req.params.id, {
+    await Publication.findByIdAndUpdate(req.params.id, {
       $set: {
         th_name: req.body.th_name,
         en_name: req.body.en_name,
         branch: req.body.branch
       }
     })
-    res.status(200).json(updatePub)
+    res.status(200).send("update Success")
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
@@ -733,13 +864,34 @@ app.get("/get/unread/notification/:id", async (req, res) => {
 })
 
 app.get("/get/confr/:id", async (req, res) => {
-  try {
-    const getConfr = await Conferences.findById(req.params.id);
-    res.status(200).json(getConfr);
-  } catch (error) {
-    res.status(500).json(error)
+  let validObj = mongoose.Types.ObjectId
+  if (validObj.isValid(req.params.id)) {
+    try {
+      const getConfr = await Conferences.findById(req.params.id);
+      if (getConfr === null) {
+        res.status(404).send("Item not found")
+      } else {
+        res.status(200).json(getConfr);
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(error)
+    }
+  } else {
+    res.status(404).send("Item not found")
   }
+
 });
+
+app.get("/get/confr/list/:id", async (req, res) => {
+  try {
+    const list = await Conferences.find({ owner: req.params.id })
+    res.status(200).json(list)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
 
 app.get("/get/host/confr/:id", async (req, res) => {
   try {
@@ -862,7 +1014,7 @@ app.get("/get/paper/assign/:id", async (req, res) => {
 
 app.get("/get/review/host/:id", async (req, res) => {
   try {
-    const reviewList = await paperAssign.find({ paper_id: req.params.id }).populate("reviewer", { "password": 0, "username": 0 })
+    const reviewList = await paperAssign.find({ paper_id: req.params.id, status: { $ne: 5 } }).populate("reviewer", { "password": 0, "username": 0 })
     res.status(200).json(reviewList)
   } catch (error) {
     console.log(error)
@@ -1090,8 +1242,18 @@ app.delete('/del/notification/:id', async (req, res) => {
 
 app.delete('/clear/notification/:id', async (req, res) => {
   try {
-    const del = await notification.deleteMany({ owner: req.params.id })
-    res.status(202).send("Notification is deleted: " + del.n)
+    await notification.deleteMany({ owner: req.params.id })
+    res.status(202).send("Notification is deleted")
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.delete("/delete/user/:id", async (req, res) => {
+  try {
+    await User.deleteOne({ _id: req.params.id })
+    res.status(200).send("User is deleted")
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
@@ -1205,7 +1367,7 @@ app.delete('/delete/inv/:id/:image/:cv', async (req, res) => {
   }
 })
 
-// search ------------------------------------
+//------------------------------------------------------- ค้นหา ----------------------------------------------------
 
 app.get('/search/paper/:title/:id', async (req, res) => {
   try {
@@ -1217,24 +1379,52 @@ app.get('/search/paper/:title/:id', async (req, res) => {
   }
 })
 
-app.get('/search/committee/:fullname', async (req, res) => {
+app.get('/search/confr', async (req, res) => {
   try {
-    const searchCommittee = await User.find({ fname: { $regex: req.params.fullname, $options: "i" }, role: "Committee" }).select({ username: 0, password: 0 })
-    res.status(200).json(searchCommittee)
-    console.log(searchCommittee)
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const searchQuery = req.query.search || ''
+    const skip = (page - 1) * limit
+
+    const items = await Conferences.find({ title: { $regex: searchQuery, $options: 'i' } })
+      .skip(skip)
+      .limit(limit)
+
+    const total = await Conferences.countDocuments({ title: { $regex: searchQuery, $options: 'i' } })
+
+    res.status(200).json({
+      items,
+      total,
+      totalPage: Math.ceil(total / limit),
+      currentPage: page
+    })
   } catch (error) {
-    console.log(error)
-    res.status(500).send(error)
+    res.status(500).json({ message: error.message })
   }
 })
 
-app.get('/get/committee/detail/:id', async (req, res) => {
+app.get('/search/committee', async (req, res) => {
   try {
-    const commitDetail = await User.findById(req.params.id).select({ username: 0, password: 0 })
-    res.status(200).json(commitDetail)
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const searchQuery = req.query.search || ''
+    const skip = (page - 1) * limit
+
+    const items = await User.find({ fname: { $regex: searchQuery, $options: 'i' }, role: "committee" })
+      .skip(skip)
+      .limit(limit)
+
+    const total = await User.countDocuments({ fname: { $regex: searchQuery, $options: 'i' }, role: "committee" })
+
+    res.status(200).json({
+      items,
+      total,
+      totalPage: Math.ceil(total / limit),
+      currentPage: page
+    })
+
   } catch (error) {
-    console.log(error)
-    res.status(500).send(error)
+    res.status(500).json({ message: error.message })
   }
 })
 
@@ -1252,6 +1442,53 @@ app.get('/search/pub/:pubname', async (req, res) => {
   try {
     const searchPub = await Publication.find({ en_name: { $regex: req.params.pubname, $options: "i" } })
     res.status(200).json(searchPub)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.get('/search/host/:hostname', async (req, res) => {
+  try {
+    const searchHost = await User.find({ role: "host", fname: { $regex: req.params.hostname, $options: "i" } })
+    res.status(200).json(searchHost)
+  } catch (error) {
+    console.log(error)
+    res.status(500).send(error)
+  }
+})
+
+app.get('/host/search', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const searchQuery = req.query.search || ''
+    const skip = (page - 1) * limit
+
+    const items = await User.find({ fname: { $regex: searchQuery, $options: 'i' }, role: "host" })
+      .skip(skip)
+      .limit(limit)
+
+    const total = await User.countDocuments({ fname: { $regex: searchQuery, $options: 'i' }, role: "host" })
+
+    res.status(200).json({
+      items,
+      total,
+      totalPage: Math.ceil(total / limit),
+      currentPage: page
+    })
+
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+app.get('/search/all/paper/:title/:limit', async (req, res) => {
+  try {
+    console.log("limit:", req.params.limit)
+    const limitInt = parseInt(req.params.limit)
+    const paperData = await Paper.find({ title: { $regex: req.params.title, $options: "i" } }).limit(limitInt)
+    res.status(200).json(paperData)
   } catch (error) {
     console.log(error)
     res.status(500).send(error)

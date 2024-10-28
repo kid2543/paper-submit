@@ -8,8 +8,6 @@ const api = process.env.REACT_APP_API_URL
 function SignIn() {
 
   const [errorMessage, setErrorMessage] = useState("")
-  const token = sessionStorage.getItem("token")
-  const role = sessionStorage.getItem("role")
 
   const navigate = useNavigate()
 
@@ -25,7 +23,6 @@ function SignIn() {
       sessionStorage.setItem("lname", res.data.lname)
       sessionStorage.setItem("token", res.data.token)
       sessionStorage.setItem("role", res.data.role)
-      sessionStorage.setItem("confr", res.data.confr_id)
       navigate("/")
     } catch (error) {
       if (error.response.status === 404) {
@@ -53,56 +50,54 @@ function SignIn() {
   }
 
   useEffect(() => {
+
+    const token = sessionStorage.getItem("token")
+    const role = sessionStorage.getItem("role")
+
     if (token) {
       switch (role) {
-        case "Admin": navigate("/admin"); break
-        case "Host": navigate("/host"); break
-        case "Author": navigate("/author"); break
-        case "Committee": navigate("/committee"); break
+        case "admin": window.location.href = "/admin"; break
+        case "host": window.location.href = "/host"; break
+        case "author": window.location.href = "/author"; break
+        case "committee": window.location.href = "/committee"; break
+        default: window.location.href = "/sign-in"
       }
     }
   }, [])
 
 
   return (
-    <div className='container' style={{ height: "100vh" }}>
-      <div className='row h-100 d-flex align-items-center'>
-        <form className='col-lg-3 mx-auto' onSubmit={handleForm}>
-          <a href="/" className='d-flex align-items-center justify-content-center text-decoration-none text-dark mb-5'>
-            <div>
-              <img alt='main-logo' src={Logo} height={48} width={48} className='me-2' />
-            </div>
-            <div>
-              <p className='fw-bold fs-4 text-center mb-0'>PAPERSS</p>
-            </div>
+    <div className='text-center signin-body'>
+      <div className='form-signin'>
+        <form onSubmit={handleForm} className='card p-3 shadow-sm'>
+          <a href='/' type='button' className='mb-3'>
+            <img src={Logo} alt='paper' className='img-fluid' height={64} width={64}  />
           </a>
-          <div className="mb-3">
-            <label className="form-label d-none">Username</label>
-            <input type="text" className="form-control form-control-lg" placeholder='Username' name='username' required onFocus={clearErrorMessage} />
+          <h3 className='h3 mb-3 fw-normal'>เข้าสู่ระบบ</h3>
+          <div className="form-floating">
+            <input type="text" className="form-control" placeholder='Username' name='username' required onFocus={clearErrorMessage} autoFocus />
+            <label className="form-label">Username</label>
           </div>
-          <div className="mb-3">
-            <label className="form-label d-none">Password</label>
-            <input type="password" className="form-control form-control-lg" placeholder='Password' name='password' id="password_input" required onFocus={clearErrorMessage} />
+          <div className="form-floating">
+            <input type="password" className="form-control" placeholder='Password' name='password' id="password_input" required onFocus={clearErrorMessage} />
+            <label className="form-label">Password</label>
           </div>
-          <div className='d-flex justify-content-between'>
-            <div className="mb-3 form-check d-flex">
-              <input type="checkbox" className="form-check-input me-2" onClick={showPassword} />
-              <label className="form-check-label">Show Password</label>
-            </div>
-            <div className='text-secondary'>
-              Forgot ?
-            </div>
+          <div className='checkbox mb-3'>
+            <label>
+              <input className='me-2' type='checkbox' onClick={showPassword} />
+              Show password
+            </label>
           </div>
-          <button type="submit" className="btn btn-primary w-100 fw-bold">LOGIN</button>
+          <button type="submit" className="btn btn-primary w-100 fw-bold mb-5">LOGIN</button>
           {errorMessage ? (
             <div className="alert alert-danger mt-5" role="alert">
               {errorMessage}
             </div>
           ) : null}
+          <div className='text-center'>
+            <a href="/sign-up" className='btn btn-link link-secondary text-decoration-none'>Create new <ion-icon name="arrow-forward"></ion-icon></a>
+          </div>
         </form>
-        <div className='text-center'>
-          <a href="/sign-up" className='btn btn-link link-secondary text-decoration-none'>Create new <ion-icon name="arrow-forward"></ion-icon></a>
-        </div>
       </div>
     </div>
   )

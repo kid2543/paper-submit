@@ -1,6 +1,9 @@
 import dayjs from 'dayjs';
 import React, { useState } from 'react'
-import Modal from 'react-bootstrap/Modal';
+import Modal from 'react-bootstrap/Modal'
+import Dropdown from 'react-bootstrap/Dropdown'
+import SearchItemNotFound from '../SearchItemNotFound';
+
 
 
 function EditDate({ data, addDate, handleChange, handleDel }) {
@@ -8,7 +11,6 @@ function EditDate({ data, addDate, handleChange, handleDel }) {
     const [show, setShow] = useState(false)
     const handleShowModal = () => setShow(true)
     const handleCloseModal = () => setShow(false)
-    const today = new Date()
 
     const addAndCloseModal = () => {
         addDate()
@@ -18,6 +20,7 @@ function EditDate({ data, addDate, handleChange, handleDel }) {
     return (
         <div className='mb-5'>
             <div>
+                <h4 className='fw-bold mb-3'>กำหนดการ</h4>
                 <Modal show={show} onHide={handleCloseModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>เพิ่มกำหนดการ</Modal.Title>
@@ -48,25 +51,26 @@ function EditDate({ data, addDate, handleChange, handleDel }) {
                     </Modal.Footer>
                 </Modal>
             </div>
-            <div>
-                <button className='btn btn-primary btn-sm' type='button' onClick={handleShowModal}>
+            <div className='mb-3 d-flex justify-content-between align-items-center'>
+                <p className='text-muted mb-0'>รายการกำหนดการ</p>
+                <button className='btn btn-outline-primary btn-sm' type='button' onClick={handleShowModal}>
                     <span className='fw-bold'>+</span> เพิ่มกำหนดการ
                 </button>
-                <div className='mt-3'>
-                    <p className='text-muted'>รายการกำหนดการ</p>
-                    <small>รายการทั้งหมด: <span className='fw-bold'>123,123,123</span></small>
-                    <hr />
-                </div>
-                <div className='table-responsive'>
-                    {data?.length > 0 ?
-                        (
+            </div>
+            <div>
+                {data?.length > 0 ?
+                    (
+                        <div className='table-responsive' style={{ minHeight: "480px" }}>
+                            <div className='mb-3'>
+                                <small className='text-muted'>รายการทั้งหมด: <span className='fw-bold'>{data.length}</span></small>
+                            </div>
                             <table className='table table-hover'>
                                 <thead className='table-secondary'>
                                     <tr>
                                         <th>ชื่อ</th>
                                         <th>เริ่ม</th>
                                         <th>สิ้นสุด</th>
-                                        <th>action</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -75,23 +79,34 @@ function EditDate({ data, addDate, handleChange, handleDel }) {
                                             <tr key={index} className='mb-3'>
                                                 <td>{date.name}</td>
                                                 <td>
-                                                    {dayjs(date.start_date).format("DD MMM YYYY")}
+                                                    {date.start_date ? (dayjs(date.start_date).format("DD MMM YYYY")): "-"}
                                                 </td>
                                                 <td>
-                                                    {dayjs(date.end_date).format("DD MMM YYYY")}
+                                                    {date.end_date ? (dayjs(date.end_date).format("DD MMM YYYY")): "-"}
                                                 </td>
                                                 <td>
-                                                    <a onClick={() => handleDel(date._id)} type='button' className='text-decoration-none text-danger'>ลบ</a>
+                                                    <Dropdown>
+                                                        <Dropdown.Toggle variant="btn">
+                                                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                                        </Dropdown.Toggle>
+
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item onClick={() => handleDel(date._id)}>
+                                                                <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                                Delete
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
                                                 </td>
                                             </tr>
                                         )
                                     })}
                                 </tbody>
                             </table>
-                        ) : (
-                            <p className='fw-bold'>ยังไม่มีกำหนดการ</p>
-                        )}
-                </div>
+                        </div>
+                    ) :
+                    <SearchItemNotFound />
+                }
             </div>
         </div>
     )

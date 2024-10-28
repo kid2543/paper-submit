@@ -10,18 +10,17 @@ function AdminUserDetail() {
 
     const [user, setUser] = useState({})
 
-    const fethUser = async () => {
-        try {
-            const res = await axios.get(api + "/get/user/byid/" + id)
-            setUser(res.data)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     useEffect(() => {
+        const fethUser = async () => {
+            try {
+                const res = await axios.get(api + "/get/user/byid/" + id)
+                setUser(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
         fethUser()
-    },[])
+    },[id])
 
     return (
         <div className='container py-5'>

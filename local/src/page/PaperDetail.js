@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import Card from '../components/Card'
 import bookCover from '../asset/book.png'
 import dayjs from 'dayjs'
 import axios from 'axios'
@@ -12,12 +11,15 @@ const mockPaper = {
   image: bookCover,
 }
 
+const api = process.env.REACT_APP_API_URL
+
 function PaperDetail() {
 
-  const api = process.env.REACT_APP_API_URL
   const {id} = useParams()
 
   const [paper, setPaper] = useState({})
+
+  useEffect(() => {
 
   const fethPaper = async () => {
     try {
@@ -28,9 +30,9 @@ function PaperDetail() {
     }
   }
 
-  useEffect(() => {
     fethPaper()
-  },[])
+
+  },[id])
 
   return (
     <div className='container py-3'>

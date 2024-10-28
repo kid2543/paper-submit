@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CloseIcon from "../asset/close.png"
 import Layout from '../components/Layout'
+import LoadingPage from '../components/LoadingPage'
 
 function HostAuth({ children }) {
 
-  const role = sessionStorage.getItem("role")
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const [role, setRole] = useState("")
+  const [loading, setLoading] = useState(true)
+
 
   const SignOut = () => {
     sessionStorage.clear()
@@ -15,20 +17,28 @@ function HostAuth({ children }) {
   }
 
   useEffect(() => {
-    setLoading(true)
-    if (!role) {
-      navigate("/sign-in")
+    const Role = sessionStorage.getItem("role")
+    setRole(Role)
+    if (!Role) {
+      alert("เฉพาะผู้จัดงานประชุมเท่านั้น กรุณา login เพื่อเข้าใช้งาน")
+      window.location.href = "/sign-in"
     }
+    setTimeout(() => {
+      setLoading(false)
+    }, 500)
   }, [])
+
   if (loading) {
-    if (role === "Host") {
-      return (
+    return <LoadingPage />
+  }
+
+  return (
+    <>
+      {role === "host" ? (
         <main>
           {children}
         </main>
-      )
-    } else {
-      return (
+      ) : (
         <Layout>
           <div className='d-flex bg-light' style={{ minHeight: "100vh" }}>
             <div className='container p-5 text-center my-5'>
@@ -48,18 +58,9 @@ function HostAuth({ children }) {
             </div>
           </div>
         </Layout>
-      )
-    }
-  } else {
-    return (
-      <div className='container text-center p-5'>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    )
-  }
-
+      )}
+    </>
+  )
 
 }
 
