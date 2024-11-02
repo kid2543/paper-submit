@@ -34,7 +34,7 @@ function HostAuth({ children }) {
 
   return (
     <>
-      {role === "host" ? (
+      {role === "host" || role === "admin" ? (
         <main>
           {children}
         </main>

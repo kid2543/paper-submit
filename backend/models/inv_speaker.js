@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Conferences = require('../models/conferences')
+const Conferences = require('./conferences')
 
 const invSpeakerSchema = mongoose.Schema(
     {

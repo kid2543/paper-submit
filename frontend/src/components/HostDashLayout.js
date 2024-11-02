@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavbarDashboard } from '../components/Navbar'
+import { NavbarDashboard } from './Navbar'
 import Footer from './Footer'
 
 function HostDashLayout({children}) {

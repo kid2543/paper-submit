@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Publication = require("../models/publication")
+const Publication = require("./publication")
 const User = require("./user")
 
 const conferencesSchema = mongoose.Schema({
@@ -10,7 +10,7 @@ const conferencesSchema = mongoose.Schema({
   sub_title: { type: String },
   confr_code: { type: String, required: true, unique: true },
   confr_desc: [{type: String}],
-  important_date: [{ name: { type: String }, start_date: { type: Date }, end_date: { type: Date } }],
+  important_date: [{ date_name: { type: String }, start_date: { type: Date }, end_date: { type: Date } }],
   schedule: [{
     start: String,
     end: String,
@@ -40,7 +40,7 @@ const conferencesSchema = mongoose.Schema({
   bank_type: { type: String },
   acc_no: { type: String },
   regis_type: [{ name: String, price_1: { type: String }, price_2: { type: String } }],
-  venue: { name: { type: String }, desc: { type: String }, remark: { type: String }, travel: { type: String } },
+  venue: { name: { type: String }, desc: { type: String }, remark: { type: String } },
   venue_image: {type: String},
   confr_start_date: {
     type: Date,

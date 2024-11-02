@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
-const User = require('../models/user')
-const Publication = require('../models/publication')
-const Conferences = require('../models/conferences')
-const Category = require("../models/category")
+const User = require('./user')
+const Publication = require('./publication')
+const Conferences = require('./conferences')
+const Category = require("./category")
 
 const paperSchema = mongoose.Schema(
     {

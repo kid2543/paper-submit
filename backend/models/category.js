@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
-const Conferences = require('../models/conferences')
-const User = require('../models/user')
+const Conferences = require('./conferences')
+const User = require('./user')
 
 const categorySchema = mongoose.Schema(
     {

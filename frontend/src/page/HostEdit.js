@@ -4,24 +4,20 @@ import Tabs from 'react-bootstrap/Tabs';
 import Edit from '../components/HostEdit/Edit';
 import Registration from '../components/HostEdit/Registration';
 import Venue from '../components/HostEdit/Venue';
-import Category from '../components/HostEdit/Category';
 
 function HostEdit() {
   return (
     <div>
-      <div className='container'>
+      <div className='container my-5'>
         <Tabs
           defaultActiveKey="home"
-          className="mb-3"
+          className="mb-5 border-bottom"
           variant='underline'
         >
           <Tab eventKey="home" title="หน้าแรก">
             <div className='container'>
               <Edit />
             </div>
-          </Tab>
-          <Tab eventKey="program" title="หัวข้อ">
-            <Category />
           </Tab>
           <Tab eventKey="registration" title="อัตราค่าลงทะเบียน">
             <Registration />

@@ -10,6 +10,7 @@ const shortid = require("shortid");
 const port = 4000;
 require('dotenv').config()
 const fs = require('fs')
+const jwt = require('jsonwebtoken')
 
 //midleware
 const Paper = require("./models/paper");
@@ -72,6 +73,33 @@ const uploadPdf = multer({
 const uploadImage = multer({
   storage: storageImage,
 });
+
+function generateAccessToken(user) {
+  return jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {
+    expiresIn: '1h'
+  })
+}
+
+function authenticateToken(req, res, next) {
+  const token = req.header('Authorization').split(' ')[1]
+  if (!token) return res.status(401);
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if(err) return res.status(403);
+    req.user = user;
+    next();
+  })
+}
+
+function authorizeRoles(...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403)
+    }
+
+    next();
+  }
+}
 
 //test
 app.get("/", (req, res) => {
@@ -136,6 +164,15 @@ app.get("/all/confr", async (req, res) => {
   } catch (error) {
     console.log(error)
     res.status(500).send(error)
+  }
+})
+
+app.get("/all/assign", async (req, res) => {
+  try {
+    const list = await paperAssign.find({status: 0})
+    res.status(200).json(list)
+  } catch (error) {
+    console.log(error)
   }
 })
 
@@ -1415,6 +1452,56 @@ app.get('/search/committee', async (req, res) => {
       .limit(limit)
 
     const total = await User.countDocuments({ fname: { $regex: searchQuery, $options: 'i' }, role: "committee" })
+
+    res.status(200).json({
+      items,
+      total,
+      totalPage: Math.ceil(total / limit),
+      currentPage: page
+    })
+
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+app.get('/search/publication', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const searchQuery = req.query.search || ''
+    const skip = (page - 1) * limit
+
+    const items = await Publication.find({ en_name: { $regex: searchQuery, $options: 'i' }})
+      .skip(skip)
+      .limit(limit)
+
+    const total = await Publication.countDocuments({ en_name: { $regex: searchQuery, $options: 'i' }})
+
+    res.status(200).json({
+      items,
+      total,
+      totalPage: Math.ceil(total / limit),
+      currentPage: page
+    })
+
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+app.get('/search/paper', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
+    const searchQuery = req.query.search || ''
+    const skip = (page - 1) * limit
+
+    const items = await Paper.find({ title: { $regex: searchQuery, $options: 'i' }}).populate("owner")
+      .skip(skip)
+      .limit(limit)
+
+    const total = await Paper.countDocuments({ title: { $regex: searchQuery, $options: 'i' }})
 
     res.status(200).json({
       items,

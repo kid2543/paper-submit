@@ -57,8 +57,6 @@ function Edit() {
     const [dateModal, setDateModal] = useState(false)
     const [importantDate, setImportantDate] = useState(false)
 
-    console.log("data", data)
-
     const handleUpdate = async (e, form, modal) => {
         e.preventDefault()
         try {
@@ -161,15 +159,15 @@ function Edit() {
                         <div className='position-absolute top-0 end-0 m-1'>
                             <button type='button' onClick={() => setImportantDate(true)} className='btn text-secondary'><ion-icon name="pencil-outline"></ion-icon></button>
                         </div>
-                        <EditImportantDate show={importantDate} handleClose={() => setImportantDate(false)} data={data} />
+                        <EditImportantDate show={importantDate} handleClose={() => setImportantDate(false)} data={data} handleUpdate={handleUpdate} />
                         <div>
-                            {important_date.map((items) => (
-                                <div key={items.id} className='show-btn-hover'>
+                            {data.important_date?.map((items) => (
+                                <div key={items._id} className='show-btn-hover'>
                                     <div className='d-flex justify-content-between align-items-center'>
-                                        {items.name}
+                                        {items.date_name}
                                     </div>
                                     <div>
-                                        {dayjs(items.start_date).format("DD MMM YYYY")} - {dayjs(items.end_date).format("DD MMM YYYY")}
+                                        {dayjs(items.start_date).format("DD/MMM/YYYY")} - {dayjs(items.end_date).format("DD/MMM/YYYY")}
                                     </div>
                                     <hr />
                                 </div>
@@ -409,19 +407,66 @@ function EditDateModal(props) {
 function EditImportantDate(props) {
 
     const [form, setForm] = useState(props.data)
+    const [list, setList] = useState(props.data.important_date)
 
+
+    console.log("list", list)
     console.log("form", form)
+
+    const handleAdd = () => {
+        setList([...list, { date_name: "", start_date: dayjs(new Date()).format("YYYY-MM-DD"), end_date: dayjs(new Date()).format("YYYY-MM-DD") }])
+    }
+
+    const handleChange = (e,index) => {
+        const {name, value} = e.target
+        let temp = [...list]
+        temp[index][name] = value
+        setList(temp)
+        setForm({...form, important_date: temp})
+    }
+
+    const handleDel = (index) => {
+        let temp = [...list]
+        temp = temp.filter((item, idx) => idx !== index )
+        setList(temp)
+        setForm({...form, important_date: temp})
+    }
 
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
                 <Modal.Title>แก้ไขแผนการจัดโครงการ</Modal.Title>
             </Modal.Header>
-            <form>
-                <Modal.Body className='row gy-3'>
+            <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
+                <Modal.Body className='row gy-5'>
                     <div className='col-12'>
-                        
+                        <button className='btn btn-primary' type='button' onClick={handleAdd}>+ Add</button>
                     </div>
+                    {list.map((items, index) => (
+                        <div className='col-12' key={index}>
+                            <p>รายการที่ {index + 1}</p>
+                            <div className='mb-3'>
+                                <label className='form-label'>
+                                    ชื่อ
+                                </label>
+                                <input required className='form-control' value={items.date_name} name='date_name' onChange={e => handleChange(e,index)} />
+                            </div>
+                            <div className='row mb-3'>
+                                <div className='col-6'>
+                                    <label className='form-label'>เริ่ม</label>
+                                    <input required className='form-control' name='start_date' type='date' value={dayjs(items.start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e,index)} />
+                                </div>
+                                <div className='col-6'>
+                                    <label className='form-label'>สิ้นสุด</label>
+                                    <input required className='form-control' name='end_date' type='date' value={dayjs(items.end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e,index)} />
+                                </div>
+                            </div>
+                            <div>
+                                <button type='button' className='btn text-danger' onClick={() => handleDel(index)}>Delete</button>
+                            </div>
+                            <hr />
+                        </div>
+                    ))}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={props.handleClose}>
