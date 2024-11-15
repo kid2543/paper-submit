@@ -44,14 +44,19 @@ const conferencesSchema = mongoose.Schema({
   venue_image: {type: String},
   confr_start_date: {
     type: Date,
-    default: Date.now()
+    default: Date.now(),
+    required: true
   },
-  confr_end_date: {type: Date},
+  confr_end_date: {
+    type: Date,
+    required: true
+  },
   status: {type: Boolean, default: false},
   question: [String],
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: User
+    ref: User,
+    required: true
   }
 });
 

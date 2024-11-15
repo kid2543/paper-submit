@@ -1,18 +1,9 @@
 import React from 'react'
-import { NavbarHost } from './Navbar'
 
-function HostLayout({ children }) {
-
-    return (
-        <div>
-            <section>
-                <NavbarHost />
-            </section>
-            <section>
-                {children}
-            </section>
-        </div>
-    )
+function HostLayout() {
+  return (
+    <div>HostLayout</div>
+  )
 }
 
 export default HostLayout

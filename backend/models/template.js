@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Conferences = require("./conferences")
 
-const uploadSchema = mongoose.Schema(
+const templateSchema = mongoose.Schema(
     {
         name : {
             type: String
@@ -16,6 +16,6 @@ const uploadSchema = mongoose.Schema(
     }
 )
 
-const UploadFile = mongoose.model("Uploadfile",uploadSchema)
+const Template = mongoose.model("Template",templateSchema)
 
-module.exports = UploadFile
+module.exports = Template

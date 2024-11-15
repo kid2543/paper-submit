@@ -1,24 +1,31 @@
 const mongoose = require('mongoose')
 
+const Status = {
+    UNREAD: 'UNREAD',
+    READ: 'READ'
+}
+
+Object.freeze(Status)
+
 const notificationSchema = mongoose.Schema(
     {
-        owner: {
+        userId: {
             type: String,
             required: true,
         },
-        header: String,
-        form: String,
-        time: {
-            type: Date,
-            default: Date.now()
-        },
-        read_status: {
-            type: Boolean,
-            default: false,
+        title: String,
+        message: String,
+        status: {
+            type: String,
+            enum: {
+                values: Object.values(Status),
+                message: '{VALUE} is not supported'
+            },
+            default: Status.UNREAD,
         }
-    }
+    }, { timestamps: true }
 )
 
-const notification = mongoose.model("notification",notificationSchema)
+const Notification = mongoose.model("notification",notificationSchema)
 
-module.exports = notification
+module.exports = Notification

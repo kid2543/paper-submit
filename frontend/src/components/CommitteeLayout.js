@@ -1,19 +1,9 @@
 import React from 'react'
-import Footer from './Footer';
-import { NavbarCommit } from './Navbar';
 
-function CommitteeLayout({ children }) {
-    return (
-        <div>
-            <NavbarCommit />
-            <main style={{ minHeight: "100vh" }}>
-                {children}
-            </main>
-            <div>
-                <Footer />
-            </div>
-        </div>
-    )
+function CommitteeLayout() {
+  return (
+    <div>CommitteeLayout</div>
+  )
 }
 
 export default CommitteeLayout

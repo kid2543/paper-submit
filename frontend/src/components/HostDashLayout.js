@@ -1,20 +1,8 @@
 import React from 'react'
-import { NavbarDashboard } from './Navbar'
-import Footer from './Footer'
 
-function HostDashLayout({children}) {
+function HostDashLayout() {
   return (
-    <>
-      <div>
-        <NavbarDashboard />
-      </div>
-      <main style={{ minHeight: "100vh" }}>
-        {children}
-      </main>
-      <div className='container'>
-        <Footer />
-      </div>
-    </>
+    <div>HostDashLayout</div>
   )
 }
 

@@ -1,16 +1,8 @@
 import React from 'react'
-import { NavbarAuthor } from './Navbar'
 
-function AuthorLayout({ children }) {
+function AuthorLayout() {
   return (
-    <div>
-      <div className='mb-5'>
-        <NavbarAuthor />
-      </div>
-      <main>
-        {children}
-      </main>
-    </div>
+    <div>AuthorLayout</div>
   )
 }
 
