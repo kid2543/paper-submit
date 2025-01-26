@@ -1,183 +1,281 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
-import LoadingPage from '../components/LoadingPage'
 
+// asset
+import Logo from '../asset/logo.png'
+
+// react bootstrap
+import Accordion from 'react-bootstrap/Accordion';
+import Card from 'react-bootstrap/Card';
 
 const api = process.env.REACT_APP_API_URL
 
 function Confr() {
 
+    const [data, setData] = useState({})
+    const [topic, setTopic] = useState([])
+    const [inv, setInv] = useState([])
+    const [partner, setPartner] = useState([])
+    const [err, setErr] = useState('')
+
     const { id } = useParams()
 
     const navigate = useNavigate()
 
-    const [data, setData] = useState({})
-    const [inv, setInv] = useState([])
-    const [cate, setCate] = useState([])
-    const [partner, setPartner] = useState([])
-    const [pub, setPub] = useState([])
-    const [impDate, setImpDate] = useState([])
-    const [loading, setLoading] = useState(true)
-
     useEffect(() => {
-        const fethData = async () => {
+        const fetchData = async () => {
             try {
-                const confrData = await axios.get(api + "/get/confr/" + id)
-                setData(confrData.data)
-                setImpDate(confrData.data.important_date)
-                const cateData = await axios.get(api + "/get/category/" + id)
-                setCate(cateData.data)
-                const pubData = await axios.get(api + "/get/pub/" + id)
-                setPub(pubData.data)
-                const invData = await axios.get(api + "/get/inv-speaker/" + id)
-                setInv(invData.data)
-                const partnerData = await axios.get(api + "/get/partner/" + id)
-                setPartner(partnerData.data)
+                const res = await axios.get('/api/conference/single/' + id)
+                setData(res.data)
+                const cate = await axios.get('/api/category/' + id)
+                setTopic(cate.data)
+                const Inv = await axios.get('/api/inv/' + id)
+                setInv(Inv.data)
+                const Partner = await axios.get('/api/partner/' + id)
+                setPartner(Partner.data)
             } catch (error) {
                 console.log(error)
+                if (error.response.data) {
+                    setErr(error.response.data.error)
+                }
             }
         }
-
-        setTimeout(() => setLoading(false), 500)
-
-        fethData()
+        fetchData()
     }, [id])
 
-    if (loading) {
-        return <LoadingPage />
-    }
-
+    console.log(data)
 
     return (
-        <div className='container-md'>
-            <section className='mb-5'>
-                <h2 className='fw-bold'>{data?.title}
-                    <button type='button' className='btn btn-light btn-sm ms-2'>
-                        <ion-icon name="pencil-outline"></ion-icon>
-                    </button>
-                </h2>
-                <p>{data?.sub_title}</p>
-                {pub.length > 0 && cate.length > 0 ? (
-                    <button type='button' onClick={() => navigate("/submit/" + id)} className='btn btn-primary'>ส่งบทความ</button>
-                ) : (
-                    <button type='button' onClick={() => navigate("/submit/" + id)} className='btn btn-info' disabled>จะเปิดให้ส่งบทความเร็วๆ นี้</button>
-                )}
-            </section>
-            <section className='mb-5'>
-                <h4 className='fw-bold'>ABOUT THE CONFERENCE</h4>
-                <p>{data?.confr_desc}</p>
-            </section>
-            {cate.length > 0 ? (
-                <section className='mb-5'>
-                    <h4 className='fw-bold'>TOPIC</h4>
-                    <div className='row g-3'>
-                        {cate?.map((item) => (
-                            <div className='col-md-3' key={item._id}>
-                                <div className='card h-100'>
-                                    <div className='card-body text-center'>
-                                        <div className='mb-3'>
-                                            <img src={api + "/image/" + item.icon} alt={item.icon} height={32} width={32} />
+        <div>
+            {err}
+            {data &&
+                <div className='bg-light'>
+                    <section id='1' className='container' style={{ padding: "180px 0px" }}>
+                        <div className='text-center'>
+                            <h1 className='display-1 fw-bold'>{data.title}</h1>
+                            <p className='text-muted'>{data.sub_title}</p>
+                            <div>
+                                <button className='btn btn-primary' disabled={!topic && !data.publication} onClick={() => navigate('/submit/' + id)}>ส่งบทความ</button>
+                            </div>
+                        </div>
+                    </section>
+                    <section id='2' className='container' style={{ padding: "64px 0px" }}>
+                        <div className='text-center'>
+                            <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
+                        </div>
+                        <div className='row g-3'>
+                            {partner?.map((items) => (
+                                <div className='col-12 col-md-3' key={items._id}>
+                                    <img src={items.img} alt={items.desc} className='img-fluid' />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                    <div className='bg-white' style={{ padding: '180px 0px 64px 0px' }}>
+                        <section id='3' className='container'>
+                            <div className='row gy-5'>
+                                <div className='col-12 col-md-4'>
+                                    <div className='sticky-top' style={{ top: "32px" }}>
+                                        <div>
+                                            <p className='fw-bold text-muted'>ข้อมูลในหน้านี้</p>
+                                            <ul className="d-flex flex-column list-unstyled">
+                                                <li>
+                                                    <a className='text-secondary' href='#1'>หน้าหลัก</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#2'>รายชื่อผู้สนับสนุน</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#3'>รายละเอียดงานประชุม</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#4'>หัวข้องานประชุม</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#5'>กำหนดการส่งบทความ</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#6'>กำหนดการงานประชุม</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#7'>วารสาร</a>
+                                                </li>
+                                                <li>
+                                                    <a className='text-secondary' href='#8'>พิธีกร</a>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <p className='mb-0'>{item.name}</p>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            ) : null}
-            {impDate.length > 0 ? (
-                <section className='mb-5'>
-                    <h4 className='fw-bold'>IMPORTANT DATE</h4>
-                    <ul className='list-group'>
-                        {impDate?.map((item, index) => (
-                            <li className='list-group-item p-3' key={index}>
-                                <h6 className='fw-bold'>{item.name}</h6>
-                                <p className='mb-0'>{dayjs(item.start_date).format("DD/MM/YYYY")} - {dayjs(item.end_date).format("DD/MM/YYYY")}</p>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-            ) : null}
-            {pub.length > 0 ? (
-                <section className='mb-5'>
-                    <h4 className='fw-bold'>PUBLICATION OPTION</h4>
-                    <div className='row g-3'>
-                        <div className='col-md-4'>
-                            <div className='card h-100'>
-                                <div className='card-body'>
-                                    Pub
-                                </div>
-                            </div>
-                        </div>
-                        <div className='col-md-4'>
-                            <div className='card h-100'>
-                                <div className='card-body'>
-                                    Publication name
-                                </div>
-                            </div>
-                        </div>
-                        <div className='col-md-4'>
-                            <div className='card h-100'>
-                                <div className='card-body'>
-                                    Name 1
-                                </div>
-                            </div>
-                        </div>
-                        <div className='col-md-4'>
-                            <div className='card h-100'>
-                                <div className='card-body'>
-                                    Pub 2
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            ) : null}
-            {inv.length > 0 ? (
-                <section className='mb-5'>
-                    <h4 className='fw-bold'>INVITED SPEAKER</h4>
-                    <div className='row gy-3'>
-                        {inv?.map((item) => (
-                            <div className='col-12' key={item._id}>
-                                <div className='card h-100'>
-                                    <div className='card-body'>
-                                        <div className='row align-items-center g-5'>
-                                            <div className='col-md-3 text-center'>
-                                                <img src={api + "/image/" + item.img} alt={item.img} className='img-thumbnail border-0' />
+                                <div className=' col-12 col-md-8'>
+
+                                    <section>
+                                        <div>
+                                            <div className='mb-4'>
+                                                <h4 className='fw-bold'>รายละเอียดงานประชุม</h4>
                                             </div>
-                                            <div className='col-md-9'>
-                                                <h6 className='fw-bold'>{item.name}</h6>
-                                                <p className='text-muted'>{item.desc}</p>
-                                                <p className='fw-bold'>{item.keynote}</p>
-                                                {item.cv &&
-                                                    <div>
-                                                        <button type='button' onClick={() => navigate(api + "/pdf/" + item.cv)} className='btn btn-outline-dark'>CV: {item.name}</button>
+                                            <div>
+                                                {data.confr_desc?.map((items, index) => (
+                                                    <p key={index}>&nbsp;&nbsp;&nbsp;&nbsp;{items}</p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </section>
+
+
+
+                                    <section id='4' style={{ padding: "64px 0px" }}>
+                                        <div className='mb-4'>
+                                            <h4 className='fw-bold'>หัวข้องานประชุม</h4>
+                                            <p className='text-muted'>หัวข้องานประชุมที่ใช้สำหรับการแยกประเภทบทความ</p>
+                                        </div>
+                                        <Accordion>
+                                            {topic?.map((items, index) => (
+                                                <Accordion.Item key={items._id} eventKey={index}>
+                                                    <Accordion.Header>{items.name}</Accordion.Header>
+                                                    <Accordion.Body>
+                                                        {items.desc}
+                                                    </Accordion.Body>
+                                                </Accordion.Item>
+                                            ))}
+                                        </Accordion>
+                                    </section>
+
+
+
+                                    <section id='5' style={{ padding: "64px 0px" }}>
+                                        <div className='mb-4'>
+                                            <h4 className='fw-bold'>กำหนดการส่งบทความ</h4>
+                                        </div>
+                                        <div className='table-responsive'>
+                                            <table className='table' style={{ width: '800px' }}>
+                                                <thead className='table-secondary'>
+                                                    <tr>
+                                                        <th>วันที่</th>
+                                                        <th>รายละเอียด</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {data.important_date?.map((items) => (
+                                                        <tr key={items._id}>
+                                                            <td>{dayjs(items.start_date).format('DD MMM, YYYY')} - {dayjs(items.end_date).format('DD MMM, YYYY')}</td>
+                                                            <td>{items.date_name}</td>
+                                                            {/* <div className='card border-0 shadow'>
+                                                                <div className='card-body'>
+                                                                    <div className='row g-3'>
+                                                                        <div className='col-12 col-md-4 border-end border-3 border-primary'>
+                                                                            <h6 className='fw-bold'>{items.date_name}</h6>
+                                                                        </div>
+
+                                                                        <div className='col-12 col-md-8'>
+                                                                            {dayjs(items.start_date).format('DD MMM YYYY')} ถึง {dayjs(items.end_date).format('DD MMM YYYY')}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div> */}
+
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+
+
+                                    {data.schedule &&
+                                        <section id='6' style={{ padding: '64px 0px' }}>
+
+                                            <div className='mb-4'>
+                                                <h4 className='fw-bold'>กำหนดการงานประชุม</h4>
+                                            </div>
+                                            <div className='table-responsive'>
+                                                <table className='table' style={{ width: "800px" }}>
+                                                    <thead className='table-secondary'>
+                                                        <tr>
+                                                            <th style={{ width: '128px' }}>เวลา <small className=' d-block text-muted'>(24-hour clock)</small></th>
+                                                            <th>รายละเอียด</th>
+                                                            <th style={{ width: '260px' }}>กรรมการ</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {data.schedule.map(items => (
+                                                            <tr key={items._id}>
+                                                                <td>{items.start} - {items.end}</td>
+                                                                <td>
+                                                                    {items.items?.map((p, index) => (
+                                                                        <p key={index}>{p}</p>
+                                                                    ))}
+                                                                </td>
+                                                                <th>
+                                                                    <ol>
+                                                                        {items.session?.map((s, index) => (
+                                                                            <li key={index} className='mb-0'>{s}</li>
+                                                                        ))}
+                                                                    </ol>
+                                                                </th>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </section>
+                                    }
+
+
+                                    {data.publication &&
+                                        <section id='7' style={{ padding: "64px 0px" }}>
+                                            <div className='mb-4'>
+                                                <h4 className='fw-bold'>วารสาร</h4>
+                                            </div>
+                                            <div className='list-group'>
+                                                {data.publication?.map((items) => (
+                                                    <div className='list-group-item list-group-item-secondary' key={items._id}>
+                                                        <div>
+                                                            <h5>{items.en_name}</h5>
+                                                            <small>{items.th_name}</small>
+                                                        </div>
+                                                        <p className='text-muted'>{items.desc}</p>
                                                     </div>
-                                                }
+                                                ))}
                                             </div>
-                                        </div>
-                                    </div>
+                                        </section>
+                                    }
+
+                                    {inv &&
+                                        <section id='8' style={{ padding: "64px 0px" }}>
+                                            <div className='mb-4'>
+                                                <h4 className='fw-bold mb-3'>พิธีกรประจำงานประชุม</h4>
+                                            </div>
+                                            <div className='row g-3'>
+                                                {inv?.map((items) => (
+                                                    <div className='col-12 col-lg-4' key={items._id}>
+                                                        <Card>
+                                                            <Card.Img variant="top" src={Logo} />
+                                                            <Card.Body>
+                                                                <Card.Title>{items.name}</Card.Title>
+                                                                <Card.Subtitle className='mb-3 text-muted'>{items.keynote}</Card.Subtitle>
+                                                                <Card.Text>
+                                                                    {items.desc}
+                                                                </Card.Text>
+                                                                {items.cv &&
+                                                                    <Link to={`${api}/uploads/${items.cv}`} target='_blank' rel='noreferrer'>{items.cv}</Link>
+                                                                }
+                                                            </Card.Body>
+                                                        </Card>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    }
+
                                 </div>
                             </div>
-                        ))}
+                        </section>
                     </div>
-                </section>
-            ) : null}
-            {partner.length > 0 ? (
-                <section>
-                    <h4 className='fw-bold'>OUR PARTNERS</h4>
-                    <div className='row g-3'>
-                        {partner?.map((item) => (
-                            <div className='col-4 col-md-3 col-lg-1' key={item._id}>
-                                <img src={api + "/image/" + item.image} alt={item.desc} className='img-thumbnail border-0' />
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            ) : null}
+                </div>
+            }
         </div>
     )
 }

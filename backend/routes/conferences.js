@@ -1,24 +1,58 @@
 const express = require('express')
 
 //midlewares
-const requireHost = require('../middlewares/requireHost')
+const verifyToken = require('../middlewares/VerifyToken')
+const checkRole = require('../middlewares/checkRole')
+const uploadImage = require('../middlewares/uploadImage')
 
 // controller
-const { createConference, editConference, allConference, openConference } = require('../controllers/confrController')
+const { createConference, editConference, allConference, openConference, singleConference, getConferByUser, getConferenceHost, uploadVenue, uploadLogo, getQuestion, searchConference, deleteConference, hostSeachConference, getHomeConfr } = require('../controllers/confr_controller')
 
 const router = express.Router()
 
 //create conference
-router.post('/', requireHost, createConference)
+router.post('/', verifyToken, checkRole(['HOST', 'ADMIN']), createConference)
 
-//edit conference
-router.patch('/', requireHost, editConference)
+//update conference
+router.patch('/', verifyToken, checkRole(['HOST', 'ADMIN']), editConference)
+
+// upload venue image
+router.patch('/venue/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadImage.single('image'),  uploadVenue)
+
+// upload logo
+router.patch('/logo/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadImage.single('image'),  uploadLogo)
 
 //get all
-router.get('/all', requireHost, allConference)
+router.get('/all', verifyToken, checkRole(['HOST', 'ADMIN']), allConference)
+
+// get conference 3 อันลล่าสุด
+router.get('/three', getHomeConfr)
 
 //get open conference
 router.get('/', openConference)
+
+// single conference
+router.get('/single/:id', singleConference)
+
+// get for host
+router.get('/host/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getConferenceHost)
+
+// read conference with owner
+router.get('/owner', verifyToken, checkRole(['HOST', 'ADMIN']), getConferByUser)
+
+// get question for committee
+router.get('/question/:id', verifyToken, checkRole(['HOST', 'ADMIN', 'COMMITTEE']), getQuestion)
+
+
+// search conference
+router.get('/search', verifyToken, checkRole(['ADMIN']), searchConference)
+
+// delete conference
+router.delete('/delete/:id', verifyToken, checkRole(['ADMIN']), deleteConference)
+
+// search conference for host
+router.get('/search/host', verifyToken, checkRole(['ADMIN', 'HOST']), hostSeachConference)
+
 
 
 module.exports = router

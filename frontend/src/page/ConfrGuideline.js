@@ -1,82 +1,74 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
-import LoadingPage from '../components/LoadingPage'
+import useFetch from '../hook/useFetch'
 
-const api = process.env.REACT_APP_API_URL
+// react component
+import Accordion from 'react-bootstrap/Accordion';
+import LoadingPage from '../components/LoadingPage';
+
 
 function ConfrGuideline() {
-
     const { id } = useParams()
-    const [forPresenter, setForPresenter] = useState([])
-    const [forSessionChair, setForSessionChair] = useState([])
-    const [forAudience, setForAudience] = useState([])
-    const [loading, setLoading] = useState(true)
+    const { data, error, status } = useFetch('/api/conference/single/' + id)
 
-    useEffect(() => {
 
-        const fethGuiline = async () => {
-            setLoading(true)
-            try {
-                const res = await axios.get(api + "/get/confr/" + id)
-                setForPresenter(res.data.guide_for_presenter)
-                setForSessionChair(res.data.guide_for_chair)
-                setForAudience(res.data.guide_for_audience)
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fethGuiline()
-    }, [id])
-
-    if (loading) {
+    if(status === 'idle' || status === 'loading') {
         return <LoadingPage />
     }
 
-    return (
-        <div className='container'>
-            <div className='mb-5'>
-                <h4 className='mb-3 fw-bold'>ข้อแนะนำสำหรับผู้นำเสนอ</h4>
-                <div>
-                    {forPresenter.length > 0 ? (
-                        <ul>
-                            {forPresenter?.map((item, index) => (
-                                <li key={index}>{item}</li>
-                            ))}
-                        </ul>
-                    ) : "-"}
-                </div>
-            </div>
-            <div className='mb-5'>
-                <h4 className='mb-3 fw-bold'>ข้อแนะนำสำหรับกรรมการห้องประชุม</h4>
-                <div>
-                    {forSessionChair.length > 0 ? (
-                        <ul>
-                            {forSessionChair?.map((item, index) => (
-                                <li key={index}>{item}</li>
-                            ))}
-                        </ul>
-                    ) : "-"
-                    }
-                </div>
+    if(error) {
+        return <div>Error Page</div>
+    }
 
-            </div>
-            <div className='mb-5'>
-                <h4 className='mb-3 fw-bold'>ข้อแนะนำสำหรับผู้ชม</h4>
-                <div>
-                    {forAudience.length > 0 ? (
-                        <ul>
-                            {forAudience?.map((item, index) => (
-                                <li key={index}>{item}</li>
-                            ))}
-                        </ul>
-                    ) : "-"
-                    }
+    return (
+        <div className='bg-light'>
+            <section style={{ padding: "180px 0px" }}>
+                <div className='container text-center'>
+                    <h1 className='display-1 fw-bold'>ข้อแนะนำการเข้าร่วมงานประชุม</h1>
+                    <p className='text-muted'>อ่านข้อแนะนำการเข้าร่วมงานประชุมได้ที่นี่!</p>
                 </div>
-            </div>
+            </section>
+            {data &&
+                <section className='bg-white' style={{ padding: "64px 0px" }}>
+                    <div className='container'>
+                    <h4 className='fw-bold mb-4'>
+                        ข้อแนะนำ
+                    </h4>
+                        <Accordion>
+                            <Accordion.Item eventKey='1'>
+                                <Accordion.Header>สำหรับผู้นำเสนอ</Accordion.Header>
+                                <Accordion.Body>
+                                    <ul>
+                                        {data.guide_for_presenter?.map((items, index) => (
+                                            <li key={index}>{items}</li>
+                                        ))}
+                                    </ul>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='2'>
+                                <Accordion.Header>สำหรับกรรมการ</Accordion.Header>
+                                <Accordion.Body>
+                                    <ul>
+                                        {data.guide_for_chair?.map((items, index) => (
+                                            <li key={index}>{items}</li>
+                                        ))}
+                                    </ul>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                            <Accordion.Item eventKey='3'>
+                                <Accordion.Header>สำหรับผู้ชม</Accordion.Header>
+                                <Accordion.Body>
+                                    <ul>
+                                        {data.guide_for_audience?.map((items, index) => (
+                                            <li key={index}>{items}</li>
+                                        ))}
+                                    </ul>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+                    </div>
+                </section>
+            }
         </div>
     )
 }

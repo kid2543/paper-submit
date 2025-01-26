@@ -1,174 +1,134 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import Dropdown from 'react-bootstrap/Dropdown'
-import SearchItemNotFound from '../SearchItemNotFound'
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 
-const api = process.env.REACT_APP_API_URL
 
 function EditQuestion() {
 
-    const [id, setId] = useState("")
-    const [q, setQ] = useState([])
-    const [text, setText] = useState("")
-    const [editText, setEditText] = useState("")
-    const [editIndex, setEditIndex] = useState(null)
-    const [show, setShow] = useState(false)
+    const id = sessionStorage.getItem('host_confr')
 
-    const handleClose = () => setShow(false)
-    const handleShow = () => setShow(true)
+    // question value
+    const [question, setQuestion] = useState([])
+    const [loading, setLoading] = useState('idle')
+    const [error, setError] = useState('')
 
-
-    const handleAdd = (e) => {
-        e.preventDefault()
-        if (text) {
-            setQ([...q, text])
-            setText("")
-            e.target.question.value = ""
-            handleClose()
-        } else {
-            alert("กรุณากรอกคำถาม")
-        }
-    }
-
-    const handleSave = async () => {
-        try {
-            await axios.patch(api + "/update/conferences/" + id, {
-                question: q
-            })
-            alert("อัพเดทข้อมูลสำเร็จ")
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleDel = (index) => {
-        setQ(q.filter((item, idx) => idx !== index))
-    }
-
-    const handleEdit = (index) => {
-        setQ((prev) => {
-            const update = [...prev]
-            update[index] = editText
-            return update
-        })
-        setEditIndex(null)
-    }
-
-    const updateEditStatus = (index, text) => {
-        setEditIndex(index)
-        setEditText(text)
-    }
-
+    const [key, setKey] = useState(0)
 
     useEffect(() => {
-
-        const confr_id = sessionStorage.getItem("host_confr")
-        setId(confr_id)
-
-        const fethQna = async () => {
+        setLoading('loading')
+        const fetchQuestion = async () => {
             try {
-                const res = await axios.get(api + "/get/question/" + confr_id)
-                setQ(res.data)
+                const res = await axios.get('/api/conference/host/' + id)
+                setQuestion(res.data.question)
             } catch (error) {
+                setError(error)
                 console.log(error)
             }
         }
+        fetchQuestion()
+        setLoading('success')
+    }, [id])
 
-        fethQna()
-    }, [])
+    const handleChange = (e, index) => {
+        const { value } = e.target
+        let temp = [...question]
+        temp[index] = value
+        setQuestion(temp)
+    }
+
+    const handleUpdate = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axios.patch('/api/conference/', {
+                _id: id,
+                question
+            })
+            setQuestion(res.data.question)
+            alert('Success')
+        } catch (error) {
+            console.log(error)
+            alert('Error')
+        }
+    }
+
+    const handleAdd = () => {
+        setQuestion([...question, ""])
+    }
+
+    const handleDel = (index) => {
+        setQuestion(question.filter((items, idx) => idx !== index))
+        setKey(key + 1)
+    }
+
+    if (loading === 'idle' || loading === 'loading') {
+        return <div>Loading...</div>
+    }
+
+    if (error) {
+        return <div>Error</div>
+    }
 
     return (
-        <div>
-            <NewQuestion show={show} handleClose={handleClose} setText={setText} handleAdd={handleAdd} />
-            <div className='mb-3 d-flex justify-content-between align-items-center'>
+        <div className='py-5'>
+            <div className='mb-4'>
                 <h4 className='fw-bold'>แบบประเมิน</h4>
-                <button className='btn btn-outline-primary btn-sm' type='button' onClick={handleShow}>New Question +</button>
+                <p className='text-muted'>เพิ่มแบบประเมินและแก้ไขเพื่อให้กรรมการอ่านและให้คะแนนได้ถูกต้อง</p>
             </div>
-            <p className='text-muted'>รายการคำถาม</p>
-            {q.length > 0 ? (
-                <div className='table-responsive' style={{ minHeight: "480px" }}>
-                    <div className='mb-3'>
-                        <button type='button' onClick={handleSave} className='btn btn-outline-success btn-sm'>Save</button>
+            <div className='card border-0 shadow-sm'>
+                <div className='card-body'>
+                    <div className='d-flex justify-content-between align-items-center mb-4'>
+                        <h6 className='fw-bold mb-0'>รายการคำถาม</h6>
+                        <div>
+                            <button onClick={handleAdd} type='button' className='btn btn-primary btn-sm'>
+                                <span className='me-2'>
+                                    <i className='bi bi-plus-lg'></i>
+                                </span>
+                                เพิ่มแบบประเมิน
+                            </button>
+                        </div>
                     </div>
-                    <table className='table table-hover h-100'>
-                        <thead>
-                            <tr>
-                                <th>คำถาม</th>
-                                <th>tools</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {q?.map((item, index) => (
-                                <tr key={index}>
-                                    {editIndex === index ? (
-                                        <>
+                    {question && (
+                        <div className='table-responsive' style={{ minHeight: "480px" }}>
+                            <div className='mb-3'>
+                                <button type='button' onClick={handleUpdate} className='btn btn-success text-white'>
+                                    <span className='me-2'>
+                                        <i className='bi bi-floppy'></i>
+                                    </span>
+                                    บันทึก
+                                </button>
+                            </div>
+                            <table className='table table-hover h-100'>
+                                <thead>
+                                    <tr>
+                                        <th>ลำดับ</th>
+                                        <th>คำถาม</th>
+                                        <th>เครื่องมือ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {question.map((item, index) => (
+                                        <tr key={index}>
                                             <td>
-                                                <input onChange={e => setEditText(e.target.value)} defaultValue={item} className='form-control' />
+                                                {index + 1}
                                             </td>
                                             <td>
-                                                <button className='btn text-success' type='button' onClick={() => handleEdit(index)}><ion-icon name="save"></ion-icon></button>
+                                                <textarea key={key} defaultValue={item} onChange={e => handleChange(e, index)} className='form-control' />
                                             </td>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <td>{item}</td>
                                             <td>
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="btn">
-                                                        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-                                                    </Dropdown.Toggle>
-
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => updateEditStatus(index, item)}>
-                                                            <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
-                                                            Edit
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => handleDel(index)}>
-                                                            <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
+                                                <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
+                                                    <i className='bi bi-trash'></i>
+                                                </button>
                                             </td>
-                                        </>
-                                    )}
-
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div >
-            ) :
-                <SearchItemNotFound />
-            }
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div >
+                    )
+                    }
+                </div>
+            </div>
         </div >
     )
 }
 
 export default EditQuestion
-
-function NewQuestion({ show, handleClose, setText, handleAdd }) {
-    return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>New Question</Modal.Title>
-            </Modal.Header>
-            <form onSubmit={handleAdd}>
-                <Modal.Body>
-                    <label className='form-label text-muted'>คำถาม</label>
-                    <input name='question' onChange={e => setText(e.target.value)} className='form-control' />
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" type='submit'>
-                        Add +
-                    </Button>
-                </Modal.Footer>
-            </form>
-        </Modal>
-    )
-}

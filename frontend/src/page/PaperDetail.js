@@ -15,7 +15,7 @@ const api = process.env.REACT_APP_API_URL
 
 function PaperDetail() {
 
-  const {id} = useParams()
+  const { id } = useParams()
 
   const [paper, setPaper] = useState({})
 
@@ -23,7 +23,7 @@ function PaperDetail() {
 
   const fethPaper = async () => {
     try {
-      const res = await axios.get(api + "/get/paper/" + id)
+      const res = await axios.get('/api/paper/' + id)
       setPaper(res.data)
     } catch (error) {
       console.log(error)
@@ -46,7 +46,7 @@ function PaperDetail() {
             <img src={mockPaper.image} alt='cover-book' height={300} width={200} />
           </div>
           <div className='col-lg-8 my-3'>
-            <button type='button' className='btn btn-primary' onClick={() => window.open(api + "/pdf/" + paper?.paper_file)}>ดูบทความฉบับเต็ม</button>
+            <button type='button' className='btn btn-primary' disabled={!paper?.paper_file} onClick={() => window.open(api + "/pdf/" + paper?.paper_file)}>ดูบทความฉบับเต็ม</button>
           </div>
         </div>
       </section>

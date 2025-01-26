@@ -1,135 +1,446 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus';
+import { useAuthContext } from '../hook/useAuthContext';
+
+// react bootstrap
+import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+import { useLogout } from '../hook/useLogout';
+import PaymentStatus from '../components/PaymentStatus';
+import dayjs from 'dayjs';
+import { toast, ToastContainer } from 'react-toastify';
+
+const api = process.env.REACT_APP_API_URL
 
 function HostReview() {
 
+  const { user } = useAuthContext()
+  const { id } = useParams()
+  const [paper, setPaper] = useState({})
+  const [review, setReview] = useState([])
+  const [result, setResult] = useState('')
+  const { logout } = useLogout()
+  const navigate = useNavigate()
+  const [sendMailFile, setSendMailFile] = useState(null)
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchPaper = async () => {
+      try {
+        const res = await axios.get('/api/paper/host/' + id)
+        setPaper(res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    const fetchReview = async () => {
+      try {
+        const res = await axios.get('/api/assign/' + id)
+        setReview(res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchPaper()
+    fetchReview()
+  }, [id])
+
+  // handle history
+
+  const [show, setShow] = useState(false);
+  const [history, setHistory] = useState({
+    id: '',
+    reviewer: ''
+  })
+
+  const handleClose = () => {
+    setHistory({ id: '', reviewer: '' })
+    setShow(false)
+  }
+
+  const handleShow = (id, reviewer) => {
+    setHistory({ id, reviewer })
+    setShow(true)
+
+  };
+
+  // end history
+
+  const handleResult = async (e) => {
+    e.preventDefault()
+    if (result === 'REVISE') {
+      try {
+        await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
+        alert('Updated')
+      } catch (error) {
+        console.log(error)
+        alert('Error')
+      }
+    } else {
+      try {
+        await axios.patch('/api/paper/result', { _id: id, result: result })
+        alert('Updated')
+      } catch (error) {
+        console.log(error)
+        alert('Error')
+      }
+    }
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
+
+  const handleStatus = (value) => {
+    for (let i in value) {
+      if (value[i].status !== 'SUCCESS')
+        return false
+    }
+    return true
+  }
+
+  // ส่งจดหมายเชิญ
+  const sendMail = async (e) => {
+    e.preventDefault()
+    const { recipient, confr_title, owner, paper_id } = e.target
+    const formData = new FormData()
+    formData.append('file', sendMailFile)
+    formData.append('recipient', recipient.value)
+    formData.append('confr_title', confr_title.value)
+    formData.append('owner', owner.value)
+    formData.append('paper_id', paper_id.value)
+    try {
+      const res = await axios.post('/api/paper/send/email', formData)
+      toast.success('ส่งจดหมายเชิญสำเร็จ')
+      setPaper(res.data)
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่ภายหลัง')
+    }
+  }
 
   return (
-    <div className='container my-4'>
-      <h2 className='text-center'>ข้อแนะนำ และผลการตรวจบทความ</h2>
-      <div className='card my-3'>
-        <div className='card-header'>
-          <h4>รายละเอียดบทความ</h4>
+    <div className='bg-light'>
+      <ToastContainer />
+      <div className='container py-5'>
+        <div className='card   shadow-sm mb-5'>
+          <div className='card-body'>
+            <div className='d-flex justify-content-between align-items-center'>
+              <h5 className='mb-0 fw-bold'>ดูผลลัพธ์บทความ</h5>
+              <Dropdown>
+                <Dropdown.Toggle className='  text-primary' variant="" id="dropdown-basic">
+                  <span className='me-2'><i className="bi bi-person-circle"></i></span>
+                  {user}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  <Dropdown.Item href="/host">Dashboard</Dropdown.Item>
+                  <Dropdown.Item href="/profile">Profile</Dropdown.Item>
+                  <Dropdown.Item type='button' onClick={handleLogout} className='text-danger'>Logout</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
         </div>
-        <div className='card-body'>
-          <p>Paper Code: รหัสบทความ</p>
-          <p>ชื่อบทความ: ชื่อบทความ</p>
-          <p>ผลลัพธ์ผู้ตรวจบทความ: สถานะของกรรมการแต่ละคน</p>
-          <form>
-            <h4>ผลลัพธ์ของบทความ</h4>
-            <select className='form-select'>
-              <option>--</option>
-              <option>ผ่าน</option>
-              <option>แก้ไข (ผ่าน)</option>
-              <option>แก้ไขค่อนข้างเยอะ (ส่งใหม่)</option>
-              <option>ไม่ผ่าน</option>
-            </select>
-            <button type='submit' className='btn btn-primary mt-3'>Submit</button>
-          </form>
+        <div className='card   shadow-sm mb-5'>
+          <div className='card-body'>
+            <p>รายละเอียดบทความ</p>
+            {paper &&
+              <div>
+                <div className='row g-3'>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>ชื่อบทความ</small>
+                    </div>
+                    <small>{paper.title}</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>รหัสบทความ</small>
+                    </div>
+                    <small>{paper.paper_code}</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>ผู้แต่ง</small>
+                    </div>
+                    <small>{paper.author}</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>ผู้ส่งบทความ</small>
+                    </div>
+                    <small>{paper.owner?.name} ({paper.owner?.username})</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>สถานะบทความ</small>
+                    </div>
+                    <small>
+                      <PaperStatus status={paper.status} />
+                    </small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>ผลลัพธ์บทความ</small>
+                    </div>
+                    <small>
+                      <PaperResult status={paper.result} />
+                    </small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>สถานะชำระเงิน</small>
+                    </div>
+                    <small>
+                      <PaymentStatus status={paper.payment_status} />
+                    </small>
+                  </div>
+                  {paper.payment_image &&
+                    <div className='col-12 col-md-6 col-lg-4'>
+                      <div>
+                        <small className='fw-bold'>หลักฐานการชำระเงิน</small>
+                      </div>
+                      <small>
+                        <Link to={`${api}/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>
+                      </small>
+                    </div>
+                  }
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>ที่อยู่ในการติดต่อ</small>
+                    </div>
+                    <small>{paper.address}</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>Email</small>
+                    </div>
+                    <small>{paper.email}</small>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <div>
+                      <small className='fw-bold'>เบอร์โทร</small>
+                    </div>
+                    <small>{paper.contact}</small>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        {paper.result === 'ACCEPT' || paper.result === 'REVISE' ? (
+          <div className='row gy-3 mb-5'>
+            <div className='col-12'>
+              <div className='card shadow-sm'>
+                {paper.letter ? (
+                  <div className='card-body'>
+                    <h6 className='fw-bold mb-0'>
+                      ส่งจดหมายเชิญเข้าร่วมงานประชุมแล้ว
+                      <span className='ms-2 badge bg-success'>
+                      <i className='bi bi-check-lg'></i>
+                      </span>
+                    </h6>
+                  </div>
+                ) : (
+                  <div className='card-body'>
+                    <h6 className='fw-bold mb-4'>
+                      ส่งจดหมายเข้าร่วมงานประชุม
+                    </h6>
+                    <form onSubmit={sendMail} className='row g-3 mb-4'>
+                      <div className='col-auto'>
+                        <label className='form-label'>อีเมล</label>
+                        <input name='recipient' className='form-control-plaintext fw-bold' readOnly value={paper.email} />
+                      </div>
+                      <div className='col-auto'>
+                        <label className='form-label'>ชื่องานประชุม</label>
+                        <input name='confr_title' className='form-control-plaintext fw-bold' readOnly value={paper.confr_code?.title} />
+                      </div>
+                      <div className='col-auto'>
+                        <label className='form-label'>ชื่อบทความ</label>
+                        <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
+                        <input className='form-control-plaintext fw-bold' readOnly value={paper.title} />
+                      </div>
+                      <div className='col-auto'>
+                        <label className='form-label'>ผู้ส่งบทความ</label>
+                        <input name='owner' className='form-control-plaintext d-none' readOnly value={paper.owner?._id} />
+                        <input className='form-control-plaintext fw-bold' readOnly value={paper.owner?.username} />
+                      </div>
+                      <div className='col-12'>
+                        <label className='form-label'>เลือกไฟล์จดหมาย</label>
+                        <input
+                          onChange={e => setSendMailFile(e.target.files[0])}
+                          required
+                          className='form-control'
+                          type='file'
+                          accept='.pdf, .doc'
+                        />
+                      </div>
+                      <div className='text-end'>
+                        <button className='btn btn-primary' type='submit' disabled={!sendMailFile}>
+                          <i className='me-2 bi bi-send'></i>
+                          ส่งจดหมายเชิญ
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className='col-12'>
+              <div className='card shadow-sm'>
+                <div className='card-body'>
+                  <p className='fw-bold'>Certificate</p>
+                  <a href={"mailto:" + paper?.owner?.email + "?subject=คุณได้รับใบรับรอง&body=คุณได้รับใบรับรอง"} className='btn btn-outline-success btn-sm'>มอบใบรับรอง</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null
+        }
+        <div className='mb-5'>
+          <p>ความคิดเห็นของกรรมการ</p>
+          {review.length > 0 ? (
+            <div>
+              <div className='row g-3 mb-5'>
+                {review?.map((item, index) => (
+                  <div key={item._id} className='col-12'>
+                    <div className='card shadow-sm'>
+                      <div className='card-body'>
+                        <div className='d-flex justify-content-between align-items-center'>
+                          <h6 className='fw-bold'>กรรมการท่านที่ {index + 1}</h6>
+                          <div>
+                            <ReviewStatus status={item.status} />
+                            <div className='text-end'>
+                              <Link onClick={() => handleShow(item._id, item.reviewer?.username)} type='button'>ดูประวัติ</Link>
+                            </div>
+                          </div>
+                        </div>
+                        {item.status === 'SUCCESS' &&
+                          <div>
+                            <p>{item.suggestion}</p>
+                            <p>รวมคะแนน: {item.total}</p>
+                            <p>ผลลัพธ์ <PaperResult status={item.result} /></p>
+                            <div>
+                              <small>{item.reviewer?.name} ({item.reviewer?.username})</small> <br />
+                              {item.updatedAt &&
+                                <small className='text-muted'>{dayjs(item.updatedAt).format('DD/MM/YYYY HH:mm')}</small>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <ReviewHistory show={show} handleClose={handleClose} data={history} />
+              </div>
+              {handleStatus(review) && paper.status === 'REVIEW' &&
+                <div className='card   shadow-sm'>
+                  <div className='card-body'>
+                    <p>เปลี่ยนผลลัพธ์บทความ</p>
+                    <form onSubmit={handleResult}>
+                      <div>
+                        <label className='form-label'>ผลลัพธ์บทความ</label>
+                        <select name='result' className="form-select" required onChange={e => setResult(e.target.value)}>
+                          <option defaultValue value="">--</option>
+                          <option value="ACCEPT">ผ่าน</option>
+                          <option value="REVISE">แก้ไข</option>
+                          <option value="REJECT">ไม่ผ่าน</option>
+                        </select>
+                      </div>
+                      {result === "REVISE" &&
+                        <div>
+                          <div>
+                            <label className='form-label mt-3'>ชื่อการแก้ไข</label>
+                            <input name='name' type='text' className='form-control' required />
+                          </div>
+                          <div>
+                            <label className='form-label mt-3'>กำหนด Deadline</label>
+                            <input name='deadline' type='date' className='form-control' required />
+                          </div>
+                        </div>
+                      }
+                      <div className='text-end mt-3'>
+                        <button type='submit' className='btn btn-primary'>Submit</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              }
+            </div>
+          ) : (
+            <h5 className='fw-bold'>ไม่พบความคิดเห็น</h5>
+          )}
         </div>
       </div>
-      <div className='card my-3'>
-        <div className='card-header'>
-          <h4>ข้อแนะนำของกรรมการ</h4>
-        </div>
-        <div className='card-body'>
-          <div className='row'>
-            <div className='col-3'>
-              หัวข้อบทความ: 
-            </div>
-            <div className='col'>
-              <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr />
-          <div className='row'>
-            <div className='col-3'>
-              บทคัดย่อ: 
-            </div>
-            <div className='col'>
-              <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr/>
-          <div className='row'>
-            <div className='col-3'>
-              วิธีการและทฤษฎี: 
-            </div>
-            <div className='col'>
-            <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr/>
-          <div className='row'>
-            <div className='col-3'>
-              สิ่งที่ค้นพบ: 
-            </div>
-            <div className='col'>
-              <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr />
-          <div className='row'>
-            <div className='col-3'>
-              การอภิปราย: 
-            </div>
-            <div className='col'>
-            <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr/>
-          <div className='row'>
-            <div className='col-3'>
-              บทสรุป: 
-            </div>
-            <div className='col'>
-            <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr/>
-          <div className='row'>
-            <div className='col-3'>
-              ข้อแนะนำต่อผู้แต่ง: 
-            </div>
-            <div className='col'>
-            <ul>
-                <li>test</li>
-              </ul>
-            </div>
-          </div>
-          <hr/>
-          <div className='row'>
-            <div className='col-3'>
-              Paper Title: 
-            </div>
-            <div className='col'>
-              <button type='button' className='btn btn-outline-primary'>
-                <span className='d-flex gap-2'>
-                <ion-icon aria-label="pdf" name="document-outline"></ion-icon>
-                File Comment
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button type='button' onClick={() => navigate(-1)} className='btn btn-secondary'>Back</button>
     </div>
   )
 }
 
 export default HostReview
+
+function ReviewHistory(props) {
+
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    const fethHistory = async () => {
+      try {
+        const res = await axios.get('/api/history/read/' + props.data.id)
+        setData(res.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    if (props.data.id) {
+      fethHistory()
+    }
+  }, [props.data.id])
+
+  return (
+    <Modal show={props.show} onHide={props.handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>{props.data.reviewer}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {data &&
+          <div>
+            {data.map((items) => (
+              <div key={items._id} className='card mb-3'>
+                <div className='card-body row'>
+                  <div className='col-12 col-md-4'>
+                    <PaperResult status={items.result} />
+                    <div>
+                      <small>
+                        {dayjs(items.createdAt).format('DD MMM, YYYY HH:mm')}
+                      </small>
+                    </div>
+                  </div>
+                  <div className='col-12 col-md-8'>
+                    <p>{items.suggestion}</p>
+                    {items.suggestion_file &&
+                      <div>
+                        <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`${api}/uploads/${items.suggestion_file}`}>ดูไฟล์</Link>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        }
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="" onClick={props.handleClose}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}

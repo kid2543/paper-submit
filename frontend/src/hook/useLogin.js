@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAuthContext } from './useAuthContext'
 import axios from 'axios'
+import Cookies from "js-cookie";
+
+import { toast } from "react-toastify";
 
 export const useLogin = () => {
     const [error, setError] = useState(null)
@@ -12,17 +15,14 @@ export const useLogin = () => {
         setError(null)
 
         try {
-            const res = await axios.post('/api/user/login', {username, password})
-            const json = await res.data
-
-            //save the user to local
-            localStorage.setItem('user', JSON.stringify(json))
-
-            //update authcontext
-            dispatch({type: 'LOGIN', payload: json})
-
+            const res = await axios.post('/api/user/login', { username, password })
+            if (res) {
+                Cookies.set('username', username, { expires: 1 })
+                dispatch({ type: 'LOGIN', payload: username })
+            }
             setIsLoading(false)
         } catch (error) {
+            toast.error('เกิดข้อผิดพลาด: ' + error.response?.data.error)
             setIsLoading(false)
             setError(error.response?.data.error)
         }

@@ -5,8 +5,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./custom.scss";
 import { AuthContextProvider } from './context/AuthContext';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+import './css/main.min.css' // sass compil
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

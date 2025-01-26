@@ -1,46 +1,20 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom'
+import useFetch from '../hook/useFetch'
 
-const api = process.env.REACT_APP_API_URL
 
 function ConfrVenue() {
 
-    const [venueImage, setVenueImage] = useState("")
-    const [venueDetail, setVenueDetail] = useState({
-        name: "",
-        desc: "",
-        remark: "",
-        travel: "",
-    })
-    const [loading, setLoading] = useState(true)
-
     const { id } = useParams()
+    const { data, loading, error } = useFetch('/api/conference/single/' + id)
 
-    useEffect(() => {
+    console.log({ data })
 
-        const fethVenue = async () => {
-            setLoading(true)
-            try {
-                const res = await axios.get(api + "/get/confr/" + id)
-                setVenueImage(res.data.venue_image)
-                setVenueDetail({
-                    name: res.data.venue?.name,
-                    desc: res.data.venue?.desc,
-                    remark: res.data.venue?.remark,
-                    travel: res.data.venue?.travel
-                })
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setLoading(false)
-            }
-        }
+    if (error) {
+        return <div>Error</div>
+    }
 
-        fethVenue()
-    }, [id])
-
-    if (loading) {
+    if (loading === 'idle' || loading === 'loading') {
         return (
             <div className="my-5 p-5 text-center">
                 <div className="spinner-border" role="status">
@@ -51,26 +25,35 @@ function ConfrVenue() {
     }
 
     return (
-        <div className="container">
-            <div className='mb-5'>
-                <h4 className='fw-bold'>สถานที่จัดงานประชุม</h4>
-            </div>
-            <div className='mb-5'>
-                <div className="row">
-                    <div className='col-md-6 mb-5 mb-md-0'>
-                        {venueImage ? (
-                            <img src={api + "/image/" + venueImage} alt={venueDetail?.name} className='img-fluid' />
-                        ):null}
-                    </div>
-                    <div className="col-md-6">
-                        <h5 className='fw-bold text-primary'>{venueDetail?.name}</h5>
-                        <p>{venueDetail?.desc}</p>
-                        <div className='mt-5'>
-                            <small className='text-muted'>{venueDetail?.remark} <a href={venueDetail?.travel}>{venueDetail?.travel}</a></small>
+        <div>
+            <section style={{ padding: "180px 0px" }}>
+                <div className='text-center'>
+                    <h1 className='display-1 fw-bold'>สถานที่จัดงานประชุม</h1>
+                    <p className='text-muted'>อ่านรายละเอียดสถานที่จัดงานได้ที่นี่</p>
+                </div>
+            </section>
+            {data &&
+                <section className='bg-white' style={{ padding: "64px 0px" }}>
+                    <div className='container'>
+                        <h1 className='fw-bold mb-4 text-center'>{data.venue.name}</h1>
+                        <div className='my-5 text-center bg-light rounded'>
+                            {data.venue_image &&
+                                <img src={`/uploads/${data.venue_image}`} alt={data.venue_image} />
+                            }
+                        </div>
+                        <div>
+                            {data.venue.desc?.map((items, index) => (
+                                <p key={index}><span className='ms-4'></span>{items}</p>
+                            ))}
+                        </div>
+                        <div>
+                            {data.venue.remark &&
+                                <p>{data.venue.remark}</p>
+                            }
                         </div>
                     </div>
-                </div>
-            </div>
+                </section>
+            }
         </div>
     )
 }

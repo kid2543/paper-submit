@@ -7,8 +7,14 @@ const partnerSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: Conferences
         },
-        image: String,
-        desc: String,
+        image: {
+            type: String,
+            required: true
+        },
+        desc: {
+            type: String,
+            required: true
+        },
     }
 )
 

@@ -1,0 +1,23 @@
+@import 'variables';
+@import 'mixins';
+@import 'global';
+@import 'components/button';
+@import 'components/card';
+@import 'components/navbar';
+@import 'components/nav';
+
+// bootstrap
+@import "../../node_modules/bootstrap/scss/functions"; 
+@import "../../node_modules/bootstrap/scss/variables";
+
+$theme-colors: (
+  "primary":    $blue-700,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark
+);
+
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";

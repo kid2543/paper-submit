@@ -1,132 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-p {
-  font-size: 14px;
-}
-
-small {
-  font-size: 12px;
-}
-
-th {
-  white-space: nowrap;
-}
-
-code {
-  font-family: 'Sarabun', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
 }
 
 :root {
   --bs-body-font-family: 'Sarabun', 'sans-serif' !important;
 }
 
-.tabs-text .nav-item .nav-link {
-  color: #000;
+a {
+  text-decoration: none !important;
 }
 
-textarea {
-  min-height: 100px !important;
-}
-
-ion-icon {
-  vertical-align: middle;
-}
-
-.text-danger:active {
-  background-color: red !important;
-  color: #FFF !important;
-}
-
-.main {
-  transition: all .2s ease-out;
-}
-
-.el-text {
-  width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dropdown-toggle::after {
-  display: none !important;
-}
-
-.dropstart .dropdown-toggle::before {
-  display: none !important;
-}
-
-.dropdown-item {
-  font-size: 14px;
-}
-
-.form-signin {
-  width: 100%;
-  max-width: 375px;
-  padding: 15px;
-  margin: auto;
-}
-
-.form-signin .checkbox {
-  font-weight: 400;
-}
-
-.form-signin .form-floating:focus-within {
-  z-index: 2;
-}
-
-.signin-body {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-}
-
-.form-signin input[type="text"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-table {
-  font-size: 14px;
-}
-
-nav {
-  z-index: 1000;
-  top: 0;
-}
-
-.btn-outline-secondary {
-  border: 0 !important;
-}
-
-.feature-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  margin-bottom: 1rem;
-  font-size: 2rem;
-  color: #fff;
-  border-radius: .75rem;
+a:hover {
+  text-decoration: underline !important;
 }

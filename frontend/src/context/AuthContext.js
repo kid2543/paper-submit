@@ -1,4 +1,5 @@
-import { createContext, useReducer, useEffect } from 'react'
+import { createContext, useReducer, useEffect, useState } from 'react'
+import Cookies from 'js-cookie'
 
 export const AuthContext = createContext()
 
@@ -17,20 +18,21 @@ export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, {
         user: null
     })
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('user'))
+        const user = Cookies.get('username')
 
         if (user) {
             dispatch({type: 'LOGIN', payload: user})
         }
-        
+        setLoading(false)
     }, [])
 
     console.log("AuthContext state: ", state)
 
     return (
-        <AuthContext.Provider value={{...state, dispatch}}>
+        <AuthContext.Provider value={{...state, dispatch, loading}}>
             { children }
         </AuthContext.Provider>
     )

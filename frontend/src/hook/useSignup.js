@@ -1,32 +1,37 @@
 import { useState } from "react";
-import { useAuthContext } from './useAuthContext'
 import axios from 'axios'
+import { useNavigate } from "react-router-dom";
+
+import { toast } from "react-toastify";
 
 export const useSignup = () => {
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(null)
-    const { dispatch } = useAuthContext()
+    let newUser = null
+    const navigate = useNavigate()
 
-    const signup = async (username, password) => {
+    const signup = async (username, password, role) => {
         setIsLoading(true)
         setError(null)
 
+        if(!role) {
+            role = "AUTHOR"
+        }
+
         try {
-            const res = await axios.post('/api/user/signup', {username, password})
-            const json = await res.data
-
-            //save the user to local
-            localStorage.setItem('user', JSON.stringify(json))
-
-            //update authcontext
-            dispatch({type: 'LOGIN', payload: json})
-
+            const res = await axios.post('/api/user/signup', {username, password, role})
             setIsLoading(false)
+            toast.success('ลงทะเบียนสำเร็จ')
+            if(role === 'AUTHOR') {
+                navigate('/login')
+            }
+            return res.data
         } catch (error) {
+            toast.error("เกิดข้อผิดพลาด: " + error.response?.data.error)
             setIsLoading(false)
             setError(error.response?.data.error)
         }
     }
 
-    return { signup, isLoading, error }
+    return { signup, isLoading, error, newUser }
 } 

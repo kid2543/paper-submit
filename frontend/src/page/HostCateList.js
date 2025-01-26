@@ -2,87 +2,63 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Modal from 'react-bootstrap/Modal';
 import ConfirmModal from '../components/ConfirmModal';
-import SearchItemNotFound from '../components/SearchItemNotFound';
-import Dropdown from 'react-bootstrap/Dropdown';
+import { Link } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
-const api = process.env.REACT_APP_API_URL
 
 function HostCateList() {
 
     const [data, setData] = useState([])
     const [searchData, setSearchData] = useState([])
-    const [id, setId] = useState("")
-    const [show, setShow] = useState(false);
-    const [createCateData, setCreateCateData] = useState({
-        cate_name: "",
-        cate_code: "",
-        cate_desc: "",
-        cate_icon: null
-    })
+    const [show, setShow] = useState(false)
     const [showCM, setShowCM] = useState(false)
+    const [createError, setCreateError] = useState(null)
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false)
+    const handleShow = () => setShow(true)
 
-    const deleteCate = async (cate_id, icon) => {
+    const id = sessionStorage.getItem('host_confr')
+
+    const deleteCate = async (cate_id) => {
         if (window.confirm("ต้องการจะลบหรือไม่ ?")) {
             try {
-                const del = await axios.delete(api + "/delete/cate/" + cate_id + "/" + icon)
-                let filterData = data.filter((item) => item._id !== cate_id)
-                setData(filterData)
-                setSearchData(filterData)
-                alert("ลบผู้ใช้งานสำเร็จ: " + del.data)
+                const res = await axios.delete('/api/category/' + cate_id)
+                toast.success(res.data)
+                setSearchData(searchData.filter(items => items._id !== cate_id))
             } catch (error) {
                 console.log(error)
+                toast.error(error.response?.data.error)
             }
         }
-    }
-
-    const searchCate = async (e) => {
-        e.preventDefault()
-        try {
-            if (e.target.cate_name.value) {
-                const res = await axios.get(api + `/search/cate/${e.target.cate_name.value}/${id}`)
-                setSearchData(res.data)
-            } else {
-                setSearchData(data)
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const handleChangeCreate = (e) => {
-        setCreateCateData({ ...createCateData, [e.target.name]: e.target.value })
     }
 
     const handleCreate = async (e) => {
         e.preventDefault()
         try {
-            const formData = new FormData()
-            formData.append("name", createCateData.cate_name)
-            formData.append("cate_code", createCateData.cate_code)
-            formData.append("desc", createCateData.cate_desc)
-            formData.append("confr_id", id)
-            formData.append("image", createCateData.cate_icon)
-            const res = await axios.post(api + "/create/category", formData)
+            const { category_code, name, desc } = e.target
+            const res = await axios.post('/api/category', {
+                category_code: category_code.value.toUpperCase(),
+                name: name.value,
+                desc: desc.value,
+                confr_id: id
+            })
             setShowCM(true)
             handleClose()
             setData(prev => [res.data, ...prev])
             setSearchData(prev => [res.data, ...prev])
+            toast.success('เพิ่มงานประชุมสำเร็จ')
         } catch (error) {
             console.log(error)
+            toast.error('เกิดข้อผิดพลาด')
+            setCreateError(error.response.data?.error)
         }
     }
 
     useEffect(() => {
 
-        const confr_id = sessionStorage.getItem("host_confr")
-        setId(confr_id)
-
         const fethCate = async () => {
             try {
-                const res = await axios.get(api + "/get/cofr/cate/" + confr_id)
+                const res = await axios.get('/api/category/' + id)
                 setData(res.data)
                 setSearchData(res.data)
             } catch (error) {
@@ -91,108 +67,105 @@ function HostCateList() {
         }
 
         fethCate()
-    }, [])
+    }, [id])
 
 
     return (
-        <div className='container my-5'>
+        <div className='py-5'>
+            <ToastContainer />
             <ConfirmModal show={showCM} setShow={setShowCM} noReturn={true} />
-            <div className='mb-3'>
-                <h4 className='m-0 fw-bold'>หัวข้องานประชุม</h4>
+            <div className='mb-4'>
+                <h4 className='fw-bold'>หัวข้องานประชุม</h4>
+                <p className='text-muted'>เพิ่มหัวข้องานประชุมและแก้ไขกรรมการประจำหัวข้อได้ที่นี่</p>
             </div>
-            <div className='d-md-flex justify-content-between mb-3'>
-                <form onSubmit={searchCate} className='col-md-4 mb-3'>
-                    <div className='input-group'>
-                        <input name='cate_name' type='text' className='form-control' placeholder='ค้นหาจากชื่อหัวข้อ' />
-                        <button type='submit' className='btn btn-outline-secondary btn-sm'>
-                            <ion-icon name="search"></ion-icon>
-                        </button>
+            <div className='card border-0 shadow-sm'>
+                <div className='card-body'>
+                    <div className='d-md-flex justify-content-between mb-4 align-items-center'>
+                        <h6 className='fw-bold mb-0'>รายการหัวข้องานประชุม</h6>
+                        <button type='button' onClick={handleShow} className='btn btn-primary'><i className="bi bi-plus-lg me-2"></i>เพิ่มหัวข้องานประชุม</button>
+                        <Modal show={show} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Create Category</Modal.Title>
+                            </Modal.Header>
+                            <form onSubmit={handleCreate}>
+                                <Modal.Body className='row g-3 align-items-center'>
+                                    <div className='col-12'>
+                                        <label className='col-form-label'>รหัสหัวข้อ</label>
+                                        <input className='form-control' name='category_code' pattern='([?=.*A-Za-z])(?=.*\d).{7,}' />
+                                        <small>รหัสหัวข้อประกอบด้วย ตัวอักษรและตัวเลข อย่างน้อย 8 ตัวอักษร</small>
+                                    </div>
+                                    <div className='col-12'>
+                                        <label className='col-form-label'>ชื่อหัวข้อ</label>
+                                        <input className='form-control' name='name' />
+                                    </div>
+                                    <div className='col-12'>
+                                        <label className='col-form-label'>รายละเอียด</label>
+                                        <textarea className='form-control' name='desc' />
+                                    </div>
+                                    {createError && <div className='text-danger'>{createError}</div>}
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <button className="btn" onClick={handleClose}>
+                                        Close
+                                    </button>
+                                    <button type='submit' className="btn btn-primary">
+                                        Create
+                                    </button>
+                                </Modal.Footer>
+                            </form>
+                        </Modal>
                     </div>
-                </form>
-                <div>
-                    <Modal show={show} onHide={handleClose}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Create Category</Modal.Title>
-                        </Modal.Header>
-                        <form onSubmit={handleCreate}>
-                            <Modal.Body className='row g-3 align-items-center'>
-                                <div className='col-12'>
-                                    <label className='col-form-label'>รหัสหัวข้อ</label>
-                                    <input className='form-control' name='cate_code' onChange={handleChangeCreate} />
-                                </div>
-                                <div className='col-12'>
-                                    <label className='col-form-label'>ชื่อหัวข้อ</label>
-                                    <input className='form-control' name='cate_name' onChange={handleChangeCreate} />
-                                </div>
-                                <div className='col-12'>
-                                    <label className='col-form-label'>รายละเอียด</label>
-                                    <textarea className='form-control' name='cate_desc' onChange={handleChangeCreate} />
-                                </div>
-                                <div className='col-12'>
-                                    <label className='col-form-label'>รูป</label>
-                                    <input className='form-control' type='file' name='cate_icon' onChange={e => setCreateCateData({ ...createCateData, cate_icon: e.target.files[0] })} />
-                                </div>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <button className="btn btn-secondary" onClick={handleClose}>
-                                    Close
-                                </button>
-                                <button type='submit' className="btn btn-primary">
-                                    Save Changes
-                                </button>
-                            </Modal.Footer>
-                        </form>
-                    </Modal>
-                    <button type='button' onClick={handleShow} className='btn btn-outline-primary btn-sm'><ion-icon name="add-circle-outline"></ion-icon> New</button>
+                    {data.length > 0 ? (
+                        <div className='table-responsive' style={{ minHeight: "280px" }}>
+                            <table className='table table-hover'>
+                                <thead>
+                                    <tr>
+                                        <th>รหัส</th>
+                                        <th>รูป</th>
+                                        <th>จำนวนกรรมการ</th>
+                                        <th>เครื่องมือ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {searchData?.map((cate) => (
+                                        <tr key={cate._id}>
+                                            <td>{cate.category_code}</td>
+                                            <td>{cate.name}</td>
+                                            <td>{cate.reviewer_list.length}</td>
+                                            <td>
+                                                <Link to={`/host/edit/category/${cate._id}`} type='button' className='btn btn-primary me-2'>
+                                                    <i className='bi bi-pen'></i>
+                                                </Link>
+                                                <button onClick={() => deleteCate(cate._id)} type='button' className='btn btn-danger'>
+                                                    <i className='bi bi-trash'></i>
+                                                </button>
+                                                {/* <div className='d-flex'>
+                                                    <Dropdown drop='down-centered'>
+                                                        <Dropdown.Toggle variant="btn">
+                                                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                                        </Dropdown.Toggle>
+
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item href={'/host/edit/category/' + cate._id}>
+                                                                <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
+                                                                Edit
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => deleteCate(cate._id, cate.icon)}>
+                                                                <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
+                                                                Delete
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div> */}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : "ไม่พบข้อมูล"}
                 </div>
             </div>
-            {data.length > 0 ? (
-                <div className="table-responsive">
-                    <table className='table table-hover'>
-                        <thead className='table-secondary'>
-                            <tr>
-                                <th>รหัส</th>
-                                <th>รูป</th>
-                                <th>ชื่อ</th>
-                                <th>จำนวนกรรมการ</th>
-                                <th>action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {searchData?.map((cate) => (
-                                <tr key={cate._id}>
-                                    <td>{cate.category_code}</td>
-                                    <td>
-                                        <img src={api + "/image/" + cate.icon} alt={cate.icon} className='rounded-circle' width={32} height={32} />
-                                    </td>
-                                    <td>{cate.name}</td>
-                                    <td>{cate.reviewer_list.length}</td>
-                                    <td>
-                                        <div className='d-flex'>
-                                            <Dropdown drop='down-centered'>
-                                                <Dropdown.Toggle variant="btn">
-                                                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-                                                </Dropdown.Toggle>
-
-                                                <Dropdown.Menu>
-                                                    <Dropdown.Item href={"/host/cate/" + cate._id}>
-                                                        <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
-                                                        Edit
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => deleteCate(cate._id, cate.icon)}>
-                                                        <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
-                                                        Delete
-                                                    </Dropdown.Item>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            ) : <SearchItemNotFound />}
         </div>
     )
 }

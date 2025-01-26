@@ -11,7 +11,7 @@ const Status = {
 const Result = {
     PENDING: 'PENDING',
     ACCEPT: 'ACCEPT',
-    REVISION: 'REVISION',
+    REVISION: 'REVISE',
     REJECT: 'REJECT'
 }
 
@@ -50,7 +50,7 @@ const paperAssignSchema = mongoose.Schema(
             },
             default: Result.PENDING
         },
-    }
+    }, { timestamps: true }
 )
 
 const paperAssign = mongoose.model("paper_assign",paperAssignSchema)

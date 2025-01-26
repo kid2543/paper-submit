@@ -5,8 +5,6 @@ import LoadingPage from '../components/LoadingPage';
 import SearchItemNotFound from '../components/SearchItemNotFound';
 import { useNavigate } from 'react-router-dom';
 
-const api = process.env.REACT_APP_API_URL
-
 function Paper() {
 
 
@@ -19,16 +17,14 @@ function Paper() {
 
     const fethPaper = async () => {
       try {
-        let res = await axios.get(api + "/paper")
+        let res = await axios.get('/api/paper')
         setPaper(res.data)
-        console.log("paper", res.data)
       } catch (error) {
         console.log(error)
       }
     }
 
     fethPaper()
-
     setLoading(false)
 
   }, [])
@@ -50,7 +46,7 @@ function Paper() {
           </div>
         </form>
         {paper.length > 0 ? (
-          <div className='row'>
+          <div className='row g-3'>
             {paper?.map((item) => (
               <div className='col-md-6 col-lg-3' key={item._id}>
                 <div className='card h-100'>

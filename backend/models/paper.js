@@ -16,8 +16,9 @@ const Status = {
 // result status
 const Result = {
     PENDING: 'PENDING',
-    ACCECPT: 'ACCECPT',
+    ACCECPT: 'ACCEPT',
     REVISE: 'REVISE',
+    PUBLIC: 'PUBLIC',
     REJECT: 'REJECT'
 }
 
@@ -26,7 +27,7 @@ const Payment = {
     NEW: 'NEW',
     PENDING: 'PENDING',
     CHECKING: 'CHECKING',
-    ACCECPT: 'ACCECPT',
+    ACCEPT: 'ACCEPT', 
     REJECT: 'REJECT'
 }
 
@@ -45,6 +46,19 @@ const paperSchema = mongoose.Schema(
             required: true,
             unique: true
         },
+        advise: {
+            type: String,
+        },
+        group:{
+            type: String,
+        },
+        university: {
+            type: String,
+        },
+        keyword: {
+            type: String,
+            required: true
+        },
         cate_code: {
             type: mongoose.Schema.Types.ObjectId,
             ref: Category,
@@ -59,10 +73,6 @@ const paperSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: User,
             required: true
-        },
-        create_date: {
-            type: Date,
-            default: Date.now()
         },
         status:{
             type: String,
@@ -79,10 +89,6 @@ const paperSchema = mongoose.Schema(
                 message: '{VALUE} is not supperted'
             },
             default: Result.PENDING
-        },
-        paper_file: {
-            type: String,
-            required: true
         },
         publication: {
             type:mongoose.Schema.Types.ObjectId,
@@ -107,31 +113,44 @@ const paperSchema = mongoose.Schema(
         payment_image: {
             type: String
         },
-        close_name_file: {
-            type: String
-        },
-        edit_paper: [{
-            type: String
-        }],
-        edit_deadline: {
-            type: String
-        },
         author: {
-            type: String
+            type: String,
+            required: true
+        },
+        email: {
+            type: String,
+            required: true
         },
         address: {
-            type: String
+            type: String,
+            required: true
         },
         contact: {
             type: String,
-        }
-    }
+            required: true
+        },
+        deadline: [
+            {name: {type: String}, date: {type: Date}}
+        ],
+        award_rate: {type: String},
+        letter: {type: String},
+        certificate: {type: String}
+    }, { timestamps: true }
 )
 
 paperSchema.index({confr_code: 1, title: 'text'})
 
-paperSchema.post('update', function(doc) {
+paperSchema.post('findByIdAndUpdate', function(doc) {
     console.log(`Notification: User ${doc.username}`)
+})
+
+paperSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+    try {
+        await mongoose.model('paper_assign').deleteMany({paper_id: this._id})
+        next()
+    } catch (error) {
+        next(error)
+    }
 })
 
 const Paper = mongoose.model("paper",paperSchema)

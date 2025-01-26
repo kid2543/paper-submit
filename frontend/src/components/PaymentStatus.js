@@ -1,14 +1,16 @@
 
 const PaymentStatus = ({status}) => {
     switch (status) {
-        case 0:
+        case 'NEW':
             return <span className='badge bg-secondary'>รอดำเนินการ</span>
-        case 1:
-            return <span className='badge bg-warning'>รอการตรวจสอบ</span>
-        case 2:
+        case 'PENDING':
+            return <span className='badge bg-warning'>รอแนบหลักฐาน</span>
+        case 'CHECKING':
+            return <span className='badge bg-primary'>รอดำเนินการ</span>
+        case 'ACCECPT':
             return <span className='badge bg-success'>ข้อมูลถูกต้อง</span>
-        case 3:
-            return <span className='badge bg-danger'>ข้อมูลไม่ถูกต้อง</span>
+        case 'REJECT':
+            return <span className='badge bg-danger'>ข้อมูลไม่ถูกต้องแนบหลักฐานใหม่</span>
         default:
             return <span className='badge bg-dark'>ไม่ระบุ</span>
     }

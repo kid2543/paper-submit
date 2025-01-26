@@ -1,0 +1,24 @@
+.sidebar {
+    height: 100vh; /* Full height */
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    z-index: 1;
+  }
+  
+  .content {
+    margin-left: 16.6667%; /* Adjust based on the width of the sidebar */
+    padding: 20px;
+  }
+  
+  @media (max-width: 991.98px) {
+    .sidebar {
+      display: none; /* Hide sidebar on smaller screens */
+    }
+  
+    .content {
+      margin-left: 0; /* Reset margin on smaller screens */
+    }
+  }
+  

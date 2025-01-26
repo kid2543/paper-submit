@@ -1,8 +1,11 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
 
-const api = process.env.REACT_APP_API_URL
+// react bootstrap
+import { Breadcrumb } from 'react-bootstrap'
+
 
 function HostEditCate() {
 
@@ -10,12 +13,9 @@ function HostEditCate() {
 
     const [cateData, setCateData] = useState({})
     const [commitData, setCommitData] = useState([])
-    const [commitList, setCommitList] = useState([])
-    const [uploadIcon, setUploadIcon] = useState(null)
     const [commitDetail, setCommitDetail] = useState([])
     const [newCommitList, setNewCommitList] = useState([])
-
-    const navigate = useNavigate()
+    const [query, setQuery] = useState('')
 
     const handleChangeList = (e) => {
         if (e.target.checked) {
@@ -27,49 +27,49 @@ function HostEditCate() {
 
     const handleUpdate = async (e) => {
         e.preventDefault()
-        if (uploadIcon) {
+        try {
             const formData = new FormData(e.target)
-            formData.append("image", uploadIcon)
-            formData.append("reviewer", newCommitList)
-            try {
-                const uploadCate = await axios.patch(api + `/update/cate/${id}/${cateData?.icon}`, formData)
-                console.log(uploadCate)
-                alert("แก้ไขข้อมูลสำเร็จ")
-                navigate(-1)
-            } catch (error) {
-                console.log(error)
-                alert("เกิดข้อผิดพลาด")
-            }
-        } else {
-            const input = e.target
-            try {
-                const update = await axios.patch(api + `/update/cate/${id}/${cateData?.icon}`, {
-                    name: input.name.value,
-                    desc: input.desc.value,
-                    reviewer: newCommitList
-                })
-                console.log(update)
-                alert("แก้ไขข้อมูลสำเร็จ")
-                navigate(-1)
-            } catch (error) {
-                console.log(error)
-                alert("เกิดข้อผิดพลาด")
-            }
+            const json = Object.fromEntries(formData.entries())
+            const res = await axios.patch('/api/category/update/' + id, json)
+            setCateData(res.data)
+            toast.success('แก้ไขสำเร็จ')
+        } catch (error) {
+            console.log(error)
         }
-
     }
+
+    const handleUpdateList = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axios.patch('/api/category/review', {
+                _id: id,
+                list: newCommitList
+            })
+            setCateData(res.data)
+            toast.success("เพิ่มกรรมการสำเร็จ")
+            window.location.reload()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleSearch = (e) => {
+        setQuery(e.target.value)
+    }
+
+    const filterData = commitData?.filter(item =>
+        item.username.toLowerCase().includes(query.toLocaleLowerCase())
+    )
 
     useEffect(() => {
 
         const fethData = async () => {
             try {
-                const res = await axios.get(api + "/get/one/cate/" + id)
+                const res = await axios.get('/api/category/one/' + id)
                 setCateData(res.data)
-                setCommitList(res.data.reviewer_list)
-                const comit = await axios.get(api + "/all/committee")
+                setCommitDetail(res.data.reviewer_list)
+                const comit = await axios.get('/api/user/committee')
                 setCommitData(comit.data)
-                const list = await axios.get(api + "/get/committee/list/" + id)
-                setCommitDetail(list.data)
             } catch (error) {
                 console.log(error)
             }
@@ -80,94 +80,125 @@ function HostEditCate() {
     }, [id])
 
     return (
-        <div className='container py-5'>
+        <div className='px-5 py-4'>
+            <ToastContainer />
             <div>
-                <h4 className='mb-3'>แก้ไขข้อมูลหัวข้องานประชุม</h4>
-                <form onSubmit={handleUpdate}>
-                    <div className='row gy-3'>
-                        <div className='col-12 col-md-6'>
-                            <label className='form-label text-muted'>ชื่องานประชุม</label>
-                            <input name='name' className='form-control' defaultValue={cateData?.name} />
-                        </div>
-                        <div className='col-12 col-md-6'>
-                            <label className='form-label text-muted'>รายละเอียดงานประชุม</label>
-                            <textarea name='desc' className='form-control' defaultValue={cateData?.desc} />
-                        </div>
-                        <div className='col-12 col-md-6'>
-                            <label className='form-label text-muted'>รูปงานประชุมเดิม</label>
-                            <img className='d-block' alt={cateData?.icon} src={api + "/image/" + cateData?.icon} height={128} width={128} />
-                        </div>
-                        <div className='col-12 col-md-6'>
-                            <label className='form-label text-muted'>แก้ไขรูปงานประชุมใหม่</label>
-                            <input onChange={e => setUploadIcon(e.target.files[0])} className='form-control' type='file' accept='image/*' />
-                        </div>
-                        <div className='col-12'>
-                            <label className='form-label text-muted'>รายชื่อกรรมการที่เพิ่มเข้ามาแล้ว</label>
-                            {commitDetail?.length > 0 ? (
-                                <div className='table-responsive mb-5'>
-                                    <table className='table table-hover'>
-                                        <thead className='table-primary'>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>ชื่อกรรมการ</th>
-                                                <th>สังกัด</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {commitDetail?.map((item, index) => (
-                                                <tr key={item._id}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{item.fname} {item.lname}</td>
-                                                    <td>{item.university}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ) : (
+                <div>
+                    <h4 className='fw-bold'>แก้ไขข้อมูลหัวข้องานประชุม</h4>
+                    <Breadcrumb>
+                        <Breadcrumb.Item href="/host/edit/category">หัวข้องานประชุม</Breadcrumb.Item>
+                        <Breadcrumb.Item active>
+                            แก้ไขหัวข้องานประชุม
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                </div>
+                <div className='card border-0 mb-5'>
+                    <div className='card-body'>
+                        <form onSubmit={handleUpdate}>
+                            <div className='row gy-3'>
                                 <p>
-                                    ไม่พบรายชื่อกรรมการ
+                                    รหัสหัวข้อ : <span className='fw-bold'>{cateData?.category_code}</span>
                                 </p>
-                            )}
-                            <div className='d-flex justify-content-between align-items-center mb-3'>
-                                <p className='form-label text-muted'>
-                                    แก้ไขรายชื่อกรรมการตรวจบทความ
-                                </p>
-                                <a href='/host/committee' className='btn btn-primary btn-sm'>เพิ่มกรรมการ</a>
+                                <div className='col-12'>
+                                    <label className='form-label text-muted'>ชื่องานประชุม</label>
+                                    <input name='name' className='form-control' defaultValue={cateData?.name} />
+                                </div>
+                                <div className='col-12'>
+                                    <label className='form-label text-muted'>รายละเอียดงานประชุม</label>
+                                    <textarea name='desc' className='form-control' defaultValue={cateData?.desc} />
+                                </div>
+                                <div className='text-end'>
+                                    <button type='submit' className='btn btn-primary'>
+                                        <i className='bi bi-floppy me-2'></i>บันทึกข้อมูล
+                                    </button>
+                                </div>
                             </div>
-
+                        </form>
+                    </div>
+                </div>
+                <div className='card border-0 shadow-sm mb-5'>
+                    <div className='card-body'>
+                        <h6 className='fw-bold mb-4'>รายชื่อกรรมการประจำหัวข้อ</h6>
+                        {commitDetail.length > 0 ? (
                             <div className='table-responsive'>
                                 <table className='table table-hover'>
-                                    <thead className='table-secondary'>
+                                    <thead>
                                         <tr>
                                             <th>#</th>
+                                            <th>ชื่อผู้ใช้งาน</th>
                                             <th>ชื่อกรรมการ</th>
-                                            <th>สังกัด/มหาวิทยาลัย</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {commitData?.map((item) => (
+                                        {commitDetail?.map((item, index) => (
                                             <tr key={item._id}>
-                                                <td>
-                                                    <input type='checkbox' onChange={e => handleChangeList(e)} value={item._id} defaultChecked={commitList.includes(item._id)} />
-                                                </td>
-                                                <td>{item.fname} {item.lname}</td>
-                                                <td>{item.university}</td>
+                                                <td>{index + 1}</td>
+                                                <td>{item.username}</td>
+                                                <td>{item.name}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                        <div className='col-12'>
-                            {newCommitList.length > 0 ? (
-                                <button type='submit' className='btn btn-success'>Save</button>
-                            ) : (
-                                <button type='submit' className='btn btn-outline-secondary'>Clear</button>
-                            )}
-                        </div>
+                        ) : (
+                            <p>
+                                ไม่พบรายชื่อกรรมการ
+                            </p>
+                        )}
                     </div>
-                </form>
+                </div>
+                <div className='card border-0 shadow-sm mb-5'>
+                    <div className='card-body'>
+                        <h6 className='fw-bold mb-4'>
+                            รายชื่อกรรมการทั้งหมด
+                        </h6>
+                        <div className='d-flex justify-content-between align-items-center mb-3'>
+                            <div>
+                                <div className="input-group">
+                                    <input type="text" className="form-control" placeholder="ค้นหา" onChange={handleSearch} />
+                                    <button className="btn btn-primary" id="basic-addon2"><i className="bi bi-search"></i></button>
+                                </div>
+                            </div>
+                            <div>
+                                <a href='/host/committee' className='btn btn-primary'>
+                                    <i className='bi bi-person-plus me-2'></i>
+                                    เพิ่มกรรมการ
+                                </a>
+                            </div>
+                        </div>
+                        <form onSubmit={handleUpdateList}>
+                            <div className='col-12'>
+                                <div className='table-responsive'>
+                                    <table className='table table-hover'>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>ชื่อผู้ใช้งาน</th>
+                                                <th>ชื่อกรรมการ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filterData?.map((item) => (
+                                                <tr key={item._id}>
+                                                    <td>
+                                                        <input type='checkbox' onChange={e => handleChangeList(e)} value={item._id} />
+                                                    </td>
+                                                    <td>{item.username}</td>
+                                                    <td>{item.name}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div className='col-12 text-end'>
+                                <button className='btn btn-success' type='submit' disabled={newCommitList.length <= 0}>
+                                    <i className='me-2 bi bi-people'></i>ยืนยัน
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     )

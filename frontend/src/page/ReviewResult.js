@@ -1,27 +1,30 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import useFetch from '../hook/useFetch'
+
+// react-bootstrap
+import { UserDropdown } from '../components/UserDropdown'
 
 const api = process.env.REACT_APP_API_URL
 
 function ReviewResult() {
-
-  const [reviweData, setReviweData] = useState({})
-  const [rate, setRate] = useState([])
-  const [suggestionFile, setSuggestionFile] = useState(null)
-
   const { id } = useParams()
-
+  const { data, setData, loading, error } = useFetch('/api/assign/one/' + id)
+  const [suggestionFile, setSuggestionFile] = useState(null)
 
   const handleUpload = async (e) => {
     e.preventDefault()
-    if(suggestionFile) {
+    if (suggestionFile) {
       try {
         const formData = new FormData()
         formData.append("file", suggestionFile)
-        await axios.patch(api + "/upload/comment/" + id, formData )
+        const res = await axios.patch('/api/assign/suggestion/' + id, formData)
+        setData(res.data)
+        alert('Upload Success')
       } catch (error) {
         console.log(error)
+        alert('Upload Error')
       }
     } else {
       alert('กรุณาเลือกไฟล์')
@@ -29,59 +32,61 @@ function ReviewResult() {
     }
   }
 
-  useEffect(() => {
-    const fethData = async () => {
-      try {
-        const res = await axios.get(api + "/get/rate/paper/" + id)
-        setReviweData(res.data)
-        setRate(res.data.rate)
-      } catch (error) {
-        console.log(error)
-      }
-    }
+  if (loading === 'idle' || loading === 'loading') {
+    return <div>Loading...</div>
+  }
 
-    fethData()
-
-  }, [id])
+  if (error) {
+    return <div>Error</div>
+  }
 
   return (
     <div className='container my-5'>
-      <div>
-        <h4 className='fw-bold'>ผลการตรวจบทความ</h4>
-      </div>
-      <div className='card'>
+      <div className='card border-0 shadow-sm mb-5'>
         <div className='card-body'>
-          <p>
-            ข้อแนะนำ: {reviweData?.suggestion}
-          </p>
-          <div className='mb-3'>
-            {reviweData?.suggestion_file ? (
-              <>
-                ข้อแนะนำ (file): <a href={api + "/pdf/" + reviweData?.suggestion_file} target='_blank' rel='noreferrer'>open file</a>
-              </>
-            ) : (
-              <form className='col-md-6 col-lg-3' onSubmit={handleUpload}>
-                <label className='form-label text-muted'>อัพโหลดข้อเสนอแนะนำ</label>
-                <input className='form-control form-control-sm' type='file' accept='.pdf,.doc' onChange={e => setSuggestionFile(e.target.files[0])} />
-                <div className='mt-2'>
-                  <button className='btn btn-outline-success btn-sm' type='submit'>Upload</button>
-                </div>
-              </form>
-            )}
-          </div>
-          <div>
-            <p>คะแนนแต่ละข้อ</p>
-            {rate?.map((item, index) => (
-              <div key={index}>
-                ข้อที่ {index + 1}: {item} คะแนน
-              </div>
-            ))}
-          </div>
-          <div>
-            รวม: {reviweData?.total} คะแนน
+          <div className='d-flex justify-content-between align-items-center'>
+            <h4 className='fw-bold'>ผลการตรวจบทความ</h4>
+            <UserDropdown />
           </div>
         </div>
+
       </div>
+      {data &&
+        <div className='card border-0 shadow-sm'>
+          <div className='card-body'>
+            <p>
+              ข้อแนะนำ: {data.suggestion}
+            </p>
+            <div className='mb-3'>
+              {data.suggestion_file ? (
+                <div>
+                  ข้อแนะนำ (file): <a href={api + "/uploads/" + data.suggestion_file} target='_blank' rel='noreferrer'>open file</a>
+                </div>
+              ) : (
+                <form className='col-md-6 col-lg-3' onSubmit={handleUpload}>
+                  <label className='form-label text-muted'>อัพโหลดข้อเสนอแนะนำ</label>
+                  <input className='form-control form-control-sm' type='file' accept='.pdf,.doc' onChange={e => setSuggestionFile(e.target.files[0])} />
+                  <div className='mt-2'>
+                    <button className='btn btn-outline-success btn-sm' type='submit' disabled={!suggestionFile}>Upload</button>
+                  </div>
+                </form>
+              )
+              }
+            </div>
+            <div>
+              <p>คะแนนแต่ละข้อ</p>
+              {data.rate.map((item, index) => (
+                <div key={index}>
+                  ข้อที่ {index + 1}: {item} คะแนน
+                </div>
+              ))}
+            </div>
+            <div>
+              รวม: {data.total} คะแนน
+            </div>
+          </div>
+        </div>
+      }
     </div>
   )
 }

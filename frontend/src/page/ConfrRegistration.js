@@ -1,159 +1,147 @@
-import axios from 'axios'
 import dayjs from 'dayjs'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
+import useFetch from '../hook/useFetch'
 
-const api = process.env.REACT_APP_API_URL
 
 function ConfrRegistration() {
 
-    const [regisDate, setRegisDate] = useState({
-        eb_start: null,
-        eb_end: null,
-        rl_start: null,
-        rl_end: null
-    })
-    const [bankDetail, setBankDetail] = useState({
-        bank_name: "",
-        bank_type: "",
-        ac_no: "",
-        ac_name: ""
-    })
-    const [regisType, setRegisType] = useState([])
-    const [loading, setLoading] = useState(true)
-
     const { id } = useParams()
+    const { data, loading, error } = useFetch('/api/conference/single/' + id)
 
-    useEffect(() => {
-
-        setLoading(true)
-        const fethRegis = async () => {
-            try {
-                const res = await axios.get(api + "/get/confr/" + id)
-                setRegisDate({
-                    eb_start: res.data.regis_eb_start_date,
-                    eb_end: res.data.regis_eb_end_date,
-                    rl_start: res.data.regis_rl_start_date,
-                    rl_end: res.data.regis_rl_end_date
-                })
-                setBankDetail({
-                    bank_name: res.data.bank_name,
-                    bank_type: res.data.bank_type,
-                    ac_no: res.data.acc_no,
-                    ac_name: res.data.acc_name
-                })
-                setRegisType(res.data.regis_type)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        
-        fethRegis()
-        setLoading(false)
-    }, [id])
-
-    if (loading) {
+    if (loading === 'idle' || loading === 'loading') {
         return (
             <LoadingPage />
         )
     }
 
+    if (error) {
+        return <div>Error</div>
+    }
+
     return (
-        <div className='container'>
-            <div className='mb-5'>
-                <h4 className='fw-bold'>รายละเอียดการลงทะเบียน</h4>
-            </div>
-            <div className='row mb-5'>
-                <p className='fw-bold'>กำหนดการลงทะเบียน</p>
-                <div className='col-md-6'>
-                    <div className='mb-3 card p-3'>
-                        <div className='row'>
-                            <div className='col'>
-                                <p className='text-primary'>Early Bird Registration:</p>
-                            </div>
-                            <div className='col'>
-                                <p>Start: {regisDate.eb_start !== null && regisDate.eb_start !== undefined ? (dayjs(regisDate.eb_start).format("DD-MM-YYYY")) : "ยังไม่ระบุ"} </p>
-                                <p>End: {regisDate.eb_end !== null && regisDate.eb_end !== undefined ? (dayjs(regisDate.eb_end).format("DD-MM-YYYY")) : "ยังไม่ระบุ"}</p>
-                            </div>
-                        </div>
-                    </div>
+        <div className='bg-light'>
+            <section style={{ padding: "180px 0px" }}>
+                <div className='text-center'>
+                    <h1 className='fw-bold display-1'>
+                        การลงทะเบียน
+                    </h1>
+                    <p className='text-muted'>อ่านรายละเอียดการลงทะเบียนได้ที่นี่!</p>
                 </div>
-                <div className='col-md-6'>
-                    <div className='mb-3 card p-3'>
-                        <div className='row'>
-                            <div className='col'>
-                                <p className='text-primary'>Regular Registration:</p>
-                            </div>
-                            <div className='col'>
-                                <p>Start: {regisDate.rl_start !== null && regisDate.rl_start !== undefined ? (dayjs(regisDate.rl_start).format("DD-MM-YYYY")) : "ยังไม่ระบุ"}</p>
-                                <p>End: {regisDate.rl_end !== null && regisDate.rl_end !== undefined ? (dayjs(regisDate.rl_end).format("DD-MM-YYYY")) : "ยังไม่ระบุ"}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className='mb-5'>
+            </section>
+            {data &&
                 <div>
-                    <p className='fw-bold'>รายละเอียดธนาคาร</p>
-                </div>
-                <div className='row'>
-                    <div className='col-md-3'>
-                        ชื่อธนาคาร
-                    </div>
-                    <div className='col-md-9 mb-3'>
-                        {bankDetail.bank_name ? (bankDetail.bank_name) : "ไม่ระบุ"}
-                    </div>
-                    <div className='col-md-3'>
-                        ชื่อบัญชี
-                    </div>
-                    <div className='col-md-9 mb-3'>
-                        {bankDetail.ac_name ? (bankDetail.ac_name) : "ไม่ระบุ"}
-                    </div>
-                    <div className='col-md-3'>
-                        ประเภทบัญชี
-                    </div>
-                    <div className='col-md-9 mb-3'>
-                        {bankDetail.bank_type ? (bankDetail.bank_type) : "ไม่ระบุ"}
-                    </div>
-                    <div className='col-md-3'>
-                        เลขบัญชี
-                    </div>
-                    <div className='col-md-9 mb-3'>
-                        {bankDetail.ac_no ? (<span className='fw-bold text-primary'>{bankDetail.ac_no}</span>) : "ไม่ระบุ"}
-                    </div>
-                </div>
-            </div>
-            <div className='mb-5'>
-                <div className='mb-3'>
-                    <p className='fw-bold'>Registration Rate</p>
-                </div>
-                {regisType.length > 0 ? (
-                    <div>
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Early Registration</th>
-                                    <th>Standard Registration</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {regisType?.map((item) => (
-                                    <tr key={item._id}>
-                                        <td>{item.name}</td>
-                                        <td>{item.price_1} </td>
-                                        <td>{item.price_2} </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className='text-end'>
-                            <small className='text-muted'>สกุลเงินบาท</small>
+                    <section className='bg-white' style={{ padding: "64px 0px" }}>
+                        <div className='container'>
+                            <h4 className='fw-bold mb-4'>ข้อมูลบัญชี</h4>
+                            <div className='card  bg-gradient text-bg-dark p-2'>
+                                <div className='card-body'>
+                                    <div className='row g-3'>
+                                        <div className='col-12 col-md-6'>
+                                            <div className='card bg-white'>
+                                                <div className='card-body'>
+                                                    <p className='fw-bold'>เลขบัญชี</p>
+                                                    <small>{data.acc_no}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='col-12 col-md-6'>
+                                            <div className='card bg-white'>
+                                                <div className='card-body'>
+                                                    <p className='fw-bold'>ชื่อบัญชี</p>
+                                                    <small>{data.acc_name}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='col-12 col-md-6'>
+                                            <div className='card bg-white'>
+                                                <div className='card-body'>
+                                                    <p className='fw-bold'>ประเภทบัญชี</p>
+                                                    <small>{data.bank_type}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='col-12 col-md-6'>
+                                            <div className='card bg-white'>
+                                                <div className='card-body'>
+                                                    <p className='fw-bold'>ชื่อธนาคาร</p>
+                                                    <small>{data.bank_name}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                ) : "ไม่พบข้อมูล"}
-            </div>
+                    </section>
+                    <section style={{ padding: "64px 0px" }}>
+                        <div className='container'>
+                            <h4 className='fw-bold mb-4'>ข้อมูลการลงทะเบียน</h4>
+                            <div className='card border-0 shadow'>
+                                <div className='card-body'>
+                                    {data.regis_eb_start_date &&
+                                        <div>
+                                            <p>Early Bird:
+                                                <span className='mx-2 badge bg-dark'>
+                                                    {data.regis_eb_start_date && dayjs(data.regis_eb_start_date).format('DD/MM/YYYY')}
+                                                </span>
+                                                -
+                                                <span className='mx-2 badge bg-dark'>
+                                                    {data.regis_eb_end_date && dayjs(data.regis_eb_end_date).format('DD/MM/YYYY')}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    }
+                                    {data.regis_rl_start_date &&
+                                        <div>
+                                            <p>Regular:
+                                                <span className='badge bg-dark mx-2'>
+                                                    {data.regis_rl_start_date &&
+                                                        dayjs(data.regis_rl_start_date).format('DD/MM/YYYY')
+                                                    }
+                                                </span>
+                                                -
+                                                <span className='badge bg-dark mx-2'>
+                                                    {data.regis_rl_end_date &&
+                                                        dayjs(data.regis_rl_end_date).format('DD/MM/YYYY')
+                                                    }
+                                                </span>
+                                            </p>
+                                        </div>
+                                    }
+                                    <div className='table-responsive'>
+                                        <table className='table table-hover'>
+                                            <thead>
+                                                <tr>
+                                                    <th>-</th>
+                                                    <th>Early</th>
+                                                    <th>Regular</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {data.regis_type?.map((items) => (
+                                                    <tr key={items._id}>
+                                                        <td>
+                                                            {items.name}
+                                                        </td>
+                                                        <td>
+                                                            {items.price_1}
+                                                        </td>
+                                                        <td>
+                                                            {items.price_2}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            }
         </div>
     )
 }

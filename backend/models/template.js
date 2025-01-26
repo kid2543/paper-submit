@@ -7,7 +7,8 @@ const templateSchema = mongoose.Schema(
             type: String
         },
         file: {
-            type: String
+            type: String,
+            required: true,
         },
         confr_id : {
             type: mongoose.Schema.Types.ObjectId,

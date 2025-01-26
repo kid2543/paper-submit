@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
+const fs = require('fs')
 
 const Roles = {
     AUTHOR: 'AUTHOR',
     COMMITTEE: 'COMMITTEE',
     HOST: 'HOST',
-    ADMIN : 'ADMIN'
+    ADMIN: 'ADMIN'
 }
 
 Object.freeze(Roles)
@@ -24,7 +25,7 @@ const userSchema = mongoose.Schema(
             required: true,
             enum: {
                 values: Object.values(Roles),
-                message: '{VALUE} is not supported' 
+                message: '{VALUE} is not supported'
             },
             default: Roles.AUTHOR
         },
@@ -35,13 +36,13 @@ const userSchema = mongoose.Schema(
         },
         password: {
             type: String,
-            required: true
+            required: true,
         },
         email: {
-            type:String,
+            type: String,
         },
         department: {
-            type:String,
+            type: String,
         },
         university: {
             type: String,
@@ -50,32 +51,30 @@ const userSchema = mongoose.Schema(
             type: String,
         },
         province: {
-            type:String,
+            type: String,
         },
         district: {
-            type:String,
+            type: String,
         },
         sub_district: {
-            type:String,
+            type: String,
         },
         zip_code: {
-            type:String,
+            type: String,
         },
     }
 )
 
-userSchema.index({fname: 1, lname: 1})
-
 //static signup method
-userSchema.statics.signup = async function(username, password, role) {
+userSchema.statics.signup = async function (username, password, role) {
 
     //validation
     const usernameRegex = /^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/
     const usernameValid = usernameRegex.test(username)
 
-    if(role === 'ADMIN') {
-        const admin = await this.findOne({role})
-        if(admin) {
+    if (role === 'ADMIN') {
+        const admin = await this.findOne({ role })
+        if (admin) {
             throw Error('Already have Admin')
         }
     }
@@ -84,8 +83,8 @@ userSchema.statics.signup = async function(username, password, role) {
         throw Error('All fields must be filled')
     }
 
-    if(!usernameValid) {
-        throw Error ('Username is not valid ')
+    if (!usernameValid) {
+        throw Error('Username is not valid ')
     }
 
     if (!validator.isStrongPassword(password)) {
@@ -101,32 +100,64 @@ userSchema.statics.signup = async function(username, password, role) {
     const salt = await bcrypt.genSalt(10)
     const hash = await bcrypt.hash(password, salt)
 
-    const user = await this.create({username, password: hash, role})
+    const user = await this.create({ username, password: hash, role })
+
 
     return user
 
 }
 
 //static login method
-userSchema.statics.login = async function(username, password) {
+userSchema.statics.login = async function (username, password) {
+
     if (!username || !password) {
         throw Error('All fields must be filled')
     }
 
-    const user = await this.findOne({username})
+    const user = await this.findOne({ username })
 
-    if(!user) {
+    if (!user) {
         throw Error('Incorrect username')
     }
 
     const match = await bcrypt.compare(password, user.password)
 
-    if(!match) {
+    if (!match) {
         throw Error('Incorrect password')
     }
 
     return user
 }
 
+userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    try {
+        if (this.role === 'COMMITTEE') {
+            // pull from category
+            await mongoose.model('category').updateMany(
+                { reviewer_list : this._id},
+                {$pull : {reviewer_list : this._id}}
+            )
+
+            // delete paper assign
+            const assign = await mongoose.model('paper_assign').find({ reviewer: this._id });
+            for(const file in assign) {
+                if(file.suggestion_file) {
+                    fs.unlinkSync(`/public/uploads/${file.suggestion_file}`)
+                    console.log("suggestion file deleted")
+                }
+            }
+            for(const doc of assign) {
+                await mongoose.Model('paper_assign').deleteOne({_id : doc._id})
+                console.log('Document is deleted', doc)
+            }
+        }
+        // next step
+        next();
+    } catch (err) {
+        next(err);
+    }
+})
+
 const User = mongoose.model("User", userSchema)
+
 module.exports = User

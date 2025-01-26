@@ -1,456 +1,229 @@
-import dayjs from 'dayjs'
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import Modal from 'react-bootstrap/Modal';
-import axios from 'axios';
-import PaymentStatus from '../components/PaymentStatus';
-import PaperStatus from '../components/PaperStatus';
-import PaperResult from '../components/PaperResult';
-import checkIcon from '../asset/check.png'
-import fileIcon from '../asset/file.png'
-import clockIcon from '../asset/wall-clock.png'
-import NotificationCard from '../components/NotificationCard';
-import LoadingPage from '../components/LoadingPage';
-import SearchItemNotFound from '../components/SearchItemNotFound';
-import Dropdown from 'react-bootstrap/Dropdown';
-
-const api = process.env.REACT_APP_API_URL
+import axios from 'axios'
+import PaperStatus, { PaperResult } from '../components/PaperStatus'
+import { Link } from 'react-router-dom'
+import useSearch from '../hook/useSearch'
+import { UserDropdown } from '../components/UserDropdown'
 
 function Host() {
 
-  const navigate = useNavigate()
+  const [data, setData] = useState({})
+  const [Paper, setPaper] = useState([])
+  const [Cate, setCate] = useState([])
+  const [loading, setLoading] = useState('idle')
+  const id = sessionStorage.getItem('host_confr')
 
-  const [show, setShow] = useState(false)
-  const [confrStart, setConfrStart] = useState(new Date())
-  const [confrEnd, setConfrEnd] = useState(new Date())
-  const [paperData, setPaperData] = useState([])
-  const [statusConfr, setStatusConfr] = useState(false)
-  const [paperFilter, setPaperFilter] = useState([])
-  const [cateNumber, setCateNumber] = useState(0)
-  const [pubNumber, setPubNumber] = useState(0)
-  const [id, setId] = useState("")
-  const [showNoti, setShowNoti] = useState(false)
-  const [notiData, setNotiData] = useState([])
-  const [remarkNoti, setRemarkNoti] = useState(false)
-  const [loading, setLoading] = useState(true)
-
-  const handleShow = () => setShow(true)
-  const handleClose = () => setShow(false)
-
-  const handleShowNoti = async () => {
-    try {
-      await axios.patch(api + "/update/notification/status/" + id)
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setShowNoti(true)
-    }
-  }
-  const handleCloseNoti = () => setShowNoti(false)
-
-  const handleDeadLine = async (e) => {
-    e.preventDefault()
-    const input = e.target
-    try {
-      await axios.patch(api + "/update/conferences/" + id, {
-        confr_start_date: input.confr_start_date.value,
-        confr_end_date: input.confr_end_date.value,
-      })
-      alert("Update Success")
-      setConfrStart(input.confr_start_date.value)
-      setConfrEnd(input.confr_end_date.value)
-    } catch (error) {
-      console.log(error)
-      alert("Error" + error.response.status)
-    } finally {
-      handleClose()
-    }
-  }
-
-  const paperIsNotAssign = (item) => {
-    const temp = []
-    for (let i in item) {
-      if (item[i].status === 0) {
-        temp.push(item[i])
-      }
-    }
-    return temp
-  }
-
-  const paperIsNotApprove = (item) => {
-    const temp = []
-    for (let i in item) {
-      if (item[i].status === 1) {
-        temp.push(item[i])
-      }
-    }
-    return temp
-  }
-
-  const notApprove = paperIsNotApprove(paperData)
-  const notAssign = paperIsNotAssign(paperData)
-
-  const searchPaper = async (e) => {
-    e.preventDefault()
-    try {
-      if (e.target.paper_list.value) {
-        const res = await axios.get(api + "/search/paper/" + e.target.paper_list.value + "/" + id)
-        console.log(res.data)
-        setPaperFilter(res.data)
-      } else {
-        setPaperFilter(paperData)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  //checkbox publication
-
-  const activeConfrStatus = async () => {
-    try {
-      await axios.patch(api + "/update/conferences/" + id, {
-        status: true
-      })
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setStatusConfr(true)
-    }
-  }
-
-  const inActiveConfrStatus = async () => {
-    try {
-      await axios.patch(api + "/update/conferences/" + id, {
-        status: false
-      })
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setStatusConfr(false)
-    }
-  }
-
-  const handleDelNoti = async (item_id) => {
-    setNotiData(notiData.filter((item) => item._id !== item_id))
-  }
-
-  const clearNotification = async () => {
-    if (window.confirm("ต้องการลบการแจ้งเตือนทั้งหมดหรือไม่?")) {
-      try {
-        const res = await axios.delete(api + "/clear/notification/" + id)
-        console.log(res)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-  }
+  const searchPaper = useSearch('/api/paper/host/search/' + id)
 
   useEffect(() => {
-
-    const confr_id = sessionStorage.getItem("host_confr")
-
-    const fethConfr = async () => {
+    setLoading('loading')
+    const fetchData = async () => {
       try {
-        const res = await axios.get(api + "/get/confr/" + confr_id)
-        setId(res.data._id)
-        setConfrStart(res.data.confr_start_date)
-        setConfrEnd(res.data.confr_end_date)
-        setStatusConfr(res.data.status)
-        setPubNumber(res.data.publication.length)
+        const confr = await axios.get('/api/conference/host/' + id)
+        const paper = await axios.get('/api/paper/confr/' + id)
+        const cate = await axios.get('/api/category/' + id)
+        setData(confr.data)
+        setPaper(paper.data)
+        setCate(cate.data)
       } catch (error) {
         console.log(error)
+      } finally {
+        setLoading('success')
       }
     }
+    fetchData()
+  }, [id])
 
-    const fethCateNumber = async () => {
-      try {
-        const res = await axios.get(api + "/get/category/" + confr_id)
-        setCateNumber(res.data.length)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    const fethPaper = async () => {
-      try {
-        const res = await axios.get(api + "/list/all/paper/" + confr_id)
-        setPaperData(res.data)
-        setPaperFilter(res.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    const fethNotification = async () => {
-      try {
-        const res = await axios.get(api + "/get/notification/" + confr_id)
-        setNotiData(res.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    const fethUnreadNoti = async () => {
-      try {
-        const res = await axios.get(api + "/get/unread/notification/" + confr_id)
-        if (res.data.length > 0) {
-          setRemarkNoti(true)
-        } else {
-          setRemarkNoti(false)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fethConfr()
-    fethPaper()
-    fethNotification()
-    fethCateNumber()
-    fethUnreadNoti()
-
-    setTimeout(() => setLoading(false), 500)
-  }, [])
-
-  if (loading) {
-    return <LoadingPage />
+  if (loading === 'idle' || loading === 'loading') {
+    return <div>Loading...</div>
   }
 
+  const openConfr = async (value) => {
+    if (window.confirm('ต้องการเปลี่ยนสถานะบทความหรือไม่ ?')) {
+      try {
+        const update = await axios.patch('/api/conference', {
+          _id: id,
+          status: value
+        })
+        if (value === true) {
+          alert('เปิดงานประชุมแล้ว')
+        } else {
+          alert('ปิดงานประชุมแล้ว')
+        }
+        setData(update.data)
+      } catch (error) {
+        console.log(error)
+        alert("เกิดข้อผิดพลาด")
+      }
+    }
+  }
 
   return (
-    <div className='container p-md-4'>
-      {cateNumber < 1 &&
-        <div className="alert alert-danger" role="alert">
-          เพิ่มหัวข้องานประชุมอย่างน้อย 1 หัวข้อ เนื่องจากผู้ส่งบทความจะไม่สามารถส่งบทความได้ <a href="/host/cate">เพิ่มหัวข้องานประชุม</a>
+    <div>
+      <section className='container'>
+        <div className='card my-5 border-0 bg-light'>
+          <div className='card-body'>
+            <div className='d-flex justify-content-between align-items-center'>
+              <h4 className='fw-bold'>
+                รายละเอียดงานประชุม
+              </h4>
+              <UserDropdown />
+            </div>
+          </div>
         </div>
-      }
-      {pubNumber < 1 &&
-        <div className="alert alert-danger" role="alert">
-          เพิ่มรายชื่อวารสารอย่างน้อย 1 วารสาร เนื่องจากผู้ส่งบทความจะไม่สามารถส่งวบทความได้ <a href="/host/pub">เพิ่มวารสาร</a>
+        <div className='card border-0 bg-light'>
+          <div className='card-body'>
+            <div className='d-flex justify-content-between align-items-center'>
+              <div>
+                <h1>{data?.title}</h1>
+                <div className="form-check form-switch">
+                  <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked={data?.status} onChange={e => openConfr(e.target.checked)} disabled={data.publication.length <= 0 || Cate.length <= 0} />
+                  <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{data?.status ? 'เปิด' : 'ปิด'}</label>
+                </div>
+              </div>
+              <div>
+                <Link className='btn btn-primary text-white' to='/host/edit'>แก้ไขงานประชุม</Link>
+              </div>
+            </div>
+          </div>
         </div>
-      }
-      <div>
-        <section className='mb-5'>
-          <Modal show={show} onHide={handleClose}>
-            <form onSubmit={handleDeadLine}>
-              <Modal.Header closeButton>
-                <Modal.Title>กำหนด Deadline</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <div className='mb-3'>
-                  <label className='form-label text-muted'>ตั้งแต่</label>
-                  <input name='confr_start_date' className='form-control' type='date' required />
+        <div className='my-5'>
+          <div className='row g-3'>
+            <div className='col-md-4'>
+              <div className='card border-0 bg-light'>
+                <div className='card-body'>
+                  <small>มอบหมายแล้ว</small>
+                  <h3>{Paper?.filter((items) => items.status === 'REVIEW').length} บทความ</h3>
                 </div>
-                <div>
-                  <label className='form-label text-muted'>ถึง</label>
-                  <input name='confr_end_date' className='form-control' type='date' required />
+              </div>
+            </div>
+            <div className='col-md-4'>
+              <div className='card border-0 bg-light'>
+                <div className='card-body'>
+                  <small>ยังไม่ได้มอบหมาย</small>
+                  <h3>{Paper?.filter((items) => items.status === 'PENDING').length} บทความ</h3>
                 </div>
-              </Modal.Body>
-              <Modal.Footer>
-                <button type='button' className="btn btn-secondary" onClick={handleClose}>
-                  Close
-                </button>
-                <button type='submit' className="btn btn-primary" >
-                  Save Changes
-                </button>
-              </Modal.Footer>
-            </form>
-          </Modal>
-        </section>
-        <section className='mb-5'>
-          <div className='d-flex justify-content-between mb-5'>
-            <button className='btn btn-outline-primary me-3' type='button' onClick={() => navigate("/host/edit")}>
-              <span className='me-2'>
-                <ion-icon name="brush"></ion-icon>
-              </span>
-              <span className=''>ปรับแต่ง</span>
-            </button>
-            <div className='d-flex align-items-center'>
-              {statusConfr ? (
-                <button className='btn btn-outline-success me-3' type='button' onClick={inActiveConfrStatus}>ACTIVE</button>
-              ) : (
-                <button className='btn btn-outline-secondary me-3' type='button' onClick={activeConfrStatus}>INACTIVE</button>
-              )}
+              </div>
+            </div>
+            <div className='col-md-4'>
+              <div className='card border-0 bg-light'>
+                <div className='card-body'>
+                  <small>บทความทั้งหมด</small>
+                  <h3>{Paper?.length} บทความ</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='card border-0 my-5'>
+          <div className='card-body'>
+            <div className='d-flex justify-content-between align-items-center mb-4'>
+              <h4 className='mb-0'>รายการบทความ</h4>
+              <form onSubmit={searchPaper.handleSearchChange} className='col-12 col-md-4'>
+                <div className="input-group">
+                  <input name='search' type="text" className="form-control" placeholder="ค้นหา" />
+                  <button type='submit' className="input-group-text btn btn-primary text-white" id="basic-addon2">
+                    <i className="bi bi-search"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+            {searchPaper.status === 'idle' || searchPaper.status === 'loading' ? (
               <div>
-                <button className='btn position-relative' type='button' onClick={handleShowNoti}>
-                  <ion-icon name="notifications-outline"></ion-icon>
-                  {remarkNoti ? (
-                    <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-                      <span className="visually-hidden">New alerts</span>
-                    </span>
-                  ) : null}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <Offcanvas placement='end' show={showNoti} onHide={handleCloseNoti}>
-            <Offcanvas.Header closeButton>
-              <Offcanvas.Title>แจ้งเตือน</Offcanvas.Title>
-            </Offcanvas.Header>
-            <Offcanvas.Body>
-
-              {notiData.length > 0 ? (
-                <div>
-                  <div className='d-flex justify-content-end mb-3'>
-                    <button type='button' className='btn btn-sm btn-outline-secondary' onClick={clearNotification}>Clear all</button>
-                  </div>
-                  <div className='row gy-3'>
-                    {notiData?.map((item, index) => (
-                      <NotificationCard key={index} header={item.header} desc={item.form} date={item.time} id={item._id} status={item.read_status} handleDelNoti={handleDelNoti} />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className='text-muted'>
-                  No message at this time
-                </div>
-              )}
-            </Offcanvas.Body>
-          </Offcanvas>
-        </section>
-        <section className='row gy-3 mb-5'>
-          <div className='col-md-6 col-lg-4'>
-            <div className='card h-100 border-0 shadow'>
-              <div className='card-body row align-items-center'>
-                <div className='col-2 text-center'>
-                  <img src={checkIcon} height={32} width={32} alt='check' />
-                </div>
-                <div className='col'>
-                  <p className='card-title text-muted'>
-                    จำนวนบทความทั้งหมด
-                  </p>
-                  <p className='card-text fs-1'>{paperData?.length}</p>
+                <div className="spinner-border" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className='col-md-6 col-lg-4'>
-            <div className='card h-100 border-0 shadow'>
-              <div className='card-body row align-items-center'>
-                <div className='col-2 text-center'>
-                  <img src={clockIcon} height={32} width={32} alt='clock' />
-                </div>
-                <div className='col'>
-                  <p className='card-title text-muted'>
-                    จำนวนบทความที่ยังไม่ได้ assign
-                  </p>
-                  <p className='card-text fs-1'>{notAssign?.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className='col-md-6 col-lg-4'>
-            <div className='card h-100 border-0 shadow'>
-              <div className='card-body row align-items-center'>
-                <div className='col-2 text-center'>
-                  <img src={fileIcon} height={32} width={32} alt='file' />
-                </div>
-                <div className='col'>
-                  <p className='card-title text-muted'>
-                    จำนวนบทความที่ยังไม่ได้อนุมัติ
-                  </p>
-                  <p className='card-text fs-1'>{notApprove?.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className='mb-5'>
-          <div className='col-12 card p-3'>
-            <div className='d-flex justify-content-between mb-3'>
-              <p className='text-secondary'>Deadline</p>
-              <div>
-                <button className='btn btn-outline-secondary' type='button' onClick={handleShow}>
-                  <span className='me-2'>
-                    <ion-icon name="calendar"></ion-icon>
-                  </span>
-                  กำหนดวันที่
-                </button>
-              </div>
-            </div>
-            <div>
-              <p>{dayjs(confrStart).format("DD MMM YYYY")} - {dayjs(confrEnd).format("DD MMM YYYY")}</p>
-            </div>
-          </div>
-        </section>
-        <section className='mb-5 card p-3 p-md-5'>
-          <div className='mb-3'>
-            <h4 className='fw-bold mb-3'>รายการบทความ</h4>
-            <form onSubmit={searchPaper} className='col-md-4 mb-3'>
-              <div className='input-group'>
-                <input className='form-control' name='paper_list' type='search' placeholder='ค้นหา' />
-                <button className='btn btn-outline-secondary btn-sm' type='submit'><ion-icon name="search"></ion-icon></button>
-              </div>
-            </form>
-          </div>
-          {paperFilter.length > 0 ? (
-            <div>
-              <div className='table-responsive-md'>
-                <table className='table table-hover align-middle'>
-                  <thead>
+            ) : (
+              <div className='table-responsive' style={{ minHeight: "328px" }}>
+                <table className='table' style={{ width: "1260px" }}>
+                  <thead className='table-dark'>
                     <tr>
-                      <th>รหัสบทความ</th>
-                      <th style={{ minWidth: "200px" }}>ชื่อบทความ</th>
-                      <th>หัวข้อ</th>
-                      <th>สถานะบทความ</th>
-                      <th>ผลลัพธ์</th>
-                      <th>สถานะการชำระเงิน</th>
-                      <th>บทความที่ถูกปิดชื่อ</th>
-                      <th>Action</th>
+                      <th>
+                        #
+                      </th>
+                      <th>
+                        ชื่อ
+                      </th>
+                      <th>
+                        รหัส
+                      </th>
+                      <th>
+                        สถานะ
+                      </th>
+                      <th>
+                        ผลลัพธ์
+                      </th>
+                      <th>
+                        action
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {paperFilter?.map((paper) => (
-                      <tr key={paper._id}>
-                        <td>{paper.paper_code}</td>
-                        <td>{paper.title}</td>
-                        <td>{paper.cate_code?.name}</td>
-                        <td className='text-center'><PaperStatus status={paper.status} /></td>
-                        <td className='text-center'><PaperResult status={paper.result} /></td>
-                        <td className='text-center'><PaymentStatus status={paper.payment_status} /></td>
-                        <td className='text-center'>
-                          {paper.close_name_file ? (
-                            <a target='_blank' rel='noreferrer' href={api + "/pdf/" + paper.close_name_file}>File</a>
-                          ) : (
-                            <div className='badge bg-warning'>
-                              ไม่พบข้อมูล
-                            </div>
-                          )}
+                    {searchPaper.data?.map((items, index) => (
+                      <tr key={items._id}>
+                        <td>
+                          {index + 1}
                         </td>
                         <td>
-                          <Dropdown>
-                            <Dropdown.Toggle variant="btn" id="dropdown-basic">
-                              <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                          {items.title}
+                        </td>
+                        <td>
+                          {items.paper_code}
+                        </td>
+                        <td>
+                          <PaperStatus status={items.status} />
+                        </td>
+                        <td>
+                          <PaperResult status={items.result} />
+                        </td>
+                        <td>
+                          <Link to={`/host/paper/${items._id}`} type='button' className='btn btn-primary me-2'>
+                            <i className='bi bi-pen'></i>
+                          </Link>
+                          <Link to={`/host/assign/${items._id}/${items.cate_code}`} type='button' className='btn btn-outline-dark'>
+                            <i className='bi bi-people'></i>
+                          </Link>
+                          {/* <Dropdown>
+                            <Dropdown.Toggle className='border-0' variant="primary" id="dropdown-basic">
+                              เพิ่มเติม
                             </Dropdown.Toggle>
+
                             <Dropdown.Menu>
-                              <Dropdown.Item href={"/host/assign/" + paper._id}>
-                                <span className='me-2'><ion-icon name="document-text"></ion-icon></span>
-                                Assign
+                              <Dropdown.Item onClick={() => navigate(`/host/paper/${items._id}`)}>
+                                <span className='me-2'><i className='bi bi-eye'></i></span>
+                                ดูรายละเอียด
                               </Dropdown.Item>
-                              <Dropdown.Item href={"/host/over-all/" + paper._id}>
-                                <span className='me-2'><ion-icon name="checkmark-done"></ion-icon></span>
-                                Approve
+                              <Dropdown.Item onClick={() => navigate(`/host/assign/${items._id}/${items.cate_code}`)}>
+                                <span className='me-2'><i className='bi bi-pen'></i></span>
+                                มอบหมายบทความ
                               </Dropdown.Item>
                             </Dropdown.Menu>
-                          </Dropdown>
+                          </Dropdown> */}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-          ) : (
-            <SearchItemNotFound />
-          )}
+            )}
 
-        </section>
-      </div>
+            <div className='d-flex justify-content-between align-items-center'>
+              <span>{`Page ${searchPaper.page} of ${searchPaper.totalPages}`}</span>
+              <div>
+                <button onClick={searchPaper.handlePreviousPage} disabled={searchPaper.page === 1} className='btn btn-link'>
+                  <i className='bi bi-arrow-left'></i> ก่อนหน้า
+                </button>
+                <button onClick={searchPaper.handleNextPage} disabled={searchPaper.page + 1 >= searchPaper.totalPages} className='btn btn-link'>
+                  ถัดไป <i className='bi bi-arrow-right'></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
 
 export default Host
-

@@ -3,7 +3,7 @@ const path = require('path')
 
 const storagePdf = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, "public/pdf");
+      cb(null, "public/uploads");
     },
     filename: (req, file, cb) => {
       cb(
@@ -19,7 +19,6 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype === "application/pdf" || file.mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
     cb(null, true)
   } else {
-    console.log(file)
     cb(new Error('Only PDF and DOC are allowed!'), false)
   }
 }

@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import OpenBook from '../asset/logo.png'
 import LoadingPage from '../components/LoadingPage';
 import SearchItemNotFound from '../components/SearchItemNotFound';
 
-const api = process.env.REACT_APP_API_URL
 
 function ConfrList() {
 
@@ -15,8 +13,9 @@ function ConfrList() {
 
   const navigate = useNavigate()
 
-  const saveConfr = (itemId) => {
+  const saveConfr = (itemId, confrCode) => {
     localStorage.setItem("confr_id", itemId)
+    localStorage.setItem("confr_code", confrCode)
     navigate("/confr/" + itemId)
   }
 
@@ -24,7 +23,7 @@ function ConfrList() {
 
     const fethConfr = async () => {
       try {
-        let res = await axios.get(api + '/conferences')
+        const res = await axios.get('/api/conference')
         setConfr(res.data)
       } catch (error) {
         console.log(error)
@@ -32,7 +31,6 @@ function ConfrList() {
         setLoading(false)
       }
     }
-
     fethConfr();
   }, [])
 
@@ -43,8 +41,8 @@ function ConfrList() {
   }
 
   return (
-    <div className='container my-5'>
-      <div>
+    <div style={{paddingTop: "128px"}}> 
+      <section className='container'>
         <div className='d-md-flex justify-content-between align-items-center mb-3'>
           <h4 className='fw-bold mb-3 mb-md-0'>งานประชุมวิชาการที่เปิดรับ</h4>
           <form>
@@ -55,14 +53,31 @@ function ConfrList() {
           {confr.length > 0 ? (
             <div className='row gx-5'>
               {confr.map((item) => (
-                <div key={item._id} className='col-12 col-md-6 col-lg-3 text-center mb-3'>
-                  <div className='card p-3'>
-                    <button className='btn' type='button' onClick={() => saveConfr(item._id)}>
-                      <img src={OpenBook} alt='cover-confer' className='img-fluid' height={96} width={96} />
-                    </button>
-                    <div className='mt-3'>
-                      <small className='text-muted'>{item.title}</small>
-                      <p className='mt-3'><ion-icon name="time-outline"></ion-icon>{dayjs(item.confr_end_date).format(" DD MMM YYYY")}</p>
+                <div key={item._id} className='col-12 col-md-6 col-lg-4 mb-3'>
+                  <div className='card text-bg-light border-0 shadow-sm h-100'>
+                    <div className='card-body'>
+                      <div className='d-flex flex-column justify-content-between h-100'>
+                        <div className='mt-3'>
+                          <h4 className='card-title'>{item.title}</h4>
+                          <p className=''><i>{dayjs(item.confr_end_date).format(" DD MMM, YYYY")}</i></p>
+                        </div>
+                        {item.cate &&
+                          <div className='mb-3'>
+                            <span className='badge text-bg-dark'>{item.cate}</span>
+                          </div>
+                        }
+                        <div className='mb-3'>
+                          {item.tag?.map((items, index) => (
+                            <span key={index} className='badge text-bg-secondary me-1'>{items}</span>
+                          ))}
+                        </div>
+
+                        <div className='mt-3 text-end popup'>
+                          <button className='btn btn-primary btn-sm' type='button' onClick={() => saveConfr(item._id, item.confr_code)}>
+                            รายละเอียดเพิ่มเติม
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -72,7 +87,7 @@ function ConfrList() {
             <SearchItemNotFound />
           )}
         </div>
-      </div>
+      </section>
     </div>
   )
 }

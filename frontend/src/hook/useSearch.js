@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-
-const api = process.env.REACT_APP_API_URL
+import { replace, useNavigate } from 'react-router-dom'
+import { useAuthContext } from "./useAuthContext"
 
 const useSearch = (fethapi) => {
     const [searchQuery, setSearchQuery] = useState('')
+    const [searchTag, setSearchTag] = useState('')
+    const [searchCate, setSearchCate] = useState('')
     const [page, setPage] = useState(1)
     const [pageSize] = useState(10)
     const [totalPages, setTotalPages] = useState(1)
     const [data, setData] = useState(null)
     const [error, setError] = useState(null)
     const [status, setStatus] = useState('idle')
+    const { dispatch } = useAuthContext()
+
+    const navigate = useNavigate()
 
     useEffect(() => {
 
@@ -18,29 +23,53 @@ const useSearch = (fethapi) => {
 
         const fetchData = async () => {
             try {
-                const res = await axios.get(api + fethapi, {
+                const res = await axios.get(fethapi, {
                     params: {
                         page: page,
-                        pageSize: pageSize,
-                        search: searchQuery
+                        limit: pageSize,
+                        search: searchQuery,
+                        tag: searchTag,
+                        cate: searchCate,
                     }
                 })
                 setData(res.data.items)
-                setTotalPages(res.data.totalPage)
+                setTotalPages(res.data.totalPages)
                 setStatus('success')
             } catch (error) {
-                console.log(error)
+                if(error.response.status === 403) {
+                    alert('ผู้ใช้งานหมดอายุ')
+                    dispatch({type: 'LOGOUT'})
+                    navigate('/', replace)
+                }
                 setError(error)
                 setStatus('error')
             }
         }
 
         fetchData()
-    }, [fethapi, page ,searchQuery])
+    }, [fethapi, page ,searchQuery, searchCate, searchTag, pageSize])
 
     const handleSearchChange = (e) => {
         e.preventDefault()
         setSearchQuery(e.target.search.value)
+        setSearchCate('')
+        setSearchTag('')
+        setPage(1)
+    }
+
+    const handleSearchTag = (e) => {
+        e.preventDefault()
+        setSearchTag(e.target.tag.value)
+        setSearchCate('')
+        setSearchQuery('')
+        setPage(1)
+    }
+
+    const handleSearchCate = (e) => {
+        e.preventDefault()
+        setSearchCate(e.target.value)
+        setSearchQuery('')
+        setSearchTag('')
         setPage(1)
     }
 
@@ -52,7 +81,7 @@ const useSearch = (fethapi) => {
         if (page > 1) setPage(page - 1)
     }
 
-    return { data, error, status, setData, handleSearchChange, handleNextPage, handlePreviousPage, page, totalPages }
+    return { data, error, status, setData, handleSearchChange, handleSearchTag, handleSearchCate, handleNextPage, handlePreviousPage, page, totalPages }
 }
 
 export default useSearch
