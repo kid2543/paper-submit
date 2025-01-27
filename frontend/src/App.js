@@ -61,6 +61,7 @@ import AdminUserDetail from './page/AdminUserDetail';
 import Award from './components/HostEdit/Award';
 import ViewAward from './components/ViewAward';
 import AwardCateList from './components/HostEdit/AwardCateList';
+import AdminSignUp from './page/AdminSignUp';
 
 
 function App() {
@@ -388,6 +389,11 @@ function App() {
 
 
         {/* admin route */}
+
+        <Route
+          path='/admin/signup'
+          element={<AdminSignUp />}
+        />
 
         <Route
           path='/admin'
