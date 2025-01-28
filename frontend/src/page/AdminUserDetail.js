@@ -22,8 +22,10 @@ function AdminUserDetail() {
             try {
                 const res = await axios.get('/api/user/admin/user/' + id)
                 setUser(res.data)
+                console.log({res})
                 if (res.data.role === 'HOST') {
                     const confr = await axios.get('/api/conference/owner/' + res.data._id)
+                    console.log({confr})
                     setConfrList(confr.data)
                 }
             } catch (error) {
@@ -58,7 +60,7 @@ function AdminUserDetail() {
             {user &&
                 <div className='card border-0 shadow-sm'>
                     <div className='card-body'>
-                        <h4 className='card-title mb-3'>{user.username}</h4>
+                        <h4 className='card-title mb-0'>{user.username}</h4>
                         <hr />
                         <div className='card-text'>
                             <form className='row g-3' onSubmit={handleUpdate}>
@@ -77,7 +79,8 @@ function AdminUserDetail() {
                                 <div className='col-md-6'>
                                     <div>
                                         <label className='form-label'>เบอร์โทร</label>
-                                        <input pattern='[0-9]{10}' maxLength={10} className='form-control' placeholder='1234567890' defaultValue={user.phone} name='phone' />
+                                        <input pattern='[0-9]{10}' maxLength={10} className='form-control' defaultValue={user.phone} name='phone' />
+                                        <div className='form-text'>เฉพาะตัวเลขจำนวน 10 หลักเท่านั้น</div>
                                     </div>
                                 </div>
                                 <div className='col-md-6'>
@@ -120,10 +123,18 @@ function AdminUserDetail() {
                                     <div>
                                         <label className='form-label'>รหัสไปรย์ษณี</label>
                                         <input className='form-control' defaultValue={user.zip_code} name='zip_code' pattern='[0-9]{5}' maxLength={5} />
+                                        <div className='form-text'>เฉพาะตัวเลขจำนวน 5 หลักเท่านั้น</div>
                                     </div>
                                 </div>
                                 <div className='text-end'>
-                                    <button type='submit' className='btn btn-primary'>ยืนยัน</button>
+                                    {confrList.length <= 0 &&
+                                        <button type='button' className='btn btn-outline-danger me-2'>
+                                            ลบผู้ใช้งาน
+                                        </button>
+                                    }
+                                    <button type='submit' className='btn btn-primary'>
+                                        ยืนยัน
+                                    </button>
                                 </div>
                             </form>
                         </div>

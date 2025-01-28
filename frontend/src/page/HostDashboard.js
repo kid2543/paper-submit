@@ -7,7 +7,6 @@ import FolderImage from '../asset/folder.png'
 
 // component
 import LoadingPage from '../components/LoadingPage';
-import SearchItemNotFound from '../components/SearchItemNotFound';
 
 
 // react boostatrap
@@ -18,6 +17,8 @@ import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import useSearch from '../hook/useSearch';
 import { UserDropdown } from '../components/UserDropdown';
+import { toast, ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 function HostDashboard() {
     const searchConfr = useSearch('/api/conference/search/host')
@@ -29,6 +30,8 @@ function HostDashboard() {
     const [errorText, setErrorText] = useState('')
     const [searchInput, setSearchInput] = useState('search')
 
+    const navigate = useNavigate()
+
     const handleCreateConfr = async (e) => {
         e.preventDefault()
         try {
@@ -36,21 +39,26 @@ function HostDashboard() {
             const value = Object.fromEntries(formData.entries())
             const res = await axios.post('/api/conference', value)
             searchConfr.setData([res.data, ...searchConfr.data])
-            alert("Success")
+            toast.success("สร้างงานประชุมสำเร็จ กรอกรายละเอียดเพิ่มเติมและเปิดเป็นสาธารณะ")
             handleClose()
         } catch (error) {
             console.log(error)
             setErrorText(error.response.data?.error)
-            alert("Error")
+            toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง")
         }
     }
 
+    const viewConference = (id) => {
+        sessionStorage.setItem('host_confr', id)
+        navigate('/host/confr')
+    }
     if (searchConfr.error) {
         return <div>Error</div>
     }
 
     return (
         <div className='container my-5'>
+            <ToastContainer />
             <div className='d-flex justify-content-between align-items-center'>
                 <div className='col-md-4'>
                     <div>
@@ -138,15 +146,39 @@ function HostDashboard() {
                     ) : (
                         <div>
                             {searchConfr.data &&
-                                <div>
-                                    {searchConfr.data.length > 0 ? (
-                                        <div className='row g-5 hover-card'>
-                                            {searchConfr.data.map((item) => (
-                                                <ConfrListCard key={item._id} name={item.title} id={item._id} status={item.status} date={item.confr_end_date} />
-                                            ))}
-                                        </div>
-                                    ) : <SearchItemNotFound />
-                                    }
+                                <div className='table-responsive'>
+                                    <table className='table' style={{ minHeight: '400px', minWidth: '800px' }}>
+                                        <thead>
+                                            <tr>
+                                                <th>รหัส</th>
+                                                <th>ชื่อ</th>
+                                                <th>เครื่องมือ</th>
+                                            </tr>
+                                        </thead>
+                                        {searchConfr.data.length > 0 ? (
+                                            <tbody>
+                                                {searchConfr.data.map((item) => (
+                                                    <tr key={item._id}>
+                                                        <td>{item.confr_code}</td>
+                                                        <td>{item.title}</td>
+                                                        <td>
+                                                            <button onClick={() => viewConference(item._id)} type='button' className='btn btn-link' to='#'>
+                                                                View
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        ) : (
+                                            <tbody>
+                                                <tr>
+                                                    <td className='p-3' colSpan={3}>ไม่พบข้อมูล</td>
+                                                </tr>
+                                            </tbody>
+                                        )
+                                        }
+                                    </table>
+
 
                                 </div >
                             }

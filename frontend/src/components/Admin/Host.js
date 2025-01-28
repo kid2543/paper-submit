@@ -134,12 +134,9 @@ function Host() {
                                             <td>{item.name}</td>
                                             <td>{item.username}</td>
                                             <td>
-                                                <Link className='btn btn-primary me-2' to={`/admin/user/${item._id}`}>
+                                                <Link className='btn btn-primary' to={`/admin/user/${item._id}`}>
                                                     <i className='bi bi-pencil-square'></i>
                                                 </Link>
-                                                <button className='btn btn-danger'>
-                                                    <i className='bi bi-trash'></i>
-                                                </button>
                                             </td>
                                         </tr>
                                     ))}

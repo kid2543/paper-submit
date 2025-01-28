@@ -295,7 +295,7 @@ const hostSeachConference = async (req, res) => {
 
     const { _id } = req.user
 
-    let query = {}
+    let query = {owner: _id}
 
     if (search) {
         query = { title: { $regex: search, $options: 'i' }, owner: _id }

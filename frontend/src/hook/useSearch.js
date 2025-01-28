@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { replace, useNavigate } from 'react-router-dom'
 import { useAuthContext } from "./useAuthContext"
+import { toast } from 'react-toastify'
 
 const useSearch = (fethapi) => {
     const [searchQuery, setSearchQuery] = useState('')
@@ -37,7 +38,7 @@ const useSearch = (fethapi) => {
                 setStatus('success')
             } catch (error) {
                 if(error.response.status === 403) {
-                    alert('ผู้ใช้งานหมดอายุ')
+                    toast.error('ผู้ใช้งานหมดอายุ')
                     dispatch({type: 'LOGOUT'})
                     navigate('/', replace)
                 }
