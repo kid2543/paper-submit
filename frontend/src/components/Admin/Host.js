@@ -7,7 +7,8 @@ import useSearch from '../../hook/useSearch'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
 
 function Host() {
 
@@ -15,35 +16,28 @@ function Host() {
     const [show, setShow] = useState(false)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
     const signUp = useSignup()
-    const navigate = useNavigate()
-
-    const handleDelete = async (userId, userName) => {
-        if (window.confirm("ต้องการจะลบ username: " + userName + " หรือไม่?")) {
-            try {
-                const res = await axios.delete('/api/user/host/' + userId)
-                setData(data.filter(items => items._id !== userId))
-                console.log(res.data)
-                alert(`User ${userName} has deleted`)
-            } catch (error) {
-                console.log(error)
-                alert('Error')
-            }
-        }
-    }
 
     const handleCreate = async (e) => {
         e.preventDefault()
-        const role = 'HOST'
-        const res = await signUp.signup(username, password, role)
-        if (res) {
-            setData([res, ...data])
-            alert("Success")
+        try {
+            const res = await axios.post('/api/user/host/add', {
+                username,
+                name,
+                password,
+                email,
+            })
+            setData([res.data, ...data])
+            toast.success('ผู้จัดงานสำเร็จ')
             setUsername('')
             setPassword('')
-            handleClose()
-        } else {
-            alert('Error')
+            setEmail('')
+            setName('')
+            handleClose()    
+        } catch (error) {
+            toast.error(error.response?.data.error)   
         }
     }
 
@@ -56,6 +50,7 @@ function Host() {
 
     return (
         <div>
+            <ToastContainer />
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>เพิ่มผู้ใช้งาน</Modal.Title>
@@ -63,16 +58,24 @@ function Host() {
                 <form onSubmit={handleCreate}>
                     <Modal.Body className='row g-3'>
                         <div className='col-12'>
-                            <label className='form-label'>Username</label>
+                            <label className='form-label'>ชื่อ - นามสกุล</label>
+                            <input className='form-control' required value={name} onChange={e => setName(e.target.value)} />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>อีเมล</label>
+                            <input type='email' className='form-control' required value={email} onChange={e => setEmail(e.target.value)} />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>ชื่อผู้ใช้งาน</label>
                             <input className='form-control' required value={username} onChange={e => setUsername(e.target.value)} />
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>Password</label>
+                            <label className='form-label'>รหัสผ่าน</label>
                             <input className='form-control' name='password' type='password' required onChange={e => setPassword(e.target.value)} />
                             <small className='text-muted'>รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข ขั้นต่ำ 8 ตัวอักษร</small>
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>Confirm password</label>
+                            <label className='form-label'>ยืนยีนรหัสผ่านอีกครั้ง</label>
                             <input className='form-control' name='confirm_password' type='password' required pattern={password} />
                         </div>
                         {signUp.error &&
@@ -118,8 +121,9 @@ function Host() {
                     <table className='table table-striped'>
                         <thead>
                             <tr>
+                                <th>ชื่อ</th>
                                 <th>ชื่อผู้ใช้งาน</th>
-                                <th></th>
+                                <th>เครื่องมือ</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -127,26 +131,15 @@ function Host() {
                                 <>
                                     {data?.map(item => (
                                         <tr key={item._id}>
+                                            <td>{item.name}</td>
                                             <td>{item.username}</td>
                                             <td>
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic">
-                                                        <i className='bi bi-three-dots'></i>
-                                                    </Dropdown.Toggle>
-
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => navigate('/admin/user/' + item._id)}>
-                                                            <span className='me-2'>
-                                                                <i className="bi bi-pen"></i>
-                                                            </span>
-                                                            แก้ไข
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item className='text-danger' type='button' onClick={() => handleDelete(item._id, item.username)}>
-                                                            <span className='me-2'><i className="bi bi-trash"></i></span>
-                                                            ลบ
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
+                                                <Link className='btn btn-primary me-2' to={`/admin/user/${item._id}`}>
+                                                    <i className='bi bi-pencil-square'></i>
+                                                </Link>
+                                                <button className='btn btn-danger'>
+                                                    <i className='bi bi-trash'></i>
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

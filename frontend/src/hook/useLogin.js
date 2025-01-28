@@ -25,8 +25,8 @@ export const useLogin = () => {
             toast.error('เกิดข้อผิดพลาด: ' + error.response?.data.error)
             setIsLoading(false)
             setError(error.response?.data.error)
+            console.log(error)
         }
     }
-
     return { login, isLoading, error }
 } 

@@ -214,6 +214,23 @@ const getConferenceHost = async (req, res) => {
     }
 }
 
+// get by host id
+const getConferenceOwner = async (req, res) => {
+    const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({error : 'รหัสผู้ใช้งานไม่ถูกต้อง'})
+    }
+
+    try {
+        const confr = await Conferences.find({owner: id})
+        res.status(200).json(confr)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({error : error.message})
+    }
+}
+
 // read conference with owner
 const getConferByUser = async (req, res) => {
     const { _id } = req.user
@@ -346,5 +363,6 @@ module.exports = {
     searchConference,
     deleteConference,
     hostSeachConference,
-    getHomeConfr
+    getHomeConfr,
+    getConferenceOwner
 }

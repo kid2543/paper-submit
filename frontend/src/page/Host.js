@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import PaperStatus, { PaperResult } from '../components/PaperStatus'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useSearch from '../hook/useSearch'
 import { UserDropdown } from '../components/UserDropdown'
+import { toast, ToastContainer } from 'react-toastify'
 
 function Host() {
 
@@ -12,6 +13,7 @@ function Host() {
   const [Cate, setCate] = useState([])
   const [loading, setLoading] = useState('idle')
   const id = sessionStorage.getItem('host_confr')
+  const navigate = useNavigate()
 
   const searchPaper = useSearch('/api/paper/host/search/' + id)
 
@@ -46,20 +48,38 @@ function Host() {
           status: value
         })
         if (value === true) {
-          alert('เปิดงานประชุมแล้ว')
+          toast.success('เปิดงานประชุมแล้ว')
         } else {
-          alert('ปิดงานประชุมแล้ว')
+          toast.success('ปิดงานประชุมแล้ว')
         }
         setData(update.data)
       } catch (error) {
         console.log(error)
-        alert("เกิดข้อผิดพลาด")
+        toast.error("เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง")
+      }
+    }
+  }
+
+  const handleDelete = async () => {
+    if (data.status === true) {
+      return toast.warning('กรุณาปิดงานประชุมก่อนทำการลบ')
+    }
+
+    if (window.confirm(`ต้องการลบงานประชุม ${data.confr_code} หรือไม่ ?`)) {
+      try {
+        await axios.delete('/api/conference/delete/' + data._id)
+        toast.success(`ลบงานประชุม ${data._id} แล้ว`)
+        navigate('/setting')
+      } catch (error) {
+        console.log(error)
+        toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
       }
     }
   }
 
   return (
     <div>
+      <ToastContainer />
       <section className='container'>
         <div className='card my-5 border-0 bg-light'>
           <div className='card-body'>
@@ -73,16 +93,31 @@ function Host() {
         </div>
         <div className='card border-0 bg-light'>
           <div className='card-body'>
-            <div className='d-flex justify-content-between align-items-center'>
-              <div>
+            <div className='row gy-3'>
+              <div className='col-12'>
                 <h1>{data?.title}</h1>
                 <div className="form-check form-switch">
                   <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" checked={data?.status} onChange={e => openConfr(e.target.checked)} disabled={data.publication.length <= 0 || Cate.length <= 0} />
                   <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{data?.status ? 'เปิด' : 'ปิด'}</label>
                 </div>
               </div>
-              <div>
-                <Link className='btn btn-primary text-white' to='/host/edit'>แก้ไขงานประชุม</Link>
+              <div className='col-12'>
+                <div className='row g-3'>
+                  <div className='col-auto'>
+                    <Link className='btn btn-primary text-white' to='/host/edit'>
+                      <i className='bi bi-pencil-square me-2'></i>
+                      แก้ไขงานประชุม
+                    </Link>
+                  </div>
+                  {Paper.length <= 0 &&
+                    <div className='col-auto'>
+                      <button type='button' onClick={handleDelete} className='btn btn-danger'>
+                        <i className='bi bi-trash me-2'></i>
+                        ลบงานประชุม
+                      </button>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </div>
@@ -117,8 +152,8 @@ function Host() {
         </div>
         <div className='card border-0 my-5'>
           <div className='card-body'>
-            <div className='d-flex justify-content-between align-items-center mb-4'>
-              <h4 className='mb-0'>รายการบทความ</h4>
+            <div className='row align-items-center gy-3 mb-4'>
+              <h4 className='col-12 col-md-8 mb-0'>รายการบทความ</h4>
               <form onSubmit={searchPaper.handleSearchChange} className='col-12 col-md-4'>
                 <div className="input-group">
                   <input name='search' type="text" className="form-control" placeholder="ค้นหา" />

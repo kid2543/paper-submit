@@ -10,7 +10,7 @@ export const useSignup = () => {
     let newUser = null
     const navigate = useNavigate()
 
-    const signup = async (username, password, role) => {
+    const signup = async (username, password, role, name) => {
         setIsLoading(true)
         setError(null)
 
@@ -19,7 +19,12 @@ export const useSignup = () => {
         }
 
         try {
-            const res = await axios.post('/api/user/signup', {username, password, role})
+            const res = await axios.post('/api/user/signup', {
+                name,
+                username, 
+                password, 
+                role
+            })
             setIsLoading(false)
             toast.success('ลงทะเบียนสำเร็จ')
             if(role === 'AUTHOR') {

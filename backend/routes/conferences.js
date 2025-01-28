@@ -6,7 +6,23 @@ const checkRole = require('../middlewares/checkRole')
 const uploadImage = require('../middlewares/uploadImage')
 
 // controller
-const { createConference, editConference, allConference, openConference, singleConference, getConferByUser, getConferenceHost, uploadVenue, uploadLogo, getQuestion, searchConference, deleteConference, hostSeachConference, getHomeConfr } = require('../controllers/confr_controller')
+const { 
+    createConference, 
+    editConference, 
+    allConference, 
+    openConference, 
+    singleConference, 
+    getConferByUser, 
+    getConferenceHost, 
+    uploadVenue, 
+    uploadLogo, 
+    getQuestion, 
+    searchConference, 
+    deleteConference, 
+    hostSeachConference, 
+    getHomeConfr, 
+    getConferenceOwner
+ } = require('../controllers/confr_controller')
 
 const router = express.Router()
 
@@ -36,6 +52,9 @@ router.get('/single/:id', singleConference)
 
 // get for host
 router.get('/host/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getConferenceHost)
+
+// get by host id
+router.get('/owner/:id', verifyToken, checkRole(['ADMIN']), getConferenceOwner)
 
 // read conference with owner
 router.get('/owner', verifyToken, checkRole(['HOST', 'ADMIN']), getConferByUser)
