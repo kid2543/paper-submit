@@ -38,7 +38,7 @@ function PaperDetail() {
     <div className='container py-3'>
       <section className='my-4'>
         <h2>{paper?.title}</h2>
-        <p className='text-muted'><ion-icon name="time-outline"></ion-icon>เผยแพร่เมื่อ {dayjs(paper?.create_date).format("DD/MM/YYYY")}</p>
+        <p className='text-muted'><ion-icon name="time-outline"></ion-icon>เผยแพร่เมื่อ {dayjs(paper?.create_date).format("DD MM YYYY")}</p>
       </section>
       <section className='container-fluid my-4'>
         <div className='row'>

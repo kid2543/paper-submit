@@ -8,8 +8,7 @@ import axios from 'axios';
 import mockImage from '../asset/logo.png'
 
 // react-bootstrap
-import Dropdown from 'react-bootstrap/Dropdown'
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 const api = process.env.REACT_APP_API_URL
@@ -81,7 +80,16 @@ function HostEditInv() {
         const formData = new FormData(e.target)
         const json = Object.fromEntries(formData.entries())
         try {
-            await axios.patch('/api/inv/update/' + inv_id, json)
+            const res = await axios.patch('/api/inv/update/' + inv_id, json)
+            let temp = [...data]
+            let newData = temp.map(items => {
+                if(items._id === inv_id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            })
+            setData(newData)
             toast.success('แก้ไขพิธีกรสำเร็จ')
         } catch (error) {
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่ภายหลัง')
@@ -99,16 +107,17 @@ function HostEditInv() {
 
 
     return (
-        <div className='py-5'>
-            <ToastContainer />
-            <div className='mb-4'>
-                <h4 className='fw-bold '>พิธีกร</h4>
-                <p className='text-muted'>เพิ่มพิธีกรรวมถึงแก้ไขรายละเอียดเกี่ยวกับพิธีกรได้ที่นี่</p>
+        <div>
+            <div className='mb-3 card'>
+                <div className="card-body">
+                    <h4 className='fw-bold card-title'>พิธีกร</h4>
+                    <p className='text-muted card-text'>เพิ่มพิธีกรรวมถึงแก้ไขรายละเอียดเกี่ยวกับพิธีกรได้ที่นี่</p>
+                </div>
             </div>
-            <div className='card shadow-sm border-0 mb-4'>
+            <div className='card shadow-sm  mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
-                        <h6 className='fw-bold mb-0'>เพิ่มพิธีกร</h6>
+                        <h6 className='fw-bold card-title'>รายการพิธีกร</h6>
                         <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
                             <i className='me-2 bi bi-plus-lg'></i>
                             เพิ่มพิธีกร
@@ -129,6 +138,8 @@ function HostEditInv() {
                     handleClose={() => setShowUploadImageModal(false)}
                     id={uploadId}
                     name={uploadName}
+                    data={data}
+                    setData={setData}
                 />
                 <UploadCv
                     show={showCvModal}
@@ -136,6 +147,8 @@ function HostEditInv() {
                     id={uploadId}
                     name={uploadName}
                     clearData={clearData}
+                    data={data}
+                    setData={setData}
                 />
                 <ConfirmDeleteDialog
                     show={showDialog}
@@ -144,25 +157,24 @@ function HostEditInv() {
                     onCancel={handleCancel}
                     onConfirm={handleDelete}
                 />
-                <h6 className='fw-bold mb-4'>รายละเอียดพิธีกร</h6>
                 {data &&
                     <div className='row g-3'>
                         {data.map((items, index) => (
-                            <div className='col-12 position-relative' key={items._id}>
+                            <div className='col-12 col-md-6 position-relative' key={items._id}>
                                 <h6 className='mb-3'>พิธีกรท่านที่: {index + 1}</h6>
-                                <div className="card">
+                                <div className="card h-100">
                                     <div className='card-body text-center'>
                                         {items.img ? (
-                                            <img src={`/uploads/${items.img}`} className='border rounded-circle p-3' alt={items.img} />
+                                            <img src={`/uploads/${items.img}`} width={288} className='img-fluid img-thumbnail' alt={items.img} />
                                         ) : (
-                                            <img src={mockImage} className='border rounded-circle p-3' alt={mockImage} />
+                                            <img src={mockImage} className='img-fluid img-thumbnail' alt={mockImage} />
                                         )}
                                         <div className='mt-2'>
                                             <button type='button' onClick={() => handleShowUploadImage(items._id, items.name)} className='btn btn-light'>เปลี่ยน</button>
                                         </div>
                                     </div>
                                     <div className='position-absolute top-0 end-0'>
-                                        <button type='button' onClick={() => handleShowDialog(items._id)} className='m-3 btn btn-danger'>
+                                        <button type='button' onClick={() => handleShowDialog(items._id)} className='m-3 btn btn-danger btn-sm'>
                                             <i className='bi bi-trash'></i>
                                         </button>
                                     </div>
@@ -181,16 +193,18 @@ function HostEditInv() {
                                                 <input name='keynote' className='form-control' defaultValue={items.keynote} />
                                             </div>
                                             <div>
-                                                <button type='submit' className='btn btn-primary'>Update</button>
-                                            </div>
-                                            <div>
-                                                <p>
+                                                <p>CV:
                                                     {items.cv &&
-                                                        <a href={`${api}/uploads/${items.cv}`} target='_blank' rel='noreferrer'>CV-{items.name}</a>
+                                                        <a className="ms-2" href={`${api}/uploads/${items.cv}`} target='_blank' rel='noreferrer'>{items.name}</a>
                                                     }
                                                 </p>
-                                                <button type='button' onClick={() => handleShowCvModal(items._id, items.name)} className='btn btn-light'>Upload CV</button>
                                             </div>
+                                            <button type='button' onClick={() => handleShowCvModal(items._id, items.name)} className='btn btn-outline-dark'>
+                                                <i className="bi bi-upload me-2"></i>
+                                                อัพโหลด CV
+                                            </button>
+                                                <button type='submit' className='btn btn-primary'>ยืนยันการแก้ไข</button>
+
                                         </form>
                                     </div>
                                 </div>
@@ -215,11 +229,11 @@ function CreateInvModal(props) {
             const json = Object.fromEntries(formData.entries())
             const res = await axios.post('/api/inv', json)
             props.setData([...props.data, res.data])
-            alert('Success')
+            toast.success('เพิ่มพิธีกรสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -245,10 +259,10 @@ function CreateInvModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Create
+                        เพิ่ม
                     </Button>
                 </Modal.Footer>
             </form>
@@ -270,11 +284,20 @@ function UploadImage(props) {
         try {
             const formData = new FormData()
             formData.append('image', imageFile)
-            await axios.patch('/api/inv/img/' + props.id, formData)
-            alert('Success')
+            const res = await axios.patch('/api/inv/img/' + props.id, formData)
+            toast.success('อัพโหลดสำเร็จ')
+            let temp = [...props.data]
+            let newData = temp.map(items => {
+                if (items._id === res.data._id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            })
+            props.setData(newData)
             closeModal()
         } catch (error) {
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
             console.log(error)
         }
     }
@@ -282,21 +305,21 @@ function UploadImage(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>Upload รูปภาพ: <span className='text-primary'>{props.name}</span></Modal.Title>
+                <Modal.Title>อัพโหลดรูปภาพ: <span className='text-primary'>{props.name}</span></Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpload}>
                 <Modal.Body>
                     <div>
-                        <label className='form-label'>Upload</label>
+                        <label className='form-label'>เลือกรูป</label>
                         <input type='file' accept='image/*' className='form-control' onChange={e => setImageFile(e.target.files[0])} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={closeModal}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!imageFile} >
-                        Upload
+                        อัพโหลด
                     </Button>
                 </Modal.Footer>
             </form>
@@ -307,6 +330,7 @@ function UploadImage(props) {
 function UploadCv(props) {
 
     const [cvFile, setCvFile] = useState(null)
+    console.log(props.key)
 
     const closeModal = () => {
         setCvFile(null)
@@ -319,11 +343,20 @@ function UploadCv(props) {
         try {
             const formData = new FormData()
             formData.append('file', cvFile)
-            await axios.patch('/api/inv/cv/' + props.id, formData)
-            alert('Success')
+            const res = await axios.patch('/api/inv/cv/' + props.id, formData)
+            let temp = [...props.data]
+            let newData = temp.map((items) => {
+                if(items._id === props.id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            }) 
+            props.setData(newData)
+            toast.success('อัพโหลดสำเร็จ')
             closeModal()
         } catch (error) {
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
         }
     }
@@ -331,21 +364,21 @@ function UploadCv(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>Upload รูปภาพ: <span className='text-primary'>{props.name}</span></Modal.Title>
+                <Modal.Title>อัพโหลดประวัติ: <span className='text-primary'>{props.name}</span></Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpload}>
                 <Modal.Body>
                     <div>
-                        <label className='form-label'>Upload</label>
+                        <label className='form-label'>เลือกไฟล์</label>
                         <input className='form-control' type='file' accept='.pdf, .doc' onChange={e => setCvFile(e.target.files[0])} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={closeModal}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!cvFile} >
-                        Upload
+                        อัพโหลด
                     </Button>
                 </Modal.Footer>
             </form>

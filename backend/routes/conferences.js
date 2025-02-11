@@ -41,8 +41,8 @@ router.patch('/logo/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadImage
 //get all
 router.get('/all', verifyToken, checkRole(['HOST', 'ADMIN']), allConference)
 
-// get conference 3 อันลล่าสุด
-router.get('/three', getHomeConfr)
+// get conference ที่เปิดรับล่าสุด
+router.get('/current', getHomeConfr)
 
 //get open conference
 router.get('/', openConference)
@@ -67,7 +67,7 @@ router.get('/question/:id', verifyToken, checkRole(['HOST', 'ADMIN', 'COMMITTEE'
 router.get('/search', verifyToken, checkRole(['ADMIN']), searchConference)
 
 // delete conference
-router.delete('/delete/:id', verifyToken, checkRole(['ADMIN']), deleteConference)
+router.delete('/delete/:id', verifyToken, checkRole(['ADMIN', 'HOST']), deleteConference)
 
 // search conference for host
 router.get('/search/host', verifyToken, checkRole(['ADMIN', 'HOST']), hostSeachConference)

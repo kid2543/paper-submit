@@ -1,10 +1,13 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { useParams, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 // react bootstrap
 import { Breadcrumb } from 'react-bootstrap'
+import useSearch from '../hook/useSearch'
+import PaginationComponent from '../components/Pagination'
+import LoadingPage from '../components/LoadingPage'
 
 
 function HostEditCate() {
@@ -12,16 +15,23 @@ function HostEditCate() {
     const { id } = useParams()
 
     const [cateData, setCateData] = useState({})
-    const [commitData, setCommitData] = useState([])
     const [commitDetail, setCommitDetail] = useState([])
-    const [newCommitList, setNewCommitList] = useState([])
-    const [query, setQuery] = useState('')
+    const {
+        data,
+        error,
+        handleNextPage,
+        handlePreviousPage,
+        handleSearchChange,
+        page,
+        status,
+        totalPages
+    } = useSearch('/api/user/search/committee')
 
-    const handleChangeList = (e) => {
+    const handleChangeList = (e, value) => {
         if (e.target.checked) {
-            setNewCommitList([...newCommitList, e.target.value])
+            setCommitDetail([...commitDetail, value])
         } else {
-            setNewCommitList(newCommitList.filter((item) => item !== e.target.value))
+            setCommitDetail(commitDetail.filter((item) => item._id !== value._id))
         }
     }
 
@@ -38,28 +48,29 @@ function HostEditCate() {
         }
     }
 
+
+    // handle navigate to add committee
+    const navigate = useNavigate()
+
+    const handleAddCommittee = () => {
+        sessionStorage.setItem('cate_id', id)
+        navigate('/host/committee')
+    }
+
     const handleUpdateList = async (e) => {
         e.preventDefault()
         try {
             const res = await axios.patch('/api/category/review', {
                 _id: id,
-                list: newCommitList
+                list: commitDetail
             })
             setCateData(res.data)
             toast.success("เพิ่มกรรมการสำเร็จ")
-            window.location.reload()
         } catch (error) {
             console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
-
-    const handleSearch = (e) => {
-        setQuery(e.target.value)
-    }
-
-    const filterData = commitData?.filter(item =>
-        item.username.toLowerCase().includes(query.toLocaleLowerCase())
-    )
 
     useEffect(() => {
 
@@ -68,8 +79,6 @@ function HostEditCate() {
                 const res = await axios.get('/api/category/one/' + id)
                 setCateData(res.data)
                 setCommitDetail(res.data.reviewer_list)
-                const comit = await axios.get('/api/user/committee')
-                setCommitData(comit.data)
             } catch (error) {
                 console.log(error)
             }
@@ -80,19 +89,20 @@ function HostEditCate() {
     }, [id])
 
     return (
-        <div className='px-5 py-4'>
-            <ToastContainer />
+        <div className='py-4'>
             <div>
-                <div>
-                    <h4 className='fw-bold'>แก้ไขข้อมูลหัวข้องานประชุม</h4>
-                    <Breadcrumb>
-                        <Breadcrumb.Item href="/host/edit/category">หัวข้องานประชุม</Breadcrumb.Item>
-                        <Breadcrumb.Item active>
-                            แก้ไขหัวข้องานประชุม
-                        </Breadcrumb.Item>
-                    </Breadcrumb>
+                <div className="card mb-3">
+                    <div className="card-body">
+                        <Breadcrumb>
+                            <Breadcrumb.Item href="/host/edit/category">หัวข้องานประชุม</Breadcrumb.Item>
+                            <Breadcrumb.Item active>
+                                แก้ไขหัวข้องานประชุม
+                            </Breadcrumb.Item>
+                        </Breadcrumb>
+                        <h4 className='fw-bold card-title'>แก้ไขข้อมูลหัวข้องานประชุม</h4>
+                    </div>
                 </div>
-                <div className='card border-0 mb-5'>
+                <div className='card  mb-3'>
                     <div className='card-body'>
                         <form onSubmit={handleUpdate}>
                             <div className='row gy-3'>
@@ -116,7 +126,7 @@ function HostEditCate() {
                         </form>
                     </div>
                 </div>
-                <div className='card border-0 shadow-sm mb-5'>
+                <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
                         <h6 className='fw-bold mb-4'>รายชื่อกรรมการประจำหัวข้อ</h6>
                         {commitDetail.length > 0 ? (
@@ -147,56 +157,91 @@ function HostEditCate() {
                         )}
                     </div>
                 </div>
-                <div className='card border-0 shadow-sm mb-5'>
+                <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
                         <h6 className='fw-bold mb-4'>
                             รายชื่อกรรมการทั้งหมด
                         </h6>
                         <div className='d-flex justify-content-between align-items-center mb-3'>
                             <div>
-                                <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="ค้นหา" onChange={handleSearch} />
-                                    <button className="btn btn-primary" id="basic-addon2"><i className="bi bi-search"></i></button>
-                                </div>
+                                <form onSubmit={handleSearchChange} className="input-group">
+                                    <input type="text" className="form-control" placeholder="ค้นหา" name='search' />
+                                    <button type='submit' className="btn btn-primary" id="basic-addon2"><i className="bi bi-search"></i></button>
+                                </form>
                             </div>
                             <div>
-                                <a href='/host/committee' className='btn btn-primary'>
+                                <button type='button' onClick={handleAddCommittee} className='btn btn-primary'>
                                     <i className='bi bi-person-plus me-2'></i>
                                     เพิ่มกรรมการ
-                                </a>
-                            </div>
-                        </div>
-                        <form onSubmit={handleUpdateList}>
-                            <div className='col-12'>
-                                <div className='table-responsive'>
-                                    <table className='table table-hover'>
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>ชื่อผู้ใช้งาน</th>
-                                                <th>ชื่อกรรมการ</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filterData?.map((item) => (
-                                                <tr key={item._id}>
-                                                    <td>
-                                                        <input type='checkbox' onChange={e => handleChangeList(e)} value={item._id} />
-                                                    </td>
-                                                    <td>{item.username}</td>
-                                                    <td>{item.name}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div className='col-12 text-end'>
-                                <button className='btn btn-success' type='submit' disabled={newCommitList.length <= 0}>
-                                    <i className='me-2 bi bi-people'></i>ยืนยัน
                                 </button>
                             </div>
-                        </form>
+                        </div>
+                        {error &&
+                            <div className="alert alert-danger" role="alert">
+                                {error}
+                            </div>
+                        }
+                        {status === 'idle' || status === 'loading' ? (
+                            <LoadingPage />
+                        ) : (
+                            <form onSubmit={handleUpdateList}>
+                                <div className='col-12'>
+                                    {data &&
+                                        <div>
+                                            <div className='table-responsive' style={{ minWidth: 1000, minHeight: 400 }}>
+                                                <table className='table table-hover'>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>อันดับ</th>
+                                                            <th>ชื่อผู้ใช้งาน</th>
+                                                            <th>ชื่อกรรมการ</th>
+                                                        </tr>
+                                                    </thead>
+                                                    {data.length > 0 ? (
+                                                        <tbody>
+                                                            {data.map((items, index) => (
+                                                                <tr key={items._id}>
+                                                                    <td>
+                                                                        <input
+                                                                            type='checkbox'
+                                                                            checked={commitDetail.some(comit => comit._id === items._id)}
+                                                                            onChange={e => handleChangeList(e, items)}
+                                                                        />
+                                                                    </td>
+                                                                    <td>{((page - 1) * 10) + (index + 1)}</td>
+                                                                    <td>{items.username}</td>
+                                                                    <td>{items.name}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    ) : (
+                                                        <tbody>
+                                                            <tr>
+                                                                <td colSpan='4' className="text-center p-3">
+                                                                    ไม่พบข้อมูล
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    )}
+                                                </table>
+                                            </div>
+                                            <PaginationComponent
+                                                currentPage={page}
+                                                onPageNext={handleNextPage}
+                                                onPagePrev={handlePreviousPage}
+                                                totalPages={totalPages}
+                                            />
+                                        </div>
+                                    }
+                                </div>
+                                <div className='col-12 text-end'>
+                                    <button className='btn btn-success' type='submit'>
+                                        <i className='me-2 bi bi-people'></i>ยืนยัน
+                                    </button>
+                                </div>
+                            </form>
+                        )}
                     </div>
                 </div>
             </div>

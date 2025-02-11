@@ -4,54 +4,50 @@ import axios from 'axios'
 
 // hook
 import { useSignup } from '../../hook/useSignup';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 // react boostrap
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Dropdown from 'react-bootstrap/Dropdown';
+import { toast } from 'react-toastify';
 
 
 function Committee() {
 
     const { data, error, status, setData, handleSearchChange, handleNextPage, handlePreviousPage, page, totalPages } = useSearch("/api/user/search/committee")
     const signUp = useSignup()
-    const navigate = useNavigate()
 
+    //modal
     const [show, setShow] = useState(false)
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-
     const handleShow = () => setShow(true)
     const handleClose = () => setShow(false)
 
+    // create committee
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+
     const handleCreate = async (e) => {
         e.preventDefault()
-        const role = 'COMMITTEE'
-        const res = await signUp.signup(username, password, role)
-        if (res) {
-            setData([res, ...data])
-            alert("Success")
+        try {
+            const res = await axios.post('/api/user/committee', {
+                username,
+                name,
+                password,
+                email,
+            })
+            setData([res.data, ...data])
+            toast.success("เพิ่มกรรมการสำเร็จ")
             setUsername('')
             setPassword('')
+            setEmail('')
+            setName('')
             handleClose()
-        } else {
-            alert('Error')
-        }
-    }
-
-    const handleDelete = async (userId, userName) => {
-        if (window.confirm("ต้องการลบผู้ใช้งาน " + userName + " หรือไม่")) {
-            try {
-                console.log(userId)
-                await axios.delete(`/api/user/committee/${userId}`)
-                setData(data.filter((item) => item._id !== userId))
-                alert("ลบสำเร็จ")
-            } catch (error) {
-                console.error("Error delete", error)
-                alert('Error')
-            }
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด: ' + error.response.data?.error)
         }
     }
 
@@ -68,16 +64,24 @@ function Committee() {
                 <form onSubmit={handleCreate}>
                     <Modal.Body className='row g-3'>
                         <div className='col-12'>
-                            <label className='form-label'>Username</label>
+                            <label className='form-label'>ชื่อ - นามสกุล</label>
+                            <input className='form-control' required value={name} onChange={e => setName(e.target.value)} />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>อีเมล</label>
+                            <input type='email' className='form-control' required value={email} onChange={e => setEmail(e.target.value)} />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>ชื่อผู้ใช้งาน</label>
                             <input className='form-control' required value={username} onChange={e => setUsername(e.target.value)} />
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>Password</label>
+                            <label className='form-label'>รหัสผ่าน</label>
                             <input className='form-control' name='password' type='password' required onChange={e => setPassword(e.target.value)} />
                             <small className='text-muted'>รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข ขั้นต่ำ 8 ตัวอักษร</small>
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>Confirm password</label>
+                            <label className='form-label'>ยืนยีนรหัสผ่านอีกครั้ง</label>
                             <input className='form-control' name='confirm_password' type='password' required pattern={password} />
                         </div>
                         {signUp.error &&
@@ -88,28 +92,28 @@ function Committee() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="" onClick={handleClose}>
-                            Close
+                            ปิด
                         </Button>
                         <Button variant="primary" type='submit'>
-                            Create
+                            สร้าง
                         </Button>
                     </Modal.Footer>
                 </form>
             </Modal>
-            <div className='d-flex justify-content-between align-items-center p-3 rounded mb-3'>
-                <p className='fw-bold mb-0'>รายชื่อกรรมการ</p>
-                <div className='d-flex'>
-                    <form className='me-2' onSubmit={handleSearchChange}>
-                        <input
-                            className='form-control'
-                            placeholder='ค้นหา...'
-                            name='search'
-                        />
-                    </form>
+            <div>
+                <div className='d-flex justify-content-between align-items-center mb-3'>
+                    <h6 className='fw-bold mb-0'>รายชื่อกรรมการ</h6>
                     <div>
                         <button type='button' className='btn btn-primary' onClick={handleShow}>เพิ่มกรรมการ</button>
                     </div>
                 </div>
+                <form className='mb-3' onSubmit={handleSearchChange}>
+                    <input
+                        className='form-control text-bg-light'
+                        placeholder='ค้นหา...'
+                        name='search'
+                    />
+                </form>
             </div>
             <div className='table-resonsive' style={{ minHeight: "200px" }}>
                 {status === 'idle' || status === 'loading' ? (
@@ -119,9 +123,11 @@ function Committee() {
                         </div>
                     </div>
                 ) : (
-                    <table className='table table-striped'>
+                    <table className='table table-hover'>
                         <thead>
                             <tr>
+                                <th>#</th>
+                                <th>ชื่อ - นามสกุล</th>
                                 <th>ชื่อผู้ใช้งาน</th>
                                 <th>เพิ่มเติม</th>
                             </tr>
@@ -129,30 +135,15 @@ function Committee() {
                         <tbody>
                             {data.length > 0 ? (
                                 <>
-                                    {data?.map((item) => (
+                                    {data?.map((item, index) => (
                                         <tr key={item._id}>
+                                            <td>{index + 1}</td>
+                                            <td>{item.name}</td>
                                             <td>{item.username}</td>
                                             <td>
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic">
-                                                        <i className="bi bi-three-dots"></i>
-                                                    </Dropdown.Toggle>
-
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => navigate('/admin/user/' + item._id)}>
-                                                            <span className='me-2'>
-                                                                <i className="bi bi-pen"></i>
-                                                            </span>
-                                                            แก้ไข
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item className='text-danger' type='button' onClick={() => handleDelete(item._id, item.username)}>
-                                                            <span className='me-2'>
-                                                                <i className="bi bi-trash"></i>
-                                                            </span>
-                                                            ลบ
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
+                                                <Link className="btn btn-light" to={`/admin/user/${item._id}`}>
+                                                    <i className="bi bi-pencil-square"></i>
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}
@@ -169,10 +160,10 @@ function Committee() {
             <div className='d-flex justify-content-between align-items-center'>
                 <span>{`Page ${page} of ${totalPages}`}</span>
                 <div>
-                    <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link border-0'>
+                    <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link '>
                         <i className="bi bi-arrow-left"></i> ก่อนหน้า
                     </button>
-                    <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link border-0'>
+                    <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link '>
                         ถัดไป <i className="bi bi-arrow-right"></i>
                     </button>
                 </div>

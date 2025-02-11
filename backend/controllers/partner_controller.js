@@ -44,7 +44,9 @@ const deletePartner = async (req, res) => {
         }
         fs.unlink(`public/uploads/${find.image}`, (err) => {
             if (err) {
-                return res.status(400).json({ error: err.message })
+                console.log(err)
+            } else {
+                console.log('ลบไฟล์สำเร็จ')
             }
         })
         await find.deleteOne()

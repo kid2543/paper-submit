@@ -11,6 +11,8 @@ export const useLogout = () => {
         try {            
             await axios.post('/api/user/logout')
             Cookies.remove('username')
+            localStorage.clear()
+            sessionStorage.clear()
             // dispatch logout action
             dispatch({type: 'LOGOUT'})
         } catch (error) {

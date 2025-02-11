@@ -7,6 +7,9 @@ const Conferences = require('../models/conferences')
 const jwt = require('jsonwebtoken')
 const Paper = require('../models/paper')
 
+const bcrypt = require('bcrypt')
+const validator = require('validator')
+
 const createToken = (_id, role) => {
     return jwt.sign({ _id, role }, process.env.JWT_SECRET, { expiresIn: '1d' })
 }
@@ -280,7 +283,7 @@ const getOwnerDetail = async (req, res) => {
     const { _id } = req.user
 
     try {
-        const user = await User.findById(_id).select('_id name email')
+        const user = await User.findById(_id).select('-password')
         if (!user) {
             return res.status(404).json({ error: 'ไม่พบผู้ใช้งาน' })
         }
@@ -342,6 +345,38 @@ const userUpdateDetail = async (req, res) => {
     }
 }
 
+// change password
+const changePassword = async (req, res) => {
+    const { old_password, new_password } = req.body
+    const { _id } = req.user
+
+    if (!validator.isStrongPassword(new_password)) {
+            return res.status(400).json({error: 'Password not strong enough'})
+        }
+
+    try {
+        const user = await User.findById(_id)
+        if(!user) {
+            return res.status(404).json({error: 'ไม่พบข้อมูลผู้ใช้งาน'})
+        }
+
+        const match = await bcrypt.compare(old_password, user.password)
+
+        if (!match) {
+            res.status(400).json({error: 'รหัสผ่านเดิมไม่ถูกต้อง'})
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(new_password, salt)
+        user.password = hash
+        user.save()
+        res.status(200).json(user)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({error : error.message})
+    }
+}
+
 module.exports = {
     loginUser,
     signupUser,
@@ -361,5 +396,6 @@ module.exports = {
     getAll,
     adminViewUser,
     updateUser,
-    userUpdateDetail
+    userUpdateDetail,
+    changePassword
 }

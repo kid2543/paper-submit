@@ -20,16 +20,18 @@ function AwardCateList() {
     }, [id])
 
     return (
-        <div className='py-5'>
-            <div className='mb-4'>
-                <h4 className='fw-bold'>รางวัลดีเด่น</h4>
-                <p className='text-muted'>เลือกหัวข้อเพื่อจัดอันดับรางวัลดีเด่น</p>
+        <div>
+            <div className='mb-3 card'>
+                <div className="card-body">
+                    <h4 className='fw-bold card-title'>รางวัลดีเด่น</h4>
+                    <p className='text-muted card-text'>เลือกหัวข้อเพื่อจัดอันดับรางวัลดีเด่น</p>
+                </div>
             </div>
             {cate &&
                 <div>
-                    <h6 className='fw-bold mb-4'>รายชื่อหัวข้องานประชุม</h6>
-                    <div className='card border-0 shadow-sm'>
+                    <div className='card shadow-sm'>
                         <div className='card-body'>
+                            <h6 className='fw-bold card-title'>รายชื่อหัวข้องานประชุม</h6>
                             <div className='table-responsive'>
                                 <table className='table' style={{ minWidth: "1000px" }}>
                                     <thead>

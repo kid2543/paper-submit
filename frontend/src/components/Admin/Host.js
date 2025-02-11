@@ -6,9 +6,8 @@ import useSearch from '../../hook/useSearch'
 // react boostatrap
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Dropdown from 'react-bootstrap/Dropdown';
-import { Link, useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Host() {
 
@@ -30,14 +29,14 @@ function Host() {
                 email,
             })
             setData([res.data, ...data])
-            toast.success('ผู้จัดงานสำเร็จ')
+            toast.success('เพิ่มผู้จัดงานสำเร็จ')
             setUsername('')
             setPassword('')
             setEmail('')
             setName('')
-            handleClose()    
+            handleClose()
         } catch (error) {
-            toast.error(error.response?.data.error)   
+            toast.error(error.response.data?.error)
         }
     }
 
@@ -50,7 +49,6 @@ function Host() {
 
     return (
         <div>
-            <ToastContainer />
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>เพิ่มผู้ใช้งาน</Modal.Title>
@@ -86,29 +84,29 @@ function Host() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="" onClick={handleClose}>
-                            Close
+                            ปิด
                         </Button>
                         <Button variant="primary" type='submit' disabled={signUp.isLoading}>
-                            Create
+                            สร้าง
                         </Button>
                     </Modal.Footer>
                 </form>
             </Modal>
-            <div className='d-flex justify-content-between p-3 mb-4 align-items-center rounded'>
-                <p className='fw-bold mb-0'>ผู้จัดงานประชุม</p>
-                <div className='d-flex'>
-                    <form onSubmit={handleSearchChange} className='me-2'>
-                        <input
-                            type="search"
-                            name='search'
-                            placeholder="ค้นหา"
-                            className='form-control'
-                        />
-                    </form>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className='fw-bold mb-0'>ผู้จัดงานประชุม</h6>
                     <button className='btn btn-primary' type='button' onClick={handleShow}>
                         เพิ่มผู้จัดงานประชุม
                     </button>
                 </div>
+                <form onSubmit={handleSearchChange} className='mb-3'>
+                        <input
+                            type="search"
+                            name='search'
+                            placeholder="ค้นหา"
+                            className='form-control text-bg-light'
+                        />
+                </form>
             </div>
             <div className='table-responsive' style={{ minHeight: "200px" }}>
                 {status === 'idle' || status === 'loading' ? (
@@ -118,9 +116,10 @@ function Host() {
                         </div>
                     </div>
                 ) : (
-                    <table className='table table-striped'>
+                    <table className='table table-hover'>
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>ชื่อ</th>
                                 <th>ชื่อผู้ใช้งาน</th>
                                 <th>เครื่องมือ</th>
@@ -129,12 +128,13 @@ function Host() {
                         <tbody>
                             {data.length > 0 ? (
                                 <>
-                                    {data?.map(item => (
+                                    {data?.map((item, index) => (
                                         <tr key={item._id}>
+                                            <td>{index + 1}</td>
                                             <td>{item.name}</td>
                                             <td>{item.username}</td>
                                             <td>
-                                                <Link className='btn btn-primary' to={`/admin/user/${item._id}`}>
+                                                <Link className='btn btn-light' to={`/admin/user/${item._id}`}>
                                                     <i className='bi bi-pencil-square'></i>
                                                 </Link>
                                             </td>

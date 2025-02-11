@@ -54,7 +54,7 @@ function Category() {
                                             <td>{items.reviewer_list.length}</td>
                                             <td>
                                                 <Dropdown>
-                                                    <Dropdown.Toggle variant="" className='border-0' id="dropdown-basic">
+                                                    <Dropdown.Toggle variant="" className='' id="dropdown-basic">
                                                         <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
                                                     </Dropdown.Toggle>
 
@@ -136,10 +136,10 @@ function CreateCategoryModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Create
+                        สร้าง
                     </Button>
                 </Modal.Footer>
             </form>
@@ -210,11 +210,11 @@ function EditCategoryModal(props) {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={props.handleClose}>
-                        Close
+                    <Button variant="" onClick={props.handleClose}>
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Edit
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -252,10 +252,10 @@ function AssignModal(props) {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.handleClose}>
-                    Close
+                    ปิด
                 </Button>
                 <Button variant="primary" onClick={props.handleClose}>
-                    Save Changes
+                    ยืนยัน
                 </Button>
             </Modal.Footer>
         </Modal>

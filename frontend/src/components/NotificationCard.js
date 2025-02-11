@@ -23,7 +23,7 @@ function NotificationCard({ header, desc, date, id, status, handleDelNoti }) {
                     <span className='col-6 text-muted'>
                         {header}
                     </span>
-                    <small className='col-6 text-end text-muted'>{dayjs(date).format("DD/MM/YYYY HH:mm")}</small>
+                    <small className='col-6 text-end text-muted'>{dayjs(date).format("DD MMM YYYY HH:mm")}</small>
                 </div>
                 <p>{desc}</p>
                 <div className='d-flex align-items-center justify-content-between'>

@@ -2,12 +2,15 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
+import { toast } from 'react-toastify'
+import { Breadcrumb } from 'react-bootstrap'
 
 function AdminUserDetail() {
 
     const { id } = useParams()
     const [user, setUser] = useState({})
     const [confrList, setConfrList] = useState([])
+    const [paperList, setPaperList] = useState([])
     const [loading, setLoading] = useState('idle')
     const navigate = useNavigate()
 
@@ -22,11 +25,15 @@ function AdminUserDetail() {
             try {
                 const res = await axios.get('/api/user/admin/user/' + id)
                 setUser(res.data)
-                console.log({res})
-                if (res.data.role === 'HOST') {
+                const role = res.data.role
+                if (role === 'HOST') {
                     const confr = await axios.get('/api/conference/owner/' + res.data._id)
-                    console.log({confr})
                     setConfrList(confr.data)
+                } else if (role === 'AUTHOR') {
+                    const paper = await axios.get('/api/paper/admin/owner/' + res.data._id)
+                    setPaperList(paper.data)
+                } else {
+                    console.log('คนหา Comment')
                 }
             } catch (error) {
                 console.log(error)
@@ -44,10 +51,11 @@ function AdminUserDetail() {
         const formData = new FormData(e.target)
         const json = Object.fromEntries(formData.entries())
         try {
-            const res = await axios.patch('/api/user/update/' + user._id, json)
-            alert('Updated status: ' + res.status)
+            await axios.patch('/api/user/update/' + user._id, json)
+            toast.success('แก้ไขสำเร็จ')
         } catch (error) {
             console.log(error)
+            toast.error('เกิดข้อผิดพลาดกรุณา ลองใหม่อีกครั้ง')
         }
     }
 
@@ -56,11 +64,21 @@ function AdminUserDetail() {
     }
 
     return (
-        <div className='p-4'>
+        <div className='py-3'>
+            <div className="card mb-3 shadow-sm">
+                <div className="card-body">
+                    <Breadcrumb>
+                        <Breadcrumb.Item href="/admin">Dashboard</Breadcrumb.Item>
+                        <Breadcrumb.Item active>
+                            รายละเอียดผู้ใช้งาน
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                </div>
+            </div>
             {user &&
-                <div className='card border-0 shadow-sm'>
+                <div className='card shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title mb-0'>{user.username}</h4>
+                        <h4 className='card-title fw-bold'>{user.username}</h4>
                         <hr />
                         <div className='card-text'>
                             <form className='row g-3' onSubmit={handleUpdate}>
@@ -121,7 +139,7 @@ function AdminUserDetail() {
                                 </div>
                                 <div className='col-md-6'>
                                     <div>
-                                        <label className='form-label'>รหัสไปรย์ษณี</label>
+                                        <label className='form-label'>รหัสไปรษณีย์</label>
                                         <input className='form-control' defaultValue={user.zip_code} name='zip_code' pattern='[0-9]{5}' maxLength={5} />
                                         <div className='form-text'>เฉพาะตัวเลขจำนวน 5 หลักเท่านั้น</div>
                                     </div>
@@ -142,30 +160,73 @@ function AdminUserDetail() {
                 </div>
             }
             {confrList.length > 0 &&
-                <div className='table-responsive'>
-                    <h6>รายการงานประชุม</h6>
-                    <table className='table'>
-                        <thead>
-                            <tr>
-                                <th>รหัสงานประชุม</th>
-                                <th>ชื่องานประชุม</th>
-                                <th>เครื่องมือ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {confrList.map(items => (
-                                <tr key={items._id}>
-                                    <td>{items.confr_code}</td>
-                                    <td>{items.title}</td>
-                                    <td>
-                                        <button onClick={() => handleEdit(items._id)} type='button' className='btn btn-danger'>
-                                            <i className='bi bi-pencil-square'></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm">
+                    <div className='card-body'>
+                        <div className='table-responsive my-4'>
+                            <h4 className="card-title fw-bold">รายการงานประชุม</h4>
+                            <div className='table-responsive' style={{ minWidth: "1000px", minHeight: '400px' }}>
+                                <table className='table'>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>รหัสงานประชุม</th>
+                                            <th>ชื่องานประชุม</th>
+                                            <th>เครื่องมือ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {confrList.map((items, index) => (
+                                            <tr key={items._id}>
+                                                <td>{index + 1}</td>
+                                                <td>{items.confr_code}</td>
+                                                <td>{items.title}</td>
+                                                <td>
+                                                    <button onClick={() => handleEdit(items._id)} type='button' className='btn btn-primary'>
+                                                        <i className='bi bi-pencil-square'></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            {paperList.length > 0 &&
+                <div className="card shadow-sm">
+                    <div className='card-body'>
+                        <div className='table-responsive my-4'>
+                            <h4 className="card-title fw-bold">รายการบทความ</h4>
+                            <div className='table-responsive' style={{ minWidth: "1000px", minHeight: '400px' }}>
+                                <table className='table'>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>รหัส</th>
+                                            <th>ชื่อ</th>
+                                            <th>เครื่องมือ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {paperList.map((items, index) => (
+                                            <tr key={items._id}>
+                                                <td>{index + 1}</td>
+                                                <td>{items.paper_code}</td>
+                                                <td>{items.title}</td>
+                                                <td>
+                                                    <button type='button' className='btn btn-primary'>
+                                                        <i className='bi bi-pencil-square'>เพิ่มให้กดแล้ว link ไปหน้าแสดงรายละเอียดบทความ</i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             }
         </div>

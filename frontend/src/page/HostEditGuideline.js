@@ -3,6 +3,7 @@ import useFetch from '../hook/useFetch'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function HostEditGuideline() {
 
@@ -23,17 +24,19 @@ function HostEditGuideline() {
   }
 
   return (
-    <div className='py-5'>
-      <div className='mb-4'>
-        <h4 className='fw-bold'>ข้อแนะนำ</h4>
-        <p className='text-mute'>เพิ่มและแก้ไขข้อแนะนำสำหรับการส่งบทความได้ที่นี่</p>
+    <div>
+      <div className='mb-3 card'>
+        <div className='card-body'>
+          <h4 className='fw-bold card-title'>ข้อแนะนำ</h4>
+          <p className='text-muted card-text'>เพิ่มและแก้ไขข้อแนะนำสำหรับการส่งบทความได้ที่นี่</p>
+        </div>
       </div>
       {data &&
         <div>
-          <div className='card border-0 shadow-sm mb-5'>
+          <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
-              <div className='d-flex justify-content-between align-items-center mb-4'>
-                <h6 className='fw-bold mb-0'>ผู้ส่งบทความ</h6>
+              <div className='d-flex justify-content-between align-items-center'>
+                <h6 className='fw-bold card-title'>ผู้ส่งบทความ</h6>
                 <div>
                   <button className='btn' type='button' onClick={() => setShowPresenter(true)}>
                     <i className='bi bi-pencil-square'></i>
@@ -49,10 +52,10 @@ function HostEditGuideline() {
 
             </div>
           </div>
-          <div className='card border-0 shadow-sm mb-5'>
+          <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
-              <div className='d-flex justify-content-between align-items-center mb-4'>
-                <h6 className='fw-bold mb-0'>กรรมการ</h6>
+              <div className='d-flex justify-content-between align-items-center'>
+                <h6 className='fw-bold card-title'>กรรมการ</h6>
                 <button className='btn' type='button' onClick={() => setShowChair(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>
@@ -65,10 +68,10 @@ function HostEditGuideline() {
               </ol>
             </div>
           </div>
-          <div className='card border-0 shadow-sm mb-5'>
+          <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
-              <div className='d-flex justify-content-between align-items-center mb-4'>
-                <h6 className='fw-bold mb-0'>ผู้เข้าชม</h6>
+              <div className='d-flex justify-content-between align-items-center'>
+                <h6 className='fw-bold card-title'>ผู้เข้าชม</h6>
                 <button className='btn' type='button' onClick={() => setShowAudience(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>
@@ -113,11 +116,11 @@ function PresenterModal(props) {
         guide_for_presenter: deleteEmpty
       })
       props.setData(res.data)
-      alert('Success')
+      toast.success('แก้ไขสำเร็จ')
       props.handleClose()
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -127,7 +130,10 @@ function PresenterModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับผู้ส่งบทความ</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>Add +</button>
+        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+          <i className="me-2 bi bi-plus-lg"></i>
+          เพิ่มหัวข้อ
+        </button>
         {list.map((items, index) => (
           <div className='my-3' key={index}>
             <label className='form-label'>ข้อที่: {index + 1}</label>
@@ -137,10 +143,10 @@ function PresenterModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
-          Close
+          ปิด
         </Button>
         <Button variant="primary" onClick={handleUpdate}>
-          Update
+          ยืนยัน
         </Button>
       </Modal.Footer>
     </Modal>
@@ -169,11 +175,11 @@ function ChairModal(props) {
         guide_for_chair: filterList
       })
       props.setData(res.data)
-      alert('Success')
+      toast.success('แก้ไขสำเร็จ')
       props.handleClose()
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -183,7 +189,10 @@ function ChairModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับกรรมการ</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>Add +</button>
+        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+          <i className="me-2 bi bi-plus-lg"></i>
+          เพิ่มหัวข้อ
+        </button>
         {list.map((items, index) => (
           <div className='my-3' key={index}>
             <label className='form-label'>ข้อที่: {index + 1}</label>
@@ -193,10 +202,10 @@ function ChairModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
-          Close
+          ปิด
         </Button>
         <Button variant="primary" onClick={handleUpdate}>
-          Update
+          ยืนยัน
         </Button>
       </Modal.Footer>
     </Modal>
@@ -225,11 +234,11 @@ function AudienceModal(props) {
         guide_for_audience: filterList
       })
       props.setData(res.data)
-      alert('Success')
+      toast.success('แก้ไขสำเร็จ')
       props.handleClose()
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -239,7 +248,10 @@ function AudienceModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับผู้เข้าชม</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <button className='btn btn-primary' type='button' onClick={handleAdd}>Add +</button>
+        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+          <i className="me-2 bi bi-plus-lg"></i>
+          เพิ่มหัวข้อ
+        </button>
         {list.map((items, index) => (
           <div className='my-3' key={index}>
             <label className='form-label'>ข้อที่: {index + 1}</label>
@@ -249,10 +261,10 @@ function AudienceModal(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
-          Close
+          ปิด
         </Button>
         <Button variant="primary" onClick={handleUpdate}>
-          Update
+          ยืนยัน
         </Button>
       </Modal.Footer>
     </Modal>

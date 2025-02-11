@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const api = process.env.REACT_APP_API_URL
 
@@ -74,7 +74,6 @@ function HostCreate() {
 
   return (
     <div className='container py-5'>
-      <ToastContainer />
       <h2 className='text-center mb-5'>สร้างงานประชุม</h2>
       <div className='row'>
         <form className={validate ? "col-md-6 mb-3 was-validated" : "mb-3 col-md-6 needs-validation"} noValidate onSubmit={createConfr}>

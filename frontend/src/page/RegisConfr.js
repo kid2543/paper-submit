@@ -55,10 +55,10 @@ function RegisConfr() {
             <div className='mb-3'>
                 <p className='fw-bold'>โปรดชำระเงินระหว่างวันที่ด้านล่าง</p>
                 <div>
-                    Early Bird Registration: <strong>{dayjs(confr?.regis_eb_start_date).format("DD/MMM/YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_eb_end_date).format("DD/MMM/YYYY")}</strong>
+                    Early Bird Registration: <strong>{dayjs(confr?.regis_eb_start_date).format("DD MMM YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_eb_end_date).format("DD MMM YYYY")}</strong>
                 </div>
                 <div>
-                    Regular Registration : <strong>{dayjs(confr?.regis_rl_start_date).format("DD/MMM/YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_rl_end_date).format("DD/MMM/YYYY")}</strong>
+                    Regular Registration : <strong>{dayjs(confr?.regis_rl_start_date).format("DD MMM YYYY")}</strong> ถึง <strong>{dayjs(confr?.regis_rl_end_date).format("DD MMM YYYY")}</strong>
                 </div>
             </div>
             <div className='mb-3'>

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 const api = process.env.REACT_APP_API_URL
@@ -103,16 +103,17 @@ function HostEditSubmission() {
   }
 
   return (
-    <div className='py-5'>
-      <ToastContainer />
-      <div className='mb-4'>
-        <h4 className='fw-bold'>การส่งบทความ</h4>
-        <p className='text-muted'>แก้ไขข้อแนะนำการส่งบทความ และอัพโหลดเทมเพลตได้ที่นี่</p>
-      </div>
-      <div className='card border-0 shadow-sm mb-4'>
+    <div>
+      <div className='mb-3 card'>
         <div className='card-body'>
-          <div className='d-flex justify-content-between align-items-center mb-4'>
-            <h6 className='fw-bold mb-0'>รายการเทมเพลต</h6>
+          <h4 className='fw-bold card-title'>การส่งบทความ</h4>
+          <p className='text-muted card-text'>แก้ไขข้อแนะนำการส่งบทความ และอัพโหลดเทมเพลตได้ที่นี่</p>
+        </div>
+      </div>
+      <div className='card  shadow-sm mb-3'>
+        <div className='card-body'>
+          <div className='d-flex justify-content-between align-items-center mb-3'>
+            <h6 className='fw-bold card-title'>รายการเทมเพลต</h6>
             <button className='btn btn-primary' onClick={() => setTemplateModal(true)}>
               <i className='bi bi-plus-lg me-2'></i>
               เพิ่มเทมเพลต
@@ -159,10 +160,10 @@ function HostEditSubmission() {
           </div>
         </div>
       </div>
-      <div className='card border-0 shadow-sm'>
+      <div className='card  shadow-sm'>
         <div className='card-body'>
-          <div className='d-flex justify-content-between align-items-center mb-4'>
-            <h6 className='fw-bold mb-0'>ข้อแนะนำการส่งบทความ</h6>
+          <div className='d-flex justify-content-between align-items-center mb-3'>
+            <h6 className='fw-bold card-title'>ข้อแนะนำการส่งบทความ</h6>
             <button className='btn btn-outline-dark' onClick={handleShow}>
               <i className='bi bi-pencil-square me-2'></i>
               แก้ไข
@@ -171,12 +172,12 @@ function HostEditSubmission() {
           <div>
             {data &&
               <div>
-                <SubmissionModal 
-                data={data} 
-                show={detailModal} 
-                handleClose={handleClose} 
-                setData={setData} 
-                state={editState}
+                <SubmissionModal
+                  data={data}
+                  show={detailModal}
+                  handleClose={handleClose}
+                  setData={setData}
+                  state={editState}
                 />
                 <ol>
                   {data.map((items, index) => (
@@ -244,7 +245,7 @@ function TemplateModal(props) {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="" onClick={closeModal}>
-            ยกเลิก
+            ปิด
           </Button>
           <Button variant="primary" disabled={!templateFile || !templateName} type='submit'>
             <i className='bi bi-upload me-2'></i>
@@ -266,7 +267,7 @@ function SubmissionModal(props) {
 
   useEffect(() => {
     setData(props.data)
-  }, [props.data,props.state])
+  }, [props.data, props.state])
 
   const handleAdd = () => {
     setData([...data, ''])
@@ -322,10 +323,17 @@ function SubmissionModal(props) {
               </button>
             </div>
             {data.map((items, index) => (
-              <div key={index}>
-                <label className='form-label'>ข้อที่ {index + 1}</label>
-                <textarea key={key} className='form-control' onChange={e => handleChange(e, index)} defaultValue={items} required />
-                <div className='mt-2 text-end'>
+              <div key={index} className="mb-3">
+                <div className="input-group">
+                <label className='form-label text-muted me-2'>ข้อที่ {index + 1}</label>
+                  <textarea
+                    key={key}
+                    className='form-control'
+                    onChange={e => handleChange(e, index)}
+                    defaultValue={items}
+                    required
+                    rows={3}
+                  />
                   <button type='button' onClick={() => handleDelete(index)} className='btn btn-danger btn-sm text-white'>
                     <i className='bi bi-trash'></i>
                   </button>
@@ -336,7 +344,7 @@ function SubmissionModal(props) {
         }
         <Modal.Footer>
           <Button variant="" onClick={closeModal}>
-            ยกเลิก
+            ปิด
           </Button>
           <Button variant="primary" type='submit'>
             ยืนยัน

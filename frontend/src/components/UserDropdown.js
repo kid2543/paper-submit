@@ -4,15 +4,12 @@ import { useLogout } from '../hook/useLogout'
 import { useAuthContext } from '../hook/useAuthContext'
 import axios from 'axios'
 
-// asset
-import UserProfile from '../asset/checked.png'
-
 // react bootstrap
 import Dropdown from 'react-bootstrap/Dropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
 // notify
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/ReactToastify.css'
 
 export function UserDropdown() {
@@ -61,14 +58,10 @@ export function UserDropdown() {
                 setNotiMessage(res.data)
                 const unread = res.data.filter(items => items.status !== true)
                 setUnreadState(unread.length)
+                
                 // alert notification
-                for (let i in unread) {
-                    toast(
-                        <div>
-                            <p className='fw-bold mb-0'>{unread[i].title}</p>
-                            <small>{unread[i].message}</small>
-                        </div>
-                    )
+                if(unread.length > 0) {
+                    toast('มีการแจ้งเตือนใหม่')
                 }
             } catch (error) {
                 console.log(error)
@@ -90,10 +83,10 @@ export function UserDropdown() {
 
     return (
         <Dropdown>
-            <Dropdown.Toggle className='p-0 m-0 border-0' variant="" id="dropdown-basic">
-                <img className='me-2' height={32} width={32} src={UserProfile} alt='user profile' />
+            <Dropdown.Toggle className=" align-items-center d-flex" variant="light" id="dropdown-basic">
+                <i className="bi bi-person-fill fs-3 me-2"></i> 
+                <span className="me-2">{user}</span>                    
             </Dropdown.Toggle>
-            <ToastContainer />
             <Dropdown.Menu>
                 <Dropdown.ItemText>
                     {user}

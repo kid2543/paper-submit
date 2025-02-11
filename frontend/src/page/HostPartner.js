@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import Bin from '../asset/bin.png'
+import { toast } from 'react-toastify'
 
 
 function HostPartner() {
@@ -30,11 +31,11 @@ function HostPartner() {
     formData.append("desc", e.target.desc.value)
     try {
       const res = await axios.post('/api/partner', formData)
-      alert("อัพโหลดข้อมูลสำเร็จ")
+      toast.success("อัพโหลดข้อมูลสำเร็จ")
       setPartnerData([...partnerData, res.data])
       handleCloseCreate()
     } catch (error) {
-      alert("เกิดข้อผิดพลาด")
+      toast.error("เกิดข้อผิดพลาด")
       console.log(error)
     } finally {
       e.target.partner.value = ""
@@ -61,10 +62,12 @@ function HostPartner() {
   }, [id])
 
   return (
-    <div className='py-5'>
-      <div className='mb-4'>
-        <h4 className='fw-bold'>รูปผู้สนับสนุน</h4>
-        <p className='text-muted'>เพิ่มและแก้ไขรูปภาพผู้สนับสนุนได้ที่นี่</p>
+    <div>
+      <div className='mb-3 card'>
+        <div className='card-body'>
+          <h4 className='fw-bold card-title'>รูปผู้สนับสนุน</h4>
+          <p className='text-muted card-text'>เพิ่มและแก้ไขรูปภาพผู้สนับสนุนได้ที่นี่</p>
+        </div>
       </div>
       <CreatePartnerModal show={showCreate} handleClose={handleCloseCreate} handleSubmit={handleSubmit} setPartnerUpload={setPartnerUpload} partnerUpload={partnerUpload} />
       <ConfirmDel
@@ -73,23 +76,25 @@ function HostPartner() {
         partnerId={partnerId}
         clearPartner={clearPartner}
       />
-      <div className='card border-0 shadow-sm'>
+      <div className='card shadow-sm'>
         <div className='card-body'>
-          <div className='d-flex justify-content-between align-items-center mb-4'>
-            <h6 className='fw-bold mb-0'>รายการผู้สนับสนุน</h6>
-            <button className='btn btn-primary btn-sm' type='button' onClick={handleShowCreate}>
+          <div className='d-flex justify-content-between align-items-center'>
+            <h6 className='fw-bold card-title'>รายการผู้สนับสนุน</h6>
+            <button className='btn btn-primary' type='button' onClick={handleShowCreate}>
               <i className='bi bi-plus-lg me-2'></i>เพิ่มรูปผู้สนับสนุน
             </button>
           </div>
           {partnerData.length > 0 && (
-            <div className='row mt-3'>
+            <div className='row g-3 mt-3'>
               {partnerData?.map((item) => (
-                <div key={item._id} className='col-6 col-md-4 mb-3'>
-                  <div className='text-center border rounded p-3 position-relative'>
-                    <div className='position-absolute top-0 end-0'>
-                      <button className='btn btn-sm' onClick={() => handleShow(item._id)} type='button' ><ion-icon name="close"></ion-icon></button>
+                <div key={item._id} className='col-auto'>
+                  <div className="btn-group">
+                    <div>
+                      <img src={`/uploads/${item.image}`} alt={item.desc} height={128} />
                     </div>
-                    <img src={`/uploads/${item.image}`} alt={item.desc} height={48} width={48} />
+                    <button className='btn btn-danger' onClick={() => handleShow(item._id)} type='button' >
+                      <i className="bi bi-trash"></i>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -109,9 +114,9 @@ function ConfirmDel({ show, handleClose, partnerId, clearPartner }) {
     try {
       const del = await axios.delete(`/api/partner/${partnerId}`)
       console.log(del)
-      alert("ลบสำเร็จ")
+      toast.success("ลบสำเร็จ")
     } catch (error) {
-      alert("เกิดข้อผิดพลาด")
+      toast.error("เกิดข้อผิดพลาด")
       console.log(error)
     } finally {
       handleClose()
@@ -123,12 +128,12 @@ function ConfirmDel({ show, handleClose, partnerId, clearPartner }) {
     <Modal show={show} onHide={handleClose}>
       <Modal.Body>
         <div className='text-center my-5'>
+          <img src={Bin} alt="del" width={48} height={48} className="mb-3" />
           <h4>ต้องการจะลบจริงหรือไม่</h4>
-          <img src={Bin} alt="del" width={48} height={48} />
         </div>
         <div className='text-center'>
-          <button onClick={handleClose} className='btn btn-dark me-3'>Cancel</button>
-          <button onClick={delPartner} className='btn btn-outline-danger'>Confirm</button>
+          <button onClick={handleClose} className='btn btn-dark me-3'>ยกเลิก</button>
+          <button onClick={delPartner} className='btn btn-outline-danger'>ยืนยันการลบ</button>
         </div>
       </Modal.Body>
     </Modal>
@@ -154,10 +159,10 @@ function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload
         </Modal.Body>
         <Modal.Footer>
           <Button variant="" onClick={handleClose}>
-            Close
+            ปิด
           </Button>
           <Button variant="primary" type="submit" disabled={!partnerUpload}>
-            Upload
+            อัพโหลด
           </Button>
         </Modal.Footer>
       </form>

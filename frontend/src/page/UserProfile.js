@@ -1,26 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAuthContext } from '../hook/useAuthContext'
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useLogout } from '../hook/useLogout';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import useFetch from '../hook/useFetch';
 import LoadingPage from '../components/LoadingPage';
 import axios from 'axios';
 
 // react tosify
-import {ToastContainer, toast} from 'react-toastify' 
+import { toast } from 'react-toastify'
 import { UserDropdown } from '../components/UserDropdown';
 
 function UserProfile() {
 
   const { data, status, error } = useFetch('/api/user/profile')
   const { user } = useAuthContext()
-  const { logout } = useLogout()
-  const navigate = useNavigate()
-  const handleClick = () => {
-    logout()
-    navigate('/')
-  }
 
   // handle update user profile
   const handleUpdate = async (e) => {
@@ -28,12 +20,48 @@ function UserProfile() {
     const formData = new FormData(e.target)
     const json = Object.fromEntries(formData.entries())
     try {
-      const res = await axios.patch('/api/user/detail/update', json)
-      console.log(res.data)
+      await axios.patch('/api/user/detail/update', json)
       toast.success('อัพเดทข้อมูลสำเร็จ')
     } catch (error) {
       console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองอีกครั้ง')
     }
+  }
+
+  const [newPassword, setNewPassword] = useState('')
+  const [oldPassword, setOldPassword] = useState('')
+  const [conNewPassword, setConNewPassword] = useState('')
+  const [errorChangePassword, setErrorChangePassword] = useState('')
+
+  // handle change password
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+
+    if (newPassword === oldPassword) {
+      toast.error('ไม่สามารถใช้รหัสผ่านเดิมได้')
+      setErrorChangePassword('รหัสผ่านใหม่ไม่สามารถซ้ำกับรหัสผ่านเดิมได้')
+      return
+    }
+
+    if (conNewPassword === newPassword) {
+      try {
+        await axios.patch('/api/user/password/change', {
+          old_password: oldPassword,
+          new_password: newPassword
+        })
+        toast.success('เปลี่ยนรหัสผ่านแล้ว')
+        setNewPassword('')
+        setOldPassword('')
+      } catch (error) {
+        console.log(error)
+        toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        setErrorChangePassword(error.response.data?.error)
+      }
+    } else {
+      toast.error('รหัสผ่านไม่ตรงกัน')
+      setErrorChangePassword('รหัสผ่านไม่ตรงกัน')
+    }
+
   }
 
   if (!user) {
@@ -49,64 +77,133 @@ function UserProfile() {
   }
 
   return (
-    <div className='container my-4'>
-      <ToastContainer />
-      <section className='card border-0'>
-        <div className='card-body'>
-          <div className='d-flex justify-content-between align-items-center'>
-            <h5>Setting</h5>
+    <div>
+      <div className='container py-3'>
+        <section className='card text-bg-light'>
+          <div className='card-body'>
+            <div className='d-flex justify-content-between align-items-center'>
+              <h5 className="fw-bold card-title">Profile</h5>
               <UserDropdown />
+            </div>
           </div>
-        </div>
-      </section>
-      <section>
-        {data &&
-          <div className='my-5'>
-            <div className='card border-0'>
+        </section>
+        <section>
+          {data &&
+            <div className='my-3'>
+              <div className='card text-bg-light'>
+                <div className='card-body'>
+                  <h4 className='fw-bold mb-3'>แก้ไขโปรไฟล์</h4>
+                  <form onSubmit={handleUpdate} className='row g-3'>
+                    <div className='col-12 col-md-6'>
+                      <label className='form-label'>ชื่อ - นามสกุล</label>
+                      <input defaultValue={data.name} name='name' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6'>
+                      <label className='form-label'>อีเมล</label>
+                      <input defaultValue={data.email} name='email' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>เบอร์โทร</label>
+                      <input defaultValue={data.phone} name='phone' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>มหาวิทยาลัย</label>
+                      <input defaultValue={data.university} name='university' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>สังกัด</label>
+                      <input defaultValue={data.department} name='department' className='form-control' />
+                    </div>
+                    <div>
+                      <h6 className="fw-bold">ข้อมูลที่อยู่</h6>
+                      <hr />
+                    </div>
+                    <div className='col-12'>
+                      <label className='form-label'>ที่อยู่</label>
+                      <textarea defaultValue={data.address} name='address' className='form-control' rows={3} />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>ตำบล</label>
+                      <input defaultValue={data.sub_district} name='sub_district' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>อำเภอ</label>
+                      <input defaultValue={data.district} name='district' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>จังหวัด</label>
+                      <input defaultValue={data.province} name='province' className='form-control' />
+                    </div>
+                    <div className='col-12 col-md-6 '>
+                      <label className='form-label'>รหัสไปรษณี</label>
+                      <input defaultValue={data.zip_code} name='zip_code' className='form-control' />
+                    </div>
+                    <div className="text-end">
+                      <button className='btn btn-primary text-white'>
+                        <i className="me-2 bi bi-floppy"></i>
+                        บันทึก
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          }
+          <div>
+            <div className='card text-bg-light'>
               <div className='card-body'>
-                <h5 className='mb-4'>แก้ไขโปรไฟล์</h5>
-                <form onSubmit={handleUpdate} className='row gy-4'>
+                <h4 className='card-tile fw-bold mb-3'>เปลี่ยนรหัสผ่าน</h4>
+                <form onSubmit={handleChangePassword} className='row g-3'>
                   <div className='col-12'>
-                    <label className='form-label'>ชื่อ - นามสกุล</label>
-                    <input defaultValue={data.name} name='name' className='form-control' />
+                    <label className='form-label'>รหัสผ่านเดิม</label>
+                    <input
+                      value={oldPassword}
+                      onChange={e => setOldPassword(e.target.value)}
+                      type='password'
+                      className='form-control'
+                      required
+                      onFocus={() => setErrorChangePassword('')}
+                    />
                   </div>
                   <div className='col-12'>
-                    <label className='form-label'>อีเมล</label>
-                    <input defaultValue={data.email} name='email' className='form-control' />
+                    <label className='form-label'>รหัสผ่านใหม่</label>
+                    <input
+                      type='password'
+                      className='form-control'
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      required
+                      onFocus={() => setErrorChangePassword('')}
+                    />
                   </div>
-                  <div>
-                    <button className='btn btn-primary text-white' style={{ width: "128px" }}>บันทึก</button>
+                  <div className='col-12'>
+                    <label className='form-label'>ยืนยันรหัสผ่านใหม่</label>
+                    <input
+                      type='password'
+                      className='form-control'
+                      required
+                      onFocus={() => setErrorChangePassword('')}
+                      value={conNewPassword}
+                      onChange={e => setConNewPassword(e.target.value)}
+                    />
+                  </div>
+                  {errorChangePassword &&
+                    <div className="text-danger">
+                      {errorChangePassword}
+                    </div>
+                  }
+                  <div className="text-end">
+                    <button type='submit' className='btn btn-primary text-white'>
+                      <i className="me-2 bi bi-floppy"></i>
+                      บันทึก
+                    </button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-        }
-        <div>
-          <div className='card border-0'>
-            <div className='card-body'>
-              <h5 className='mb-4'>เปลี่ยนรหัสผ่าน</h5>
-              <form className='row gy-4'>
-                <div className='col-12'>
-                  <label className='form-label'>รหัสผ่านเดิม</label>
-                  <input type='password' className='form-control' />
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>รหัสผ่านใหม่</label>
-                  <input type='password' className='form-control' />
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>ยืนยันรหัสผ่านใหม่</label>
-                  <input type='password' className='form-control' />
-                </div>
-                <div>
-                  <button className='btn btn-primary text-white' style={{ width: "128px" }}>บันทึก</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   )
 }

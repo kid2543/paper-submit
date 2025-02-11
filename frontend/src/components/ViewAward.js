@@ -16,25 +16,27 @@ function ViewAward() {
   }
 
   return (
-    <div className='py-5'>
-      <Breadcrumb>
-        <Breadcrumb.Item href="/host/edit/award">รางวัลดีเด่น</Breadcrumb.Item>
-        <Breadcrumb.Item href={"/host/edit/award/" + id}>
-          แก้ไขรางวัลดีเด่น
-        </Breadcrumb.Item>
-        <Breadcrumb.Item active>รายชื่อรางวัลดีเด่น</Breadcrumb.Item>
-      </Breadcrumb>
-      <div className='mb-4'>
-        <h4 className='fw-bold'>รายชื่อรางวัลดีเด่น</h4>
-        <p className='text-muted'>ดูรายชื่อรางวัลดีเด่นได้ที่นี่</p>
+    <div>
+      <div className="card mb-3">
+        <div className='card-body'>
+          <Breadcrumb>
+            <Breadcrumb.Item href="/host/edit/award">รางวัลดีเด่น</Breadcrumb.Item>
+            <Breadcrumb.Item href={"/host/edit/award/" + id}>
+              แก้ไขรางวัลดีเด่น
+            </Breadcrumb.Item>
+            <Breadcrumb.Item active>รายชื่อรางวัลดีเด่น</Breadcrumb.Item>
+          </Breadcrumb>
+          <h4 className='fw-bold card-title'>รายชื่อรางวัลดีเด่น</h4>
+          <p className='text-muted card-text'>ดูรายชื่อรางวัลดีเด่นได้ที่นี่</p>
+        </div>
       </div>
       {paper.data &&
         <div className='row g-3'>
           {paper.data.map(papers => (
-            <div className='col-12' key={papers._id}>
-              <div className='card border-0 shadow-sm'>
+            <div className='col-12 col-md-6 col-lg-4' key={papers._id}>
+              <div className='card  shadow-sm'>
                 <div className='card-body row align-items-center'>
-                  <div className='col-12 col-md-4 text-center'>
+                  <div className='col-12 col-md-4 text-md-center'>
                     <h1 className='text-primary'>{papers.award_rate}</h1>
                   </div>
                   <div className='col-12 col-md-8'>

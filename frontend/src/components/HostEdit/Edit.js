@@ -5,6 +5,8 @@ import SearchItemNotFound from '../SearchItemNotFound'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios'
+import { toast } from 'react-toastify';
+import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
 
 function Edit() {
@@ -36,24 +38,48 @@ function Edit() {
     const [titleModal, setTitleModal] = useState(false)
     const [descModal, setDescModal] = useState(false)
     const [dateModal, setDateModal] = useState(false)
+    const [editDateData, setEditDateData] = useState({})
     const [importantDate, setImportantDate] = useState(false)
     const [confrModal, setConfrModal] = useState(false)
     const [logoModal, setLogoModal] = useState(false)
     const [tagModal, setTagModal] = useState(false)
     const [cateModal, setCateModal] = useState(false)
+    const [createDateModal, setCreateDateModal] = useState(false)
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+    const [scheduleId, setScheduleId] = useState('')
+
+    const handleShowEditDate = (items) => {
+        console.log(items)
+        setEditDateData(items)
+        setDateModal(true)
+    }
 
     const handleUpdate = async (e, form, modal) => {
         e.preventDefault()
         try {
             const res = await axios.patch('/api/conference', form)
-            alert("Success")
+            toast.success("อัพเดทสำเร็จ")
             setData(res.data)
-            modal()
+            if (modal) {
+                modal()
+            }
             setKey(key + 1)
         } catch (error) {
             console.log(error)
-            alert("Error")
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
+    }
+
+    const handleShowDeleteDialog = (id) => {
+        setScheduleId(id)
+        setShowDeleteDialog(true)
+    }
+
+    const deleteSchedule = (e, id) => {
+        let temp = { ...data }
+        temp.schedule = temp.schedule.filter(items => items._id !== id)
+        handleUpdate(e, temp)
+        setShowDeleteDialog(false)
     }
 
     if (status === 'idle' || status === 'loading') {
@@ -67,7 +93,7 @@ function Edit() {
     return (
         <div key={key}>
             {data &&
-                <div className='row gy-5'>
+                <div className='row g-3'>
                     <div className='col-12' >
                         <Layout>
                             <div className='py-4'>
@@ -129,8 +155,8 @@ function Edit() {
                             <div className='position-absolute top-0 end-0 m-2'>
                                 <button type='button' onClick={() => setConfrModal(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
                             </div>
-                            <p>เริ่มต้น: {data.confr_start_date && dayjs(data.confr_start_date).format('DD/MM/YYYY')}</p>
-                            <p>สิ้นสุด: {data.confr_end_date && dayjs(data.confr_end_date).format('DD/MM/YYYY')}</p>
+                            <p>เริ่มต้น: {data.confr_start_date && dayjs(data.confr_start_date).format('DD MMM YYYY')}</p>
+                            <p>สิ้นสุด: {data.confr_end_date && dayjs(data.confr_end_date).format('DD MMM YYYY')}</p>
                         </Layout>
                     </div>
                     <div className='col-12 col-md-6'>
@@ -173,13 +199,20 @@ function Edit() {
                         </Layout>
                     </div>
                     <div className='col-12'>
+                        <ConfirmDeleteDialog
+                            header='ยืนยันการลบกำหนดการ ?'
+                            message='ต้องการลบกำหนดการหรือไม่'
+                            onCancel={() => setShowDeleteDialog(false)}
+                            onConfirm={e => deleteSchedule(e, scheduleId)}
+                            show={showDeleteDialog}
+                        />
                         <Layout>
                             <div>
                                 <h3>กำหนดการ</h3>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
-                                <button type='button' onClick={() => setDateModal(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
+                                <button type='button' onClick={() => setCreateDateModal(true)} className='btn'><i className="bi bi-plus-lg"></i></button>
                             </div>
                             <div>
                                 <table className='table'>
@@ -188,10 +221,11 @@ function Edit() {
                                             <th>เวลา</th>
                                             <th>รายละเอียด</th>
                                             <th>กรรมการ</th>
+                                            <th>เครื่องมือ</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.schedule?.map((list, index) => (
+                                        {data.schedule?.sort((a,b) => a.start.localeCompare(b.start)).map((list, index) => (
                                             <tr key={index}>
                                                 <td>{list.start} - {list.end}</td>
                                                 <td>
@@ -204,13 +238,39 @@ function Edit() {
                                                         <p className='fw-bold' key={idx}>{chair}</p>
                                                     ))}
                                                 </td>
+                                                <td>
+                                                    <div className="btn-group">
+                                                        <button onClick={() => handleShowEditDate(list)} className="btn btn-outline-dark" type='button'>
+                                                            <i className="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleShowDeleteDialog(list._id)}
+                                                            className="btn btn-outline-dark"
+                                                            type='button'
+                                                        >
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                         </Layout>
-                        <EditDateModal show={dateModal} handleClose={() => setDateModal(false)} data={data} handleUpdate={handleUpdate} />
+                        <EditDateModal
+                            show={dateModal}
+                            handleClose={() => setDateModal(false)}
+                            data={data}
+                            editDate={editDateData}
+                            handleUpdate={handleUpdate}
+                        />
+                        <CreateDateModal
+                            show={createDateModal}
+                            handleClose={() => setCreateDateModal(false)}
+                            data={data}
+                            handleUpdate={handleUpdate}
+                        />
                     </div>
                     <div className='col-12'>
                         <Layout>
@@ -229,7 +289,11 @@ function Edit() {
                                             {items.date_name}
                                         </div>
                                         <div>
-                                            {dayjs(items.start_date).format("DD/MMM/YYYY")} - {dayjs(items.end_date).format("DD/MMM/YYYY")}
+                                            {dayjs(items.start_date).format("DD MMM YYYY")} {items.end_date && 
+                                            <>
+                                            - {dayjs(items.end_date).format("DD MMM YYYY")}
+                                            </>
+                                            }
                                         </div>
                                         <hr />
                                     </div>
@@ -248,7 +312,7 @@ export default Edit
 
 function Layout({ children }) {
     return (
-        <div className='card shadow-sm border-0 h-100 position-relative'>
+        <div className='card h-100 position-relative'>
             <div className='card-body'>
                 {children}
             </div>
@@ -286,10 +350,10 @@ function EditTitleModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -342,10 +406,158 @@ function EditDescModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        ยืนยัน
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}
+
+function CreateDateModal(props) {
+
+    const [desc, setDesc] = useState([""])
+    const [chair, setChair] = useState([])
+
+    // desc
+    const handleChangeDesc = (e, index) => {
+        const { value } = e.target
+        let temp = [...desc]
+        temp[index] = value
+        setDesc(temp)
+    }
+
+    const handleAddDesc = () => {
+        setDesc([...desc, ""])
+    }
+
+    const handleDeleteDesc = (index) => {
+        setDesc(desc.filter((items, idx) => idx !== index))
+    }
+
+    // chair
+    const handleChangeChair = (e, index) => {
+        const { value } = e.target
+        let temp = [...chair]
+        temp[index] = value
+        setChair(temp)
+    }
+
+    const handleAddChair = () => {
+        setChair([...chair, ""])
+    }
+
+    const handleDeleteChair = (index) => {
+        setChair(chair.filter((items, idx) => idx !== index))
+    }
+
+
+    // update data
+    const updateSchedule = (e) => {
+        e.preventDefault()
+        let temp = [...props.data.schedule]
+        let allData = { ...props.data }
+        temp.push({
+            start: e.target.start.value,
+            end: e.target.end.value,
+            items: desc,
+            session: chair
+        })
+        allData.schedule = temp
+        props.handleUpdate(e, allData, props.handleClose)
+    }
+
+    return (
+        <Modal show={props.show} onHide={props.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>เพิ่มกำหนดการ</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={updateSchedule}>
+                <Modal.Body className="row g-3">
+                    <div className="col-6">
+                        <label>เริ่มต้น</label>
+                        <input name='start' className="form-control" type='time' required />
+                    </div>
+                    <div className="col-6">
+                        <label>สิ้นสุด</label>
+                        <input name='end' className="form-control" type='time' required />
+                    </div>
+                    <div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0">รายละเอียด</p>
+                            <button onClick={handleAddDesc} type='button' className="btn btn-success">
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มรายละเอียด
+                            </button>
+                        </div>
+                        <div className="row g-3">
+                            {desc.map((descs, index) => (
+                                <div key={index}>
+                                    <label className="form-label">หัวข้อที่ {index + 1}</label>
+                                    <div className="input-group">
+                                        <textarea
+                                            rows={3}
+                                            onChange={e => handleChangeDesc(e, index)}
+                                            value={descs}
+                                            type='text'
+                                            className='form-control'
+                                            required
+                                        />
+                                        <button
+                                            type='button'
+                                            className="btn btn-danger"
+                                            onClick={() => handleDeleteDesc(index)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0">กรรมการ</p>
+                            <button onClick={handleAddChair} type='button' className="btn btn-success">
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มกรรมการ
+                            </button>
+                        </div>
+                        <div className="row g-3">
+                            {chair.map((chairs, index) => (
+                                <div key={index}>
+                                    <label className="form-label">กรรมการท่านที่: {index + 1}</label>
+                                    <div className="input-group">
+                                        <input
+                                            key={index}
+                                            onChange={e => handleChangeChair(e, index)}
+                                            value={chairs}
+                                            type='text'
+                                            className='form-control'
+                                            required
+                                        />
+                                        <button
+                                            onClick={() => handleDeleteChair(index)}
+                                            type='button'
+                                            className="btn btn-danger"
+                                        >
+                                            <i className='bi bi-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="" onClick={props.handleClose}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" type='submit'>
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -355,162 +567,192 @@ function EditDescModal(props) {
 
 function EditDateModal(props) {
 
-    const [form, setForm] = useState(props.data)
-    const [schedule, setSchedule] = useState(props.data.schedule)
+    const [data, setData] = useState({
+        start: '',
+        end: '',
+        items: [],
+        session: []
+    })
 
-    const handleAdd = () => {
-        let temp = [...schedule]
-        temp = [...temp, {
-            start: "",
-            end: "",
+    useEffect(() => {
+        setData(props.editDate)
+    }, [props.editDate])
+
+    // desc
+    const handleAddDesc = () => {
+        let temp = { ...data }
+        temp.items.push('')
+        setData(temp)
+    }
+
+    const handleChangeDesc = (e, index) => {
+        const { value } = e.target
+        let temp = { ...data }
+        temp.items[index] = value
+        setData(temp)
+    }
+
+    const handleDeleteDesc = (index) => {
+        let temp = { ...data }
+        temp.items = temp.items.filter((list, idx) => idx !== index)
+        setData(temp)
+    }
+
+    //chair
+    const handleAddChair = () => {
+        let temp = { ...data }
+        temp.session.push('')
+        setData(temp)
+    }
+
+    const handleChangeChair = (e, index) => {
+        const { value } = e.target
+        let temp = { ...data }
+        temp.session[index] = value
+        setData(temp)
+    }
+
+    const handleDeleteChair = (e, index) => {
+        let temp = { ...data }
+        temp.session = temp.session.filter((list, idx) => idx !== index)
+        setData(temp)
+    }
+
+    const handleCloseModal = () => {
+        setData({
+            start: '',
+            end: '',
             items: [],
             session: []
-        }]
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
+        })
+        props.handleClose()
     }
 
-    const addDesc = (index) => {
-        let temp = []
-        let desc = []
-        temp = [...schedule]
-        desc = temp[index].items
-        desc.push("")
-        temp[index].items = desc
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
+    const updateSchedule = (e) => {
+        e.preventDefault()
+        let temp = { ...props.data }
+        temp.schedule = temp.schedule.map((items) => {
+            if (items._id === data._id) {
+                return data
+            } else {
+                return items
+            }
+        })
+        props.handleUpdate(e, temp, props.handleClose)
     }
-
-    const addSession = (index) => {
-        let temp = []
-        let session = []
-        temp = [...schedule]
-        session = temp[index].session
-        session.push('')
-        temp[index].session = session
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const handleChange = (e, index) => {
-        const { name, value } = e.target
-        let temp = [...schedule]
-        temp[index][name] = value
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const changeDesc = (e, index, index2) => {
-        const { value } = e.target
-        let temp = [...schedule]
-        temp[index].items[index2] = value
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const changeSession = (e, index, index2) => {
-        const { value } = e.target
-        let temp = [...schedule]
-        temp[index].session[index2] = value
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const handleDelete = (index) => {
-        let temp = [...schedule]
-        temp = temp.filter((item, idx) => idx !== index)
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const deleteSub = (index1, index2) => {
-        let temp = [...schedule]
-        temp[index1].items = temp[index1].items.filter((items, idx) => idx !== index2)
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
-    const deleteSession = (index1, index2) => {
-        let temp = [...schedule]
-        temp[index1].session = temp[index1].session.filter((items, idx) => idx !== index2)
-        setSchedule(temp)
-        setForm({ ...form, schedule: temp })
-    }
-
 
     return (
-        <Modal show={props.show} onHide={props.handleClose}>
+        <Modal show={props.show} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-                <Modal.Title>แก้ไขกำหนดการ</Modal.Title>
+                <Modal.Title>เพิ่มกำหนดการ</Modal.Title>
             </Modal.Header>
-            <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
-                <Modal.Body>
-                    <div className='mb-3'>
-                        <button onClick={handleAdd} className='btn btn-primary' type='button'>เพิ่มกำหนดการ</button>
+            <form
+                onSubmit={updateSchedule}
+            >
+                <Modal.Body className="row g-3">
+                    <div className="col-6">
+                        <label>เริ่มต้น</label>
+                        <input
+                            name='start'
+                            className="form-control"
+                            value={data?.start}
+                            type='time'
+                            required
+                            onChange={e => setData({ ...data, start: e.target.value })}
+                        />
                     </div>
-                    {schedule.map((items, index) => (
-                        <div key={index} className='row g-3'>
-                            <div className='d-flex justify-content-between aling-items-center'>
-                                <p className='mb-0 bg-light p-2 rounded text-primary'>
-                                    กำหนดการที่ {index + 1}
-                                </p>
-                                <div className='text-end'>
-                                    <button className='btn text-danger btn-sm' type='button' onClick={() => handleDelete(index)}>ลบกำหนดการ</button>
-                                </div>
-                            </div>
-                            <div className='col-6'>
-                                <label className='form-label'>เริ่ม</label>
-                                <input className='form-control' name='start' type='time' value={items.start} onChange={e => handleChange(e, index)} required />
-                            </div>
-                            <div className='col-6'>
-                                <label className='form-label'>สิ้นสุด</label>
-                                <input className='form-control' name='end' type='time' value={items.end} onChange={e => handleChange(e, index)} required />
-                            </div>
-
-                            <div className='row g-3'>
-                                <div className='d-flex justify-content-between align-items-center'>
-                                    <p className='mb-0 fw-bold'>รายละเอียด</p>
-                                    <div>
-                                        <button className='btn btn-outline-primary' type='button' onClick={() => addDesc(index)}>เพิ่มหัวข้อ</button>
-                                    </div>
-                                </div>
-                                {items.items?.map((sub, idx) => (
-                                    <div className='col-12' key={idx}>
-                                        <label className='form-label'>{idx + 1}.</label>
-                                        <textarea className='form-control' name='items' defaultValue={sub} onChange={e => changeDesc(e, index, idx)} required />
-                                        <div className='my-2 text-end'>
-                                            <button className='btn text-danger btn-sm' type='button' onClick={() => deleteSub(index, idx)}>Delete</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className='row g-3'>
-                                <div className='d-flex justify-content-between align-items-center'>
-                                    <p className='fw-bold mb-0'>กรรมการประจำ Session</p>
-                                    <div>
-                                        <button type='button' onClick={() => addSession(index)} className='btn btn-outline-primary'>เพิ่มกรรมการ</button>
-                                    </div>
-                                </div>
-                                {items.session?.map((sub, idx) => (
-                                    <div className='col-12' key={idx}>
-                                        <label className='form-label'>{idx + 1}.</label>
-                                        <input className='form-control' name='session' defaultValue={sub} onChange={e => changeSession(e, index, idx)} required />
-                                        <div className='my-2 text-end'>
-                                            <button className='btn text-danger btn-sm' type='button' onClick={() => deleteSession(index, idx)}>Delete</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <hr />
+                    <div className="col-6">
+                        <label>สิ้นสุด</label>
+                        <input
+                            name='end'
+                            className="form-control"
+                            type='time'
+                            value={data?.end}
+                            required
+                            onChange={e => setData({ ...data, end: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0">รายละเอียด</p>
+                            <button
+                                onClick={handleAddDesc}
+                                type='button'
+                                className="btn btn-success"
+                            >
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มรายละเอียด
+                            </button>
                         </div>
-                    ))}
+                        <div className="row g-3">
+                            {data.items?.map((descs, index) => (
+                                <div key={index}>
+                                    <label className="form-label">หัวข้อที่ {index + 1}</label>
+                                    <div className="input-group">
+                                        <textarea
+                                            rows={3}
+                                            onChange={e => handleChangeDesc(e, index)}
+                                            value={descs}
+                                            type='text'
+                                            className='form-control'
+                                            required
+                                        />
+                                        <button
+                                            type='button'
+                                            className="btn btn-danger"
+                                            onClick={() => handleDeleteDesc(index)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0">กรรมการ</p>
+                            <button
+                                onClick={handleAddChair}
+                                type='button'
+                                className="btn btn-success"
+                            >
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มกรรมการ
+                            </button>
+                        </div>
+                        <div className="row g-3">
+                            {data.session?.map((chairs, index) => (
+                                <div key={index}>
+                                    <label className="form-label">กรรมการท่านที่: {index + 1}</label>
+                                    <div className="input-group">
+                                        <input
+                                            key={index}
+                                            onChange={e => handleChangeChair(e, index)}
+                                            value={chairs}
+                                            type='text'
+                                            className='form-control'
+                                            required
+                                        />
+                                        <button
+                                            onClick={() => handleDeleteChair(index)}
+                                            type='button'
+                                            className="btn btn-danger"
+                                        >
+                                            <i className='bi bi-trash'></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="" onClick={props.handleClose}>
-                        Close
+                    <Button variant="" onClick={handleCloseModal}>
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -568,7 +810,7 @@ function EditImportantDate(props) {
                                 </div>
                                 <div className='col-6'>
                                     <label className='form-label'>สิ้นสุด</label>
-                                    <input required className='form-control' name='end_date' type='date' value={dayjs(items.end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e, index)} />
+                                    <input className='form-control' name='end_date' type='date' value={dayjs(items.end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e, index)} />
                                 </div>
                             </div>
                             <div className='text-end'>
@@ -580,10 +822,10 @@ function EditImportantDate(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>
@@ -604,10 +846,10 @@ function ConfrDateModal(props) {
             const json = Object.fromEntries(formData.entries())
             const update = await axios.patch('/api/conference', json)
             props.setData(update.data)
-            alert('Success')
+            toast.success('แก้ไขสำเร็จ')
             closeModal()
         } catch (error) {
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
         }
     }
@@ -635,10 +877,10 @@ function ConfrDateModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={closeModal}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!editState}>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>
@@ -663,11 +905,11 @@ function UploadLogo(props) {
             formData.append('image', file)
             const res = await axios.patch('/api/conference/logo/' + props.id, formData)
             props.setData(res.data)
-            alert('Success')
+            toast.success('Success')
             closeModal()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -676,7 +918,7 @@ function UploadLogo(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>Upload Logo</Modal.Title>
+                <Modal.Title>อัพโหลดรูป Logo</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body>
@@ -685,10 +927,10 @@ function UploadLogo(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={closeModal}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!file}>
-                        Upload
+                        อัพโหลด
                     </Button>
                 </Modal.Footer>
             </form>
@@ -700,6 +942,7 @@ function EditTagModal(props) {
 
     const [data, setData] = useState(props.data.tag)
     const [form, setForm] = useState(props.data)
+    const [key, setKey] = useState(0)
 
     const handleAdd = () => {
         setData([...data, ""])
@@ -713,22 +956,44 @@ function EditTagModal(props) {
         setForm({ ...form, tag: temp })
     }
 
+    const deleteTag = (index) => {
+        let temp = [...data]
+        let newData = temp.filter((items, idx) => idx !== index)
+        setData(newData)
+        setForm({ ...form, tag: newData })
+        setKey(key + 1)
+    }
+
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>แก้ไข Tag</Modal.Title>
+                <Modal.Title>แก้ไข Tags</Modal.Title>
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
                 <Modal.Body>
-                    <div className='mb-3'>
-                        <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>เพิ่ม Tag</button>
+                    <div className='mb-3 d-flex justify-content-between align-items-center'>
+                        <h6 className="fw-bold">รายการ Tags</h6>
+                        <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>
+                            <i className="bi bi-plus-lg me-2"></i>
+                            เพิ่ม
+                        </button>
                     </div>
                     {data &&
-                        <div>
+                        <div key={key}>
                             {data.map((items, index) => (
-                                <div key={index} className='mb-3'>
+                                <div key={index}>
                                     <label className='form-label'>Tag: {index + 1}</label>
-                                    <input className='form-control' type='text' defaultValue={items} onChange={e => handleChange(e, index)} />
+                                    <input
+                                        className='form-control'
+                                        type='text'
+                                        defaultValue={items}
+                                        onChange={e => handleChange(e, index)}
+                                        required />
+                                    <div className="text-end mt-2">
+                                        <button type='button' onClick={() => deleteTag(index)} className='btn btn-danger btn-sm'>
+                                            <i className='bi bi-trash'></i>
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -736,10 +1001,10 @@ function EditTagModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Save Changes
+                        แก้ไข
                     </Button>
                 </Modal.Footer>
             </form>
@@ -777,10 +1042,10 @@ function EditCateModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Save Changes
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>

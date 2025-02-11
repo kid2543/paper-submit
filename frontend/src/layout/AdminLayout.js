@@ -1,14 +1,13 @@
 import React from 'react'
-import AdminSidebar from '../components/AdminSidebar'
+import AdminSidebar from '../components/AdminSidebar/AdminSidebar'
 
-function AdminLayout({children}) {
+function AdminLayout({ children }) {
     return (
-        <div>
-            <div>
-                <AdminSidebar />
-                <div style={{ marginLeft: "240px" }}>
+        <div className='bg-light'>
+            <div style={{ minHeight: '100vh' }}>
+                <AdminSidebar>
                     {children}
-                </div>
+                </AdminSidebar>
             </div>
         </div>
     )

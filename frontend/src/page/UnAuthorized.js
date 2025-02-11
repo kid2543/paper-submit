@@ -9,7 +9,7 @@ function UnAuthorized() {
         <img src={ForbidenImage} alt='403' />
       </div>
         <div className='text-center my-3'>
-            <Link className='btn btn-primary' to='/'>Back to home</Link>
+            <Link className='btn btn-primary' to='/'>กลับไปหน้าหลัก</Link>
         </div>
     </div>
   )

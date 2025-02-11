@@ -28,7 +28,7 @@ function ConfrVenue() {
         <div>
             <section style={{ padding: "180px 0px" }}>
                 <div className='text-center'>
-                    <h1 className='display-1 fw-bold'>สถานที่จัดงานประชุม</h1>
+                    <h1 className='display-1 fw-bold px-2'>สถานที่จัดงานประชุม</h1>
                     <p className='text-muted'>อ่านรายละเอียดสถานที่จัดงานได้ที่นี่</p>
                 </div>
             </section>
@@ -36,11 +36,11 @@ function ConfrVenue() {
                 <section className='bg-white' style={{ padding: "64px 0px" }}>
                     <div className='container'>
                         <h1 className='fw-bold mb-4 text-center'>{data.venue.name}</h1>
-                        <div className='my-5 text-center bg-light rounded'>
-                            {data.venue_image &&
-                                <img src={`/uploads/${data.venue_image}`} alt={data.venue_image} />
-                            }
-                        </div>
+                        {data.venue_image &&
+                            <div className='my-5 text-center rounded p-3 mx-auto' style={{ maxWidth: "600px" }}>
+                                <img src={`/uploads/${data.venue_image}`} alt={data.venue_image} className="img-fluid" />
+                            </div>
+                        }
                         <div>
                             {data.venue.desc?.map((items, index) => (
                                 <p key={index}><span className='ms-4'></span>{items}</p>

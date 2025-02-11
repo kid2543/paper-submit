@@ -12,11 +12,11 @@ function ConfrGuideline() {
     const { data, error, status } = useFetch('/api/conference/single/' + id)
 
 
-    if(status === 'idle' || status === 'loading') {
+    if (status === 'idle' || status === 'loading') {
         return <LoadingPage />
     }
 
-    if(error) {
+    if (error) {
         return <div>Error Page</div>
     }
 
@@ -30,42 +30,62 @@ function ConfrGuideline() {
             </section>
             {data &&
                 <section className='bg-white' style={{ padding: "64px 0px" }}>
-                    <div className='container'>
-                    <h4 className='fw-bold mb-4'>
-                        ข้อแนะนำ
-                    </h4>
+                    <div className='container py-3'>
+                        <h4 className='fw-bold mb-4'>
+                            ข้อแนะนำ
+                        </h4>
                         <Accordion>
                             <Accordion.Item eventKey='1'>
                                 <Accordion.Header>สำหรับผู้นำเสนอ</Accordion.Header>
                                 <Accordion.Body>
-                                    <ul>
+                                    <ol>
                                         {data.guide_for_presenter?.map((items, index) => (
                                             <li key={index}>{items}</li>
                                         ))}
-                                    </ul>
+                                    </ol>
                                 </Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey='2'>
                                 <Accordion.Header>สำหรับกรรมการ</Accordion.Header>
                                 <Accordion.Body>
-                                    <ul>
+                                    <ol>
                                         {data.guide_for_chair?.map((items, index) => (
                                             <li key={index}>{items}</li>
                                         ))}
-                                    </ul>
+                                    </ol>
                                 </Accordion.Body>
                             </Accordion.Item>
                             <Accordion.Item eventKey='3'>
                                 <Accordion.Header>สำหรับผู้ชม</Accordion.Header>
                                 <Accordion.Body>
-                                    <ul>
+                                    <ol>
                                         {data.guide_for_audience?.map((items, index) => (
                                             <li key={index}>{items}</li>
                                         ))}
-                                    </ul>
+                                    </ol>
                                 </Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
+                    </div>
+                    <div className='container py-3'>
+                        <h4 className='fw-bold mb-4'>
+                            ข้อแนะนำการนำเสนอ
+                        </h4>
+                        <Accordion>
+                            <Accordion.Item eventKey='1'>
+                                <Accordion.Header>สำหรับผู้นำเสนอ</Accordion.Header>
+                                <Accordion.Body>
+                                    <ol>
+                                        {data.presentation_guideline?.map((items, index) => (
+                                            <li key={index}>{items}</li>
+                                        ))}
+                                    </ol>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        </Accordion>
+                        {data.presentation_remark &&
+                                <p className="my-3">รายละเอียดเพิ่มเติม: <span className="text-info">{data.presentation_remark}</span></p>
+                        }
                     </div>
                 </section>
             }

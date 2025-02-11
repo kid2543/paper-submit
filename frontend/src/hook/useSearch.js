@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { replace, useNavigate } from 'react-router-dom'
-import { useAuthContext } from "./useAuthContext"
 import { toast } from 'react-toastify'
 
 const useSearch = (fethapi) => {
@@ -14,9 +12,6 @@ const useSearch = (fethapi) => {
     const [data, setData] = useState(null)
     const [error, setError] = useState(null)
     const [status, setStatus] = useState('idle')
-    const { dispatch } = useAuthContext()
-
-    const navigate = useNavigate()
 
     useEffect(() => {
 
@@ -37,11 +32,7 @@ const useSearch = (fethapi) => {
                 setTotalPages(res.data.totalPages)
                 setStatus('success')
             } catch (error) {
-                if(error.response.status === 403) {
-                    toast.error('ผู้ใช้งานหมดอายุ')
-                    dispatch({type: 'LOGOUT'})
-                    navigate('/', replace)
-                }
+                toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
                 setError(error)
                 setStatus('error')
             }

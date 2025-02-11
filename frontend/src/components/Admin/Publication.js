@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import useSearch from "../../hook/useSearch"
 import axios from "axios"
 
@@ -6,80 +6,152 @@ import axios from "axios"
 import LoadingPage from "../LoadingPage"
 
 // react boostrap
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Dropdown from 'react-bootstrap/Dropdown';
+import {
+    Button,
+    Modal,
+} from 'react-bootstrap';
+import { toast } from "react-toastify";
+import ConfirmDeleteDialog from "../ConfirmDeleteDialog";
 
 function Publication() {
 
-    const { data, error, status, setData, handleSearchChange, handleNextPage, handlePreviousPage, page, totalPages } = useSearch("/api/publication/search")
+    const {
+        data,
+        error,
+        status,
+        setData,
+        handleSearchChange,
+        handleNextPage,
+        handlePreviousPage,
+        page,
+        totalPages
+    } = useSearch("/api/publication/search")
 
     const [createPub, setCreatePub] = useState(false)
     const [editModal, setEditModal] = useState(false)
-    const [key, setKey] = useState(0)
     const [edit, setEdit] = useState({
         th_name: "",
         en_name: "",
         desc: []
     })
 
+    const handleCloseEditModal = () => {
+        setEdit({
+            th_name: '',
+            en_name: '',
+            desc: []
+        })
+        setEditModal(false)
+    }
+
     const handleEdit = (data) => {
         setEdit(data)
         setEditModal(true)
     }
 
+    // handle delete modal and function
+    const [deleteId, setDeleteId] = useState('')
+    const [showDelete, setShowDelete] = useState(false)
+    const [errorText, setErrorText] = useState(null)
+    const handleShowDelete = (id) => {
+        setDeleteId(id)
+        setShowDelete(true)
+    }
+    const handleCloseDelete = () => {
+        setDeleteId('')
+        setShowDelete(false)
+    }
     const handleDel = async (id) => {
-        if (window.confirm("ต้องการลบวารสารหรือไม่")) {
-            try {
-                await axios.delete('/api/publication/' + id)
-                let temp = [...data]
-                temp = temp.filter((items) => items._id !== id)
-                setData(temp)
-                alert('Deleted')
-            } catch (error) {
-                console.log(error)
-            }
+        setErrorText(null)
+        try {
+            await axios.delete('/api/publication/' + id)
+            let temp = [...data]
+            temp = temp.filter((items) => items._id !== id)
+            setData(temp)
+            toast.success('ลบวารสารแล้ว')
+        } catch (error) {
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+            console.log(error)
+            setErrorText(error.response.data?.error)
+        } finally {
+            handleCloseDelete()
         }
     }
 
     return (
-        <div className='mx-5 my-5'>
-            <div className="card border-0 shadow-sm">
+        <div>
+            <ConfirmDeleteDialog
+                header='ยืนยันการลบวารสาร ?'
+                message='ต้องการลบวารสารหรือไม่ เนื่องจากหากมีบทความที่มาการส่งบทความมายังวารสารนี้แล้วจะไม่สามารถลบได้'
+                onCancel={handleCloseDelete}
+                onConfirm={() => handleDel(deleteId)}
+                show={showDelete}
+
+            />
+            {errorText &&
+                <div className="alert alert-danger">
+                    {errorText}
+                </div>
+            }
+            <div className="card shadow-sm">
                 <div className="card-body">
-                    <p className="fw-bold">รายการวารสาร</p>
-                    {error && <div className="text-danger">Error</div>}
-                    <div className='d-flex justify-content-between my-3'>
-                        <form onSubmit={handleSearchChange}>
-                            <input
-                                className='form-control'
-                                type='search'
-                                placeholder='ค้นหา'
-                                name='search'
-                            />
-                        </form>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h4 className="fw-bold card-title">รายการวารสาร</h4>
                         <div>
-                            <button type='button' className='btn btn-primary' onClick={() => setCreatePub(true)}>เพิ่มวารสาร</button>
-                            <CreatePubModal show={createPub} handleClose={() => setCreatePub(false)} setData={setData} data={data} />
+                            <button
+                                type='button'
+                                className='btn btn-primary'
+                                onClick={() => setCreatePub(true)}
+                            >
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มวารสาร
+                            </button>
+                            <CreatePubModal
+                                show={createPub}
+                                handleClose={() => setCreatePub(false)}
+                                setData={setData}
+                                data={data}
+                            />
+                            <EditPubModal
+                                show={editModal}
+                                handleClose={handleCloseEditModal}
+                                data={edit}
+                                setData={setData}
+                                updateData={data}
+                            />
                         </div>
                     </div>
+                    {error && <div className="text-danger">Error</div>}
+                    <form className="mb-3" onSubmit={handleSearchChange}>
+                        <input
+                            className='form-control'
+                            type='search'
+                            placeholder='ค้นหา'
+                            name='search'
+                        />
+                    </form>
                     <div>
                         {status === 'idle' || status === 'loading' ? (
                             <LoadingPage />
                         ) : (
-                            <div key={key} >
+                            <div >
                                 {data &&
-                                    <div className="table-responsive" style={{ minWidth: "500px", minHeight: "200px" }}>
+                                    <div className="table-responsive" style={{ minWidth: "1000px", minHeight: "400px" }}>
                                         <table className='table table-hover'>
                                             <thead>
                                                 <tr>
+                                                    <th>#</th>
                                                     <th>ชื่อภาษาไทย</th>
                                                     <th>ชื่อภาษาอังกฤษ</th>
                                                     <th>เพิ่มเติม</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {data.map((item) => (
+                                                {data.map((item, index) => (
                                                     <tr key={item._id}>
+                                                        <td>
+                                                            {index + 1}
+                                                        </td>
                                                         <td>
                                                             {item.th_name}
                                                         </td>
@@ -87,9 +159,22 @@ function Publication() {
                                                             {item.en_name}
                                                         </td>
                                                         <td>
-                                                            <Dropdown align="end">
-                                                                <Dropdown.Toggle variant='btn'>
-                                                                    <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+                                                            <div className="btn-group">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleEdit(item)}
+                                                                    className="btn btn-light">
+                                                                    <i className="bi bi-pencil-square"></i>
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleShowDelete(item._id)}
+                                                                    className="btn btn-light text-danger">
+                                                                    <i className="bi bi-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                            {/* <Dropdown align="end">
+                                                                <Dropdown.Toggle variant='dark'>
                                                                 </Dropdown.Toggle>
                                                                 <Dropdown.Menu>
                                                                     <Dropdown.Item type='button' onClick={() => handleEdit(item)}>
@@ -102,7 +187,7 @@ function Publication() {
                                                                         ลบ
                                                                     </Dropdown.Item>
                                                                 </Dropdown.Menu>
-                                                            </Dropdown>
+                                                            </Dropdown> */}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -174,7 +259,7 @@ function CreatePubModal(props) {
                 en_name: "",
                 desc: [""]
             })
-            alert('Created')
+            toast.success('เพิ่มวารสารแล้ว')
             props.handleClose()
         } catch (error) {
             console.log(error)
@@ -184,25 +269,44 @@ function CreatePubModal(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>New Publication</Modal.Title>
+                <Modal.Title>สร้างวารสารใหม่</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleCreate}>
                 <Modal.Body>
                     <div className='mb-3'>
                         <label className='form-label text-muted'>ชื่อไทย</label>
-                        <input name='th_name' className='form-control' placeholder='ไม่มีให้ใส่ -' required onChange={handleChange} />
+                        <input
+                            name='th_name'
+                            className='form-control'
+                            placeholder='ไม่มีให้ใส่ -'
+                            required
+                            onChange={handleChange}
+                        />
                     </div>
                     <div className='mb-3'>
                         <label className='form-label text-muted'>ชื่อภาษาอังกฤษ</label>
-                        <input name='en_name' className='form-control' placeholder="ไม่มีให้ใส่ -" required onChange={handleChange} />
+                        <input
+                            name='en_name'
+                            className='form-control'
+                            placeholder="ไม่มีให้ใส่ -"
+                            required
+                            onChange={handleChange}
+                        />
                     </div>
                     <div className='mb-3'>
-                        <button className='btn btn-primary' type='button' onClick={handleAdd}>+ Add</button>
+                        <button
+                            className='btn btn-success'
+                            type='button'
+                            onClick={handleAdd}
+                        >
+                            <i className="bi bi-plus-lg me-2"></i>
+                            เพิ่มรายละเอียด
+                        </button>
                     </div>
                     <div>
                         {form.desc.map((items, index) => (
                             <div key={index} className='mb-3'>
-                                <label className='form-label'>ย่อหน้าที่ {index + 1}</label>
+                                <label className='form-label'>ข้อที่ {index + 1}</label>
                                 <textarea className='form-control' defaultValue={items} onChange={e => handleDesc(e, index)} />
                             </div>
                         ))}
@@ -210,10 +314,10 @@ function CreatePubModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Create
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -223,93 +327,136 @@ function CreatePubModal(props) {
 
 function EditPubModal(props) {
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        let temp = { ...props.data }
-        temp[name] = value
-        props.setData(temp)
-    }
+    const [data, setData] = useState({
+        th_name: '',
+        en_name: '',
+        desc: []
+    })
+    const [isLoading, setIsLoading] = useState(false)
+
+    useEffect(() => {
+        setData(props.data)
+    }, [props.data])
 
     const handleAdd = () => {
-        let temp = { ...props.data }
-        let arr = [...props.data.desc]
-        arr.push("")
-        temp.desc = arr
-        props.setData(temp)
+        let temp = { ...data }
+        temp.desc.push('')
+        setData(temp)
     }
 
-    const handleDesc = (e, index) => {
+    const handleChange = (e, index) => {
+        const { name, value } = e.target
+        let temp = { ...data }
+        temp[name] = value
+        setData(temp)
+    }
+
+    const handleChangeDesc = (e, index) => {
         const { value } = e.target
-        let temp = { ...props.data }
+        let temp = { ...data }
         temp.desc[index] = value
-        props.setData(temp)
+        setData(temp)
+    }
+
+    const handleDelete = (index) => {
+        let temp = { ...data }
+        temp.desc = temp.desc.filter((items, idx) => idx !== index)
+        setData(temp)
     }
 
     const handleUpdate = async (e) => {
+        setIsLoading(true)
         e.preventDefault()
-        const data = props.data
-        const id = props.data._id
         try {
-            const res = await axios.patch('/api/publication/' + id, data)
-            props.handleClose()
-            props.setKey(props.key + 1)
-            const newData = props.searchData.map((items) => {
-                if(items._id === id) {
+            const res = await axios.patch('/api/publication/' + data._id, data)
+            let temp = [...props.updateData]
+            const newData = temp.map((items) => {
+                if (items._id === res.data._id) {
                     return res.data
                 } else {
                     return items
                 }
             })
-            props.setSearch(newData)
-            alert("Update Success")
+            props.setData(newData)
+            toast.success('แก้ไขวารสารสำเร็จ')
+            props.handleClose()
         } catch (error) {
             console.log(error)
-            alert("Error")
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setIsLoading(false)
         }
     }
 
     return (
-        <div>
-            <Modal show={props.show} onHide={props.handleClose}>
-                {props.data &&
-                    <>
-                        <Modal.Header closeButton>
-                            <Modal.Title>แก้ไขวารสาร {props.data.en_name}</Modal.Title>
-                        </Modal.Header>
-                        <form onSubmit={handleUpdate}>
-                            <Modal.Body className='row gy-3'>
-                                <div className='col-12'>
-                                    <label className='form-label'>ชื่อภาษาไทย</label>
-                                    <input name='th_name' className='form-control' defaultValue={props.data.th_name} onChange={handleChange} />
+        <Modal show={props.show} onHide={props.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>แก้ไขวารสาร: <span className="text-primary">{props.data?.en_name}</span></Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleUpdate}>
+                <Modal.Body className="row g-3">
+                    <div>
+                        <label className="form-label">ชื่อภาษาไทย</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="ไม่มีให้ใส่ -"
+                            value={data?.th_name}
+                            name="th_name"
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="form-label">ชื่อภาษาอังกฤษ</label>
+                        <input
+                            type="text"
+                            placeholder="ไม่มีให้ใส่ -"
+                            className="form-control"
+                            value={data?.en_name}
+                            name="en_name"
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <p className="fw-bold mb-0">รายละเอียดวารสาร</p>
+                        <div className="mb-3">
+                            <Button type="button" onClick={handleAdd} variant="success">
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มวารสาร
+                            </Button>
+                        </div>
+                        <div className="row g-3">
+                            {data?.desc.map((items, index) => (
+                                <div key={index}>
+                                    <label className="form-label">
+                                        ข้อที่: {index + 1}
+                                        <Button type="button" variant="" onClick={() => handleDelete(index)} className="text-danger">
+                                            <i className="bi bi-trash"></i>
+                                        </Button>
+                                    </label>
+                                    <textarea
+                                        value={items}
+                                        rows={3}
+                                        className="form-control"
+                                        onChange={e => handleChangeDesc(e, index)}
+                                        required
+                                    />
                                 </div>
-                                <div className='col-12'>
-                                    <label className='form-label'>ชื่อภาษาอังกฤษ</label>
-                                    <input name='en_name' className='form-control' defaultValue={props.data.en_name} onChange={handleChange} />
-                                </div>
-                                <div className='col-12'>
-                                    <label className='form-label'>เป้าหมาย</label>
-                                    <div className='mb-3'>
-                                        <button type='button' onClick={handleAdd} className='btn btn-primary'>+ Add</button>
-                                    </div>
-                                    {props.data.desc.map((items, index) => (
-                                        <div className='mb-3' key={index}>
-                                            <textarea className='form-control' defaultValue={items} onChange={e => handleDesc(e, index)} />
-                                        </div>
-                                    ))}
-                                </div>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="" onClick={props.handleClose}>
-                                    Close
-                                </Button>
-                                <Button variant="primary" type='submit'>
-                                    Update
-                                </Button>
-                            </Modal.Footer>
-                        </form>
-                    </>
-                }
-            </Modal>
-        </div>
+                            ))}
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={props.handleClose}>
+                        ปิด
+                    </Button>
+                    <Button disabled={isLoading} variant="primary" type='submit'>
+                        อัพเดท
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
     )
 }

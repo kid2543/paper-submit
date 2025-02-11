@@ -42,7 +42,7 @@ function ReviewResult() {
 
   return (
     <div className='container my-5'>
-      <div className='card border-0 shadow-sm mb-5'>
+      <div className='card  shadow-sm mb-5'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center'>
             <h4 className='fw-bold'>ผลการตรวจบทความ</h4>
@@ -52,7 +52,7 @@ function ReviewResult() {
 
       </div>
       {data &&
-        <div className='card border-0 shadow-sm'>
+        <div className='card  shadow-sm'>
           <div className='card-body'>
             <p>
               ข้อแนะนำ: {data.suggestion}

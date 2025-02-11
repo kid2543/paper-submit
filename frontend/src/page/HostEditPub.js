@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-
+import { toast } from 'react-toastify'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 function HostEditPub() {
 
@@ -11,6 +12,10 @@ function HostEditPub() {
 
     const confr_id = sessionStorage.getItem("host_confr")
 
+    //modal
+    const [show, setShow] = useState(false)
+    const handleShow = () => setShow(true)
+    const handleClose = () => setShow(false)
 
     // handle check in publcation table
     const handleCheck = (e) => {
@@ -25,20 +30,18 @@ function HostEditPub() {
     // update publication list
     const handleUpdate = async (e) => {
         e.preventDefault()
-        if (window.confirm('ยืนยันข้อมูลหรือไม่ ?')) {
-            try {
-                const res = await axios.patch('/api/conference', {
-                    _id: confr_id,
-                    publication: newPub
-                })
-                setPubConfr(res.data.publication)
-                alert('Success')
-            } catch (error) {
-                alert('Error')
-                console.log(error)
-            }
-        } else {
-            return
+        try {
+            const res = await axios.patch('/api/conference', {
+                _id: confr_id,
+                publication: newPub
+            })
+            setPubConfr(res.data.publication)
+            toast.success('แก้ไขรายชื่อวารสารสำเร็จ')
+            handleClose()
+            setNewPub([])
+        } catch (error) {
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกคร้ง')
+            console.log(error)
         }
     }
 
@@ -71,16 +74,25 @@ function HostEditPub() {
     )
 
     return (
-        <div className='py-5'>
-            <div className='mb-4'>
-                <h4 className='fw-bold'>วารสาร</h4>
-                <p className='text-muted'>แก้ไขรายการวารสารได้ที่นี่</p>
+        <div>
+            <ConfirmDialog
+                show={show}
+                handleClose={handleClose}
+                header='ยืนยันการเลือกวารสาร ?'
+                text='เมื่อทำการเลือกวารสารใหม่วารสารที่เคยเลือกไว้จะหายไป ต้องการยืนยันการเลือกหรือไม่ ?'
+                handleSubmit={handleUpdate}
+            />
+            <div className='mb-3 card'>
+                <div className="card-body">
+                    <h4 className='fw-bold card-title'>วารสาร</h4>
+                    <p className='text-muted card-text'>แก้ไขรายการวารสารได้ที่นี่</p>
+                </div>
             </div>
-            <div className='card border-0 shadow-sm mb-4'>
+            <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
-                    <div className='mb-4'>
-                        <h6 className='fw-bold'>รายชื่อวารสารในงานประชุม</h6>
-                        <small className='text-muted'>เลือกวารสารที่ต้องการทั้งหมดแล้วกดบันทึกเพื่อ หากต้องการเปลี่ยนให้เลือกวารสารทั้งหมดใหม่อีกครั้ง</small>
+                    <div className='mb-3'>
+                        <h6 className='fw-bold card-title'>รายชื่อวารสารในงานประชุม</h6>
+                        <small className='text-muted card-text'>เลือกวารสารที่ต้องการทั้งหมดแล้วกดบันทึกเพื่อ หากต้องการเปลี่ยนให้เลือกวารสารทั้งหมดใหม่อีกครั้ง</small>
                     </div>
                     <ol>
                         {pubConfr.length <= 0 && <div>ไม่พบข้อมูล</div>}
@@ -92,10 +104,10 @@ function HostEditPub() {
                     </ol>
                 </div>
             </div>
-            <div className='card border-0 shadow-sm'>
+            <div className='card  shadow-sm'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center mb-4'>
-                        <h6 className='fw-bold'>รายชื่อวารสารทั้งหมด</h6>
+                    <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <h6 className='fw-bold card-title'>รายชื่อวารสารทั้งหมด</h6>
                         <div>
                             <input className='form-control' placeholder='ค้นหาวารสาร' onChange={e => setQuery(e.target.value)} />
                         </div>
@@ -126,7 +138,12 @@ function HostEditPub() {
                             </tbody>
                         </table>
                         <div className='text-end'>
-                            <button className='btn btn-success' type='submit' disabled={newPub.length <= 0}>
+                            <button
+                                onClick={handleShow}
+                                className='btn btn-success'
+                                type='button'
+                                disabled={newPub.length <= 0}
+                            >
                                 <i className='bi bi-floppy me-2'></i>
                                 บันทึก
                             </button>

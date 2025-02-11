@@ -1,14 +1,15 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 // react-bootstrap
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, Breadcrumb } from 'react-bootstrap'
 
 function HostCreateCommit() {
 
   const [error, setError] = useState(null)
+  const cate_id = sessionStorage.getItem('cate_id')
 
   // comfrim modal state
   const [show, setShow] = useState(false)
@@ -62,7 +63,7 @@ function HostCreateCommit() {
         </div>
       )
       setModalData({
-        name:'',
+        name: '',
         email: '',
         password: '',
         username: '',
@@ -78,59 +79,69 @@ function HostCreateCommit() {
   }
 
   return (
-    <div className='px-5 py-4' style={{ minHeight: '100vh' }}>
-      <ToastContainer />
-      <div className='mb-4'>
-        <h4 className='fw-bold'>เพิ่มกรรมการ</h4>
-        <p className='text-muted'>กรอกรายละเอียดกรรมการและเพิ่มกรรมการได้ที่นี่</p>
-      </div>
-      <div className='card border-0 shadow-sm'>
+      <div>
+        <div className='card mb-3' >
+          <div className="card-body">
+            <Breadcrumb>
+              <Breadcrumb.Item href="/host/edit/category">หัวข้องานประชุม</Breadcrumb.Item>
+              <Breadcrumb.Item href={`/host/edit/category/${cate_id}`}>
+                แก้ไขหัวข้องานประชุม
+              </Breadcrumb.Item>
+              <Breadcrumb.Item active>
+                เพิ่มกรรมการ
+              </Breadcrumb.Item>
+            </Breadcrumb>
+            <h4 className='fw-bold card-title'>เพิ่มกรรมการ</h4>
+            <p className='text-muted card-text'>กรอกรายละเอียดกรรมการและเพิ่มกรรมการได้ที่นี่</p>
+          </div>
+        </div>
+        <div className='card  shadow-sm'>
 
-        <div className='card-body'>
-          <form onSubmit={handleShow}>
-            <ConfirmCreateCommittee
-              show={show}
-              handleClose={handleClose}
-              data={modalData}
-              handleCreate={handleCreate}
-            />
-            <div className='row gy-3'>
-              <div className='col-12 col-md-12'>
-                <label className='form-label'>ชื่อ - นามสกุล</label>
-                <input required className='form-control' name='name' value={modalData.name} onChange={e => handleChange(e)} type='text' />
+          <div className='card-body'>
+            <form onSubmit={handleShow}>
+              <ConfirmCreateCommittee
+                show={show}
+                handleClose={handleClose}
+                data={modalData}
+                handleCreate={handleCreate}
+              />
+              <div className='row gy-3'>
+                <div className='col-12 col-md-12'>
+                  <label className='form-label'>ชื่อ - นามสกุล</label>
+                  <input required className='form-control' name='name' value={modalData.name} onChange={e => handleChange(e)} type='text' />
+                </div>
+                <div className='col-12 col-md-12'>
+                  <label className='form-label'>อีเมล</label>
+                  <input required className='form-control' name='email' value={modalData.email} onChange={e => handleChange(e)} type='email' />
+                </div>
+                <div className='col-12'>
+                  <label className='form-label'>ชื่อผู้ใช้</label>
+                  <input required className='form-control' name='username' value={modalData.username} onChange={e => handleChange(e)} type='text' />
+                </div>
+                <div className='col-12 col-md-6'>
+                  <label className='form-label'>รหัสผ่าน</label>
+                  <input required className='form-control' name='password' type='password' value={modalData.password} onChange={e => handleChange(e)} />
+                </div>
+                <div className='col-12 col-md-6'>
+                  <label className='form-label'>ยืนยันรหัสผ่าน</label>
+                  <input required className='form-control' name='confirm_password' value={modalData.confirm} onChange={e => handleChange(e)} pattern={modalData.password} type='password' />
+                </div>
               </div>
-              <div className='col-12 col-md-12'>
-                <label className='form-label'>อีเมล</label>
-                <input required className='form-control' name='email' value={modalData.email} onChange={e => handleChange(e)} type='email' />
+              <div className='text-end mt-3'>
+                <button type='submit' className='btn btn-primary'>
+                  <i className='bi bi-plus-lg me-2'></i>
+                  เพิ่ม
+                </button>
               </div>
-              <div className='col-12'>
-                <label className='form-label'>ชื่อผู้ใช้</label>
-                <input required className='form-control' name='username' value={modalData.username} onChange={e => handleChange(e)} type='text' />
-              </div>
-              <div className='col-12 col-md-6'>
-                <label className='form-label'>รหัสผ่าน</label>
-                <input required className='form-control' name='password' type='password' value={modalData.password} onChange={e => handleChange(e)} />
-              </div>
-              <div className='col-12 col-md-6'>
-                <label className='form-label'>ยืนยันรหัสผ่าน</label>
-                <input required className='form-control' name='confirm_password' value={modalData.confirm} onChange={e => handleChange(e)} pattern={modalData.password} type='password' />
-              </div>
-            </div>
-            <div className='text-end mt-3'>
-              <button type='submit' className='btn btn-primary'>
-                <i className='bi bi-plus-lg me-2'></i>
-                เพิ่ม
-              </button>
-            </div>
-            {error &&
-              <div className='text-danger'>
-                {error}
-              </div>
-            }
-          </form>
+              {error &&
+                <div className='text-danger'>
+                  {error}
+                </div>
+              }
+            </form>
+          </div>
         </div>
       </div>
-    </div>
   )
 }
 
@@ -143,32 +154,32 @@ function ConfirmCreateCommittee(props) {
       <Modal.Header closeButton>
         <Modal.Title>ยืนยันข้อมูลผู้ใช้</Modal.Title>
       </Modal.Header>
-        <Modal.Body>
-          {props.data &&
-            <div>
-              <label className='form-label'>
-                ชื่อ - นามสกุล
-                <input className='form-control-plaintext' readOnly placeholder={props.data.name} />
-              </label>
-              <label className='form-label'>
-                อีเมล
-                <input className='form-control-plaintext' readOnly placeholder={props.data.email} />
-              </label>
-              <label className='form-label'>
-                ชื่อผู้ใช้งาน
-                <input className='form-control-plaintext' readOnly placeholder={props.data.username} />
-              </label>
-            </div>
-          }
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="" onClick={props.handleClose}>
-            ยกเลิก
-          </Button>
-          <Button variant="primary" onClick={props.handleCreate}>
-            ยืนยัน
-          </Button>
-        </Modal.Footer>
+      <Modal.Body>
+        {props.data &&
+          <div>
+            <label className='form-label'>
+              ชื่อ - นามสกุล
+              <input className='form-control-plaintext' readOnly placeholder={props.data.name} />
+            </label>
+            <label className='form-label'>
+              อีเมล
+              <input className='form-control-plaintext' readOnly placeholder={props.data.email} />
+            </label>
+            <label className='form-label'>
+              ชื่อผู้ใช้งาน
+              <input className='form-control-plaintext' readOnly placeholder={props.data.username} />
+            </label>
+          </div>
+        }
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="" onClick={props.handleClose}>
+          ยกเลิก
+        </Button>
+        <Button variant="primary" onClick={props.handleCreate}>
+          ยืนยัน
+        </Button>
+      </Modal.Footer>
     </Modal>
   )
 }

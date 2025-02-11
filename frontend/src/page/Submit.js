@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import UnAuthorized from './UnAuthorized';
 
 function Submit() {
 
-    const { id } = useParams()
+    const id = sessionStorage.getItem('send_paper')
     const [paper, setPaper] = useState([{
         name: "",
         file: null
@@ -13,14 +15,16 @@ function Submit() {
     const [cate, setCate] = useState([]);
     const [pub, setPub] = useState([]);
     const [err, setErr] = useState("")
-
     const navigate = useNavigate()
 
+    const handleDelFile = (index) => {
+        setPaper(paper.filter((item, idx) => idx !== index))
+    }
 
     const handleForm = async (e) => {
         e.preventDefault()
-        if(paper.length <= 0) {
-            alert('กรุณาเลือกไฟล์')
+        if (paper.length <= 0) {
+            toast.warning('กรุณาเลือกไฟล์')
             return
         }
         const {
@@ -57,23 +61,26 @@ function Submit() {
             formData.append('paper_code', `${confr.confr_code}-${cateCode[1]}-`)
             const json = Object.fromEntries(formData.entries())
             const res = await axios.post('/api/paper/create', json)
-            for(let i in paper) {
+            for (let i in paper) {
                 const formData = new FormData()
                 formData.append('paper_id', res.data._id)
                 formData.append('file', paper[i].file)
                 formData.append('name', paper[i].name)
                 await axios.post('/api/paperfile', formData)
             }
-            alert('ส่งบทความสำเร็จ')
-            navigate('/setting')
+            toast.success('ส่งบทความสำเร็จ')
+            setTimeout(
+                navigate('/setting'), 1000
+            )
+
         } catch (error) {
-            alert("ไม่สามารถสร้างงานประชุมได้: " + error.message)
+            toast.error("เกิดข้อผิดพลาด ไม่สามารถส่งบทความได้ กรุณาลองใหม่อีกครั้ง")
             console.log(error)
             setErr(error.response?.data.error)
         }
     }
 
-    const handleChangeFileName = (e,index) => {
+    const handleChangeFileName = (e, index) => {
         const { value } = e.target
         let temp = [...paper]
         temp[index].name = value
@@ -111,8 +118,16 @@ function Submit() {
         getCateCode();
     }, [id])
 
+    if (!id) {
+        return (
+            <div style={{ padding: '128px 0px' }}>
+                <UnAuthorized />
+            </div>
+        )
+    }
+
     return (
-        <div>
+        <div style={{ padding: '128px 0px' }}>
             <div className='bg-dark position-fixed w-100 top-0' style={{ height: "480px", zIndex: -1 }}>
             </div>
             <form className='container my-5' onSubmit={handleForm}>
@@ -179,24 +194,36 @@ function Submit() {
                                     <div>
                                         <label className='form-label'>เบอร์โทรศัพท์</label>
                                         <input name='contact' pattern='[0-9]{10}' maxLength={10} className='form-control' required />
+                                        <div className="form-text">
+                                            เฉพาะหมายเลขจำนวน 10 หลักเท่านั้น
+                                        </div>
                                     </div>
                                     <div>
                                         <label className='form-label'>อีเมล</label>
                                         <input type='email' className='form-control' name='email' required />
                                     </div>
                                     <div>
-                                        <button type='button' onClick={() => setPaper([...paper, {}])} className='btn btn-primary'>เพิ่มไฟล์</button>
+                                        <div>
+                                            กรณีมีมากกว่า 1 ไฟล์
+                                        </div>
+                                        <button type='button' onClick={() => setPaper([...paper, {}])} className='btn btn-success'>
+                                            <i className="bi bi-plus-lg me-2"></i>
+                                            เพิ่มไฟล์
+                                        </button>
                                     </div>
                                     {paper.map((items, index) => (
-                                        <div key={index}>
-                                            <div>
+                                        <div key={index} className="mb-3">
+                                            <div className="mb-3">
                                                 <label className='form-label'>ชื่อไฟล์</label>
-                                                <input onChange={e => handleChangeFileName(e, index)} className='form-control' type='text' required />
+                                                <input onChange={e => handleChangeFileName(e, index)} value={items.name} className='form-control' type='text' required />
                                             </div>
                                             <div>
-                                            <label className='form-label'>แนบไฟล์เอกสาร</label>
-                                            <input onChange={e => handleChangeFile(e, index)} type='file' accept='.doc, .pdf' className='form-control' required />
-                                        </div>
+                                                <label className='form-label'>แนบไฟล์เอกสาร</label>
+                                                <input onChange={e => handleChangeFile(e, index)} type='file' accept='.doc, .pdf' className='form-control' required />
+                                            </div>
+                                            <div className="text-end my-2">
+                                                <button type='button' onClick={() => handleDelFile(index)} className="btn btn-danger">ลบ</button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

@@ -50,7 +50,8 @@ const listReviewer = async (req, res) => {
 
     const hasDuplicates = (arr) => arr.length !== new Set(arr).size;
 
-    let check = []
+    let check = 0
+    let newList = []
 
     if(!mongoose.Types.ObjectId.isValid(_id)){
         return res.status(400).json({error: "ไม่ใช่รหัสหัวข้อ"})
@@ -61,20 +62,22 @@ const listReviewer = async (req, res) => {
     }
 
     for(let i in list) {
-        if(!mongoose.Types.ObjectId.isValid(list[i])){
-            check.push(list[i])
+        if(!mongoose.Types.ObjectId.isValid(list[i]._id)){
+            check = check + 1
+        } else {
+            newList.push(list[i]._id)
         }
     }
 
-    if(check.length > 0) {
-        return res.status(400).json({error: 'พบข้อมูลที่ไม่ใช่รหัสกรรมการ', check})
+    if(check > 0) {
+        return res.status(400).json({error: 'พบข้อมูลที่ไม่ใช่รหัสกรรมการ'})
     }
 
     try {
         const category = await Category.findByIdAndUpdate(
             _id,
             {
-                reviewer_list: list
+                reviewer_list: newList
             },
             {
                 new: true

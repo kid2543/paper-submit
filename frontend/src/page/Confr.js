@@ -7,8 +7,13 @@ import dayjs from 'dayjs'
 import Logo from '../asset/logo.png'
 
 // react bootstrap
-import Accordion from 'react-bootstrap/Accordion';
-import Card from 'react-bootstrap/Card';
+import {
+    Tooltip,
+    OverlayTrigger,
+    Card,
+    Accordion,
+} from 'react-bootstrap'
+import UnAuthorized from './UnAuthorized'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -19,8 +24,10 @@ function Confr() {
     const [inv, setInv] = useState([])
     const [partner, setPartner] = useState([])
     const [err, setErr] = useState('')
+    const [isOpen, setIsOpen] = useState(true)
 
     const { id } = useParams()
+    const host_confr = sessionStorage.getItem('host_confr')
 
     const navigate = useNavigate()
 
@@ -29,6 +36,9 @@ function Confr() {
             try {
                 const res = await axios.get('/api/conference/single/' + id)
                 setData(res.data)
+                if (res.data.status === false && host_confr !== id) {
+                    setIsOpen(false)
+                }
                 const cate = await axios.get('/api/category/' + id)
                 setTopic(cate.data)
                 const Inv = await axios.get('/api/inv/' + id)
@@ -43,34 +53,54 @@ function Confr() {
             }
         }
         fetchData()
-    }, [id])
+    }, [id, host_confr])
 
-    console.log(data)
+    const handleSendPaper = (confr_id) => {
+        sessionStorage.setItem('send_paper', confr_id)
+        navigate('/submit')
+    }
+
+    if (!isOpen) {
+        return <UnAuthorized />
+    }
+
 
     return (
         <div>
             {err}
             {data &&
-                <div className='bg-light'>
+                <div className='bg-light bg-gradient'>
                     <section id='1' className='container' style={{ padding: "180px 0px" }}>
                         <div className='text-center'>
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
-                            <p className='text-muted'>{data.sub_title}</p>
+                            <p className='text-muted'>{data.sub_title} <br /> {data.confr_code} </p>
                             <div>
-                                <button className='btn btn-primary' disabled={!topic && !data.publication} onClick={() => navigate('/submit/' + id)}>ส่งบทความ</button>
+                                {topic && data.publication ? (
+                                    <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
+                                        <i className="bi bi-send me-2"></i>
+                                        ส่งบทความเลย!
+                                    </button>
+                                ) : (
+                                    <p>จะเปิดให้ส่งบทความเร็วๆ นี้</p>
+                                )
+                                }
                             </div>
                         </div>
                     </section>
-                    <section id='2' className='container' style={{ padding: "64px 0px" }}>
-                        <div className='text-center'>
-                            <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
-                        </div>
-                        <div className='row g-3'>
-                            {partner?.map((items) => (
-                                <div className='col-12 col-md-3' key={items._id}>
-                                    <img src={items.img} alt={items.desc} className='img-fluid' />
-                                </div>
-                            ))}
+                    <section className="text-bg-secondary">
+                        <div id='2' className='container' style={{ padding: "64px 0px" }}>
+                            <div className='text-center'>
+                                <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
+                            </div>
+                            <div className='row g-3'>
+                                {partner?.map((items) => (
+                                    <div className='col-auto' key={items._id}>
+                                        <TriggerExample name={items.desc}>
+                                            <img src={`/uploads/${items.image}`} alt={items.desc} height={128} />
+                                        </TriggerExample>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </section>
                     <div className='bg-white' style={{ padding: '180px 0px 64px 0px' }}>
@@ -149,20 +179,27 @@ function Confr() {
                                         <div className='mb-4'>
                                             <h4 className='fw-bold'>กำหนดการส่งบทความ</h4>
                                         </div>
-                                        <div className='table-responsive'>
-                                            <table className='table' style={{ width: '800px' }}>
-                                                <thead className='table-secondary'>
-                                                    <tr>
-                                                        <th>วันที่</th>
-                                                        <th>รายละเอียด</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {data.important_date?.map((items) => (
-                                                        <tr key={items._id}>
-                                                            <td>{dayjs(items.start_date).format('DD MMM, YYYY')} - {dayjs(items.end_date).format('DD MMM, YYYY')}</td>
-                                                            <td>{items.date_name}</td>
-                                                            {/* <div className='card border-0 shadow'>
+                                        <div className="card" >
+                                            <div className="card-body">
+                                                <div className='table-responsive'>
+                                                    <table className='table' style={{ width: '800px' }}>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>วันที่</th>
+                                                                <th>รายละเอียด</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {data.important_date?.map((items) => (
+                                                                <tr key={items._id}>
+                                                                    <td>{dayjs(items.start_date).format('DD MMM YYYY')} {items.end_date &&
+                                                                        <>
+                                                                            - {dayjs(items.end_date).format('DD MMM YYYY')}
+                                                                        </>
+                                                                    }
+                                                                    </td>
+                                                                    <td>{items.date_name}</td>
+                                                                    {/* <div className='card  shadow'>
                                                                 <div className='card-body'>
                                                                     <div className='row g-3'>
                                                                         <div className='col-12 col-md-4 border-end border-3 border-primary'>
@@ -176,10 +213,12 @@ function Confr() {
                                                                 </div>
                                                             </div> */}
 
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </section>
 
@@ -190,35 +229,39 @@ function Confr() {
                                             <div className='mb-4'>
                                                 <h4 className='fw-bold'>กำหนดการงานประชุม</h4>
                                             </div>
-                                            <div className='table-responsive'>
-                                                <table className='table' style={{ width: "800px" }}>
-                                                    <thead className='table-secondary'>
-                                                        <tr>
-                                                            <th style={{ width: '128px' }}>เวลา <small className=' d-block text-muted'>(24-hour clock)</small></th>
-                                                            <th>รายละเอียด</th>
-                                                            <th style={{ width: '260px' }}>กรรมการ</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {data.schedule.map(items => (
-                                                            <tr key={items._id}>
-                                                                <td>{items.start} - {items.end}</td>
-                                                                <td>
-                                                                    {items.items?.map((p, index) => (
-                                                                        <p key={index}>{p}</p>
-                                                                    ))}
-                                                                </td>
-                                                                <th>
-                                                                    <ol>
-                                                                        {items.session?.map((s, index) => (
-                                                                            <li key={index} className='mb-0'>{s}</li>
-                                                                        ))}
-                                                                    </ol>
-                                                                </th>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                            <div className="card">
+                                                <div className="card-body">
+                                                    <div className='table-responsive'>
+                                                        <table className='table' style={{ width: "800px" }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style={{ width: '128px' }}>เวลา <small className=' d-block text-muted'>(24-hour clock)</small></th>
+                                                                    <th>รายละเอียด</th>
+                                                                    <th style={{ width: '260px' }}>กรรมการ</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {data.schedule.map(items => (
+                                                                    <tr key={items._id}>
+                                                                        <td>{items.start} - {items.end}</td>
+                                                                        <td>
+                                                                            {items.items?.map((p, index) => (
+                                                                                <p key={index}>{p}</p>
+                                                                            ))}
+                                                                        </td>
+                                                                        <th>
+                                                                            <ol>
+                                                                                {items.session?.map((s, index) => (
+                                                                                    <li key={index} className='mb-0'>{s}</li>
+                                                                                ))}
+                                                                            </ol>
+                                                                        </th>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </section>
                                     }
@@ -231,12 +274,15 @@ function Confr() {
                                             </div>
                                             <div className='list-group'>
                                                 {data.publication?.map((items) => (
-                                                    <div className='list-group-item list-group-item-secondary' key={items._id}>
-                                                        <div>
-                                                            <h5>{items.en_name}</h5>
-                                                            <small>{items.th_name}</small>
+                                                    <div className='list-group-item' key={items._id}>
+                                                        <div className="mb-3">
+                                                            <h6 className="fw-bold">{items.en_name} / {items.th_name}</h6>
                                                         </div>
-                                                        <p className='text-muted'>{items.desc}</p>
+                                                        <p className="text-dark">
+                                                            <span className="ms-4">
+                                                                {items.desc}
+                                                            </span>
+                                                        </p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -248,11 +294,15 @@ function Confr() {
                                             <div className='mb-4'>
                                                 <h4 className='fw-bold mb-3'>พิธีกรประจำงานประชุม</h4>
                                             </div>
-                                            <div className='row g-3'>
+                                            <div className='row row-cols-1 row-cols-lg-2 g-3'>
                                                 {inv?.map((items) => (
-                                                    <div className='col-12 col-lg-4' key={items._id}>
-                                                        <Card>
-                                                            <Card.Img variant="top" src={Logo} />
+                                                    <div className='col' key={items._id}>
+                                                        <Card className="h-100">
+                                                            {items.img ? (
+                                                                <Card.Img variant="top" src={`/uploads/${items.img}`} alt={items.name} style={{ height: '30rem', objectFit: 'cover' }} />
+                                                            ) : (
+                                                                <Card.Img variant="top" src={Logo} alt={items.name} />
+                                                            )}
                                                             <Card.Body>
                                                                 <Card.Title>{items.name}</Card.Title>
                                                                 <Card.Subtitle className='mb-3 text-muted'>{items.keynote}</Card.Subtitle>
@@ -260,7 +310,16 @@ function Confr() {
                                                                     {items.desc}
                                                                 </Card.Text>
                                                                 {items.cv &&
-                                                                    <Link to={`${api}/uploads/${items.cv}`} target='_blank' rel='noreferrer'>{items.cv}</Link>
+                                                                    <p>CV:
+                                                                        <Link
+                                                                            to={`${api}/uploads/${items.cv}`}
+                                                                            target='_blank'
+                                                                            rel='noreferrer'
+                                                                            className='ms-2'
+                                                                        >
+                                                                            {items.cv}
+                                                                        </Link>
+                                                                    </p>
                                                                 }
                                                             </Card.Body>
                                                         </Card>
@@ -281,3 +340,21 @@ function Confr() {
 }
 
 export default Confr
+
+function TriggerExample({ children, name }) {
+    const renderTooltip = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            {name}
+        </Tooltip>
+    );
+
+    return (
+        <OverlayTrigger
+            placement="auto"
+            delay={{ show: 250, hide: 400 }}
+            overlay={renderTooltip}
+        >
+            {children}
+        </OverlayTrigger>
+    );
+}

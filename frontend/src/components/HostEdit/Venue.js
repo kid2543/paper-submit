@@ -9,6 +9,7 @@ import LoadingPage from '../LoadingPage';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function Venue() {
 
@@ -29,22 +30,25 @@ function Venue() {
     }
 
     return (
-        <div className='py-5'>
-            <div className='row gy-5'>
+        <div>
+            <div className='row g-3'>
                 <ModalVenue data={data} setData={setData} show={showModal} handleClose={() => setShowModal(false)} />
                 <ModalUploadVenue setData={setData} show={showModalA} handleClose={() => setShowModalA(false)} />
                 <div className='col-12'>
-                    <div className='mb-4'>
-                        <h4 className='fw-bold'>สถานที่จัดงาน</h4>
-                        <p className='text-muted'>แก้ไขสถานที่จัดงานและอัพโหลดรูปสถานที่จัดงานได้ที่นี่</p>
+                    <div className='mb-3 card'>
+                        <div className='card-body'>
+                            <h4 className='fw-bold card-title'>สถานที่จัดงาน</h4>
+                            <p className='text-muted card-text'>แก้ไขสถานที่จัดงานและอัพโหลดรูปสถานที่จัดงานได้ที่นี่</p>
+                        </div>
                     </div>
-                    <div className='card border-0 shadow-sm'>
+                    <div className='card  shadow-sm'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-3'>
                                 <h6 className='fw-bold mb-0'>รายละเอียดสถานที่จัดงาน</h6>
                                 <div>
-                                    <button className='btn me-2' onClick={() => setShowModal(true)}>
-                                        <i className='bi bi-pencil-square'></i>
+                                    <button className='btn btn-outline-dark me-2' onClick={() => setShowModal(true)}>
+                                        <i className='bi bi-pencil-square me-2'></i>
+                                        แก้ไขรายละเอียด
                                     </button>
                                     <button className='btn btn-primary' onClick={() => setShowModalA(true)}>
                                         <span className='me-2'>
@@ -57,7 +61,7 @@ function Venue() {
                             <div>
                                 <div>
                                     {data?.venue_image &&
-                                        <img src={'/uploads/' + data?.venue_image} alt='mock' className='img-fluid' />
+                                        <img src={'/uploads/' + data?.venue_image} alt={data?.venue.name} className='img-fluid' />
                                     }
                                 </div>
                                 <div>
@@ -91,11 +95,11 @@ function ModalVenue(props) {
                 venue: edit
             })
             props.setData(update.data)
-            alert('Success')
+            toast.success('อัพโหลดสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -142,10 +146,10 @@ function ModalVenue(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>
@@ -165,11 +169,11 @@ function ModalUploadVenue(props) {
             try {
                 const res = await axios.patch('/api/conference/venue/' + sessionStorage.getItem('host_confr'), formData)
                 props.setData(res.data)
-                alert('Success')
+                toast.success('อัพเดทสำเร็จ')
                 props.handleClose()
             } catch (error) {
                 console.log(error)
-                alert('Error')
+                toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             }
         }
     }
@@ -188,10 +192,10 @@ function ModalUploadVenue(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!newFile}>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>

@@ -29,7 +29,10 @@ const {
     updatePaperAward,
     getPaperByCategory,
     getPaperAward,
-    sendEmailPdf
+    sendEmailPdf,
+    sendCertificate,
+    getPaperArchive,
+    getPaperOwnerAdmin
 } = require('../controllers/paper_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
@@ -52,7 +55,7 @@ router.get('/host/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getReviewPape
 router.get('/single/:id', publicPaperSingle)
 
 // get all public
-router.get('/all/:id', publicPaperAll)
+router.get('/all', publicPaperAll)
 
 // get for conference
 router.get('/confr/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getPaperForConference)
@@ -67,7 +70,7 @@ router.get('/category/award/:id', verifyToken, getPaperAward)
 router.patch('/cancel', verifyToken, cancelPaper)
 
 //create paper
-router.post('/create', verifyToken, checkRole(['AUTHOR', 'ADMIN']), createPaper)
+router.post('/create', verifyToken, checkRole(['AUTHOR']), createPaper)
 
 // upload close name file
 router.patch('/close/file', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), uploadCloseNamePaper)
@@ -90,6 +93,9 @@ router.patch('/award', verifyToken, checkRole(['ADMIN', 'HOST']), updatePaperAwa
 // search paper
 router.get('/search', verifyToken, checkRole(['ADMIN']), searchPaper)
 
+// get paper is pass
+router.get('/archive', verifyToken, checkRole(['AUTHOR']), getPaperArchive)
+
 // host search paper
 router.get('/host/search/:id', verifyToken, checkRole(['HOST', 'ADMIN']), hostSeachPaper)
 
@@ -99,6 +105,8 @@ router.get('/author/search', verifyToken, checkRole(['AUTHOR', 'ADMIN']), author
 // get paper for admin
 router.get('/admin/:id', verifyToken, checkRole(['ADMIN']), adminPaper)
 
+// get paper by owner id by admin
+router.get('/admin/owner/:id', verifyToken, checkRole(['ADMIN']), getPaperOwnerAdmin)
 
 // delete paper
 router.delete('/:id', verifyToken, checkRole(['ADMIN']), deletePaper)
@@ -108,6 +116,9 @@ router.patch('/edit/status/:id', verifyToken, checkRole(['AUTHOR']), editPaperSt
 
 // send email
 router.post('/send/email', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), sendEmailPdf)
+
+// send certificate
+router.post('/send/certificate', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), sendCertificate)
 
 
 module.exports = router

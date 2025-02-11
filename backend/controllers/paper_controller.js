@@ -6,6 +6,7 @@ const editPaperFile = require('../models/paper_edit')
 const paperAssign = require('../models/paper_assign')
 const paperAssignHistory = require('../models/paper_assign_history')
 const Notification = require('../models/notification')
+const Counters = require('../models/counter')
 
 
 const nodemailer = require('nodemailer')
@@ -21,6 +22,20 @@ const getPapers = async (req, res) => {
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
+    }
+}
+
+// get paper when paper is 
+const getPaperArchive = async (req, res) => {
+
+    const { _id } = req.user
+
+    try {
+        const paper = await Paper.find({owner: _id, result: 'ACCEPT', award_rate: {$ne : null}})
+        res.status(200).json(paper)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({error : error.message})
     }
 }
 
@@ -75,7 +90,20 @@ const getReviewPaper = async (req, res) => {
     }
 }
 
-//create paper
+// สร้าง document counter จาก id
+
+// นับรหัสบทความ นำเอา รหัส Category มาใส่
+async function getNextSequenceValue(sequenceId) {
+    console.log(sequenceId)
+    const sequenceDocument = await Counters.findOneAndUpdate(
+       { _id: sequenceId },
+       { $inc: { sequence_value: 1 } },
+       {upsert: true, new: true }
+    );
+    return sequenceDocument.sequence_value
+ }
+
+// create paper
 const createPaper = async (req, res) => {
     const {
         title,
@@ -104,8 +132,8 @@ const createPaper = async (req, res) => {
     }
 
     try {
-        const paperNumber = await Paper.countDocuments({ cate_code })
-        let paperCode = paper_code + (paperNumber + 1)
+        let paperId = await getNextSequenceValue(cate_code)
+        let paperCode = paper_code + paperId
         const paper = await Paper.create({
             title,
             paper_code: paperCode,
@@ -123,7 +151,7 @@ const createPaper = async (req, res) => {
             group,
             keyword,
         })
-        await Notification.create({ user_id: confr_code, title: 'แจ้งเตือนบทความใหม่', mssage: 'มีบทความใหม่ถูกส่งเข้ามา' })
+        await Notification.create({ user_id: confr_code, title: 'แจ้งเตือนบทความใหม่', message: 'มีบทความใหม่ถูกส่งเข้ามา กรุณาตรวจสอบ' })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -235,7 +263,7 @@ const updatePaperResult = async (req, res) => {
 
 // cancel paper
 const cancelPaper = async (req, res) => {
-    const { _id } = req.body
+    const { _id } = req.user
 
     if (!mongoose.Types.ObjectId.isValid(_id)) {
         return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
@@ -251,7 +279,7 @@ const cancelPaper = async (req, res) => {
             return res.status(400).json({ error: 'ไม่สามารถยกเลิกบทความได้เนื่องจากมอบหมายให้กรรมการแล้ว' })
         const paper = await Paper.findByIdAndUpdate(_id, { status: 'CANCEL' })
         // create notification
-        await createNotification(paper.owner, `ยกเลิกบทความสำเร็จ`, `บทความ ${paper.paper_code} ถูกยกเลิกแล้ว`)
+        await createNotification(req.user._id, `ยกเลิกบทความสำเร็จ`, `บทความ ${paper.paper_code} ถูกยกเลิกแล้ว`)
         res.status(204).send('Cancel paper success')
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -280,7 +308,7 @@ const publicPaperSingle = async (req, res) => {
 // get all public
 const publicPaperAll = async (req, res) => {
     try {
-        const paper = await Paper.find({ "published.status": true })
+        const paper = await Paper.find({status: 'SUCCESS', result: 'ACCEPT', award_rate: {$ne: null} })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -456,6 +484,22 @@ const adminPaper = async (req, res) => {
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
+    }
+}
+
+// get paper list by owner from admin
+const getPaperOwnerAdmin = async (req, res) => {
+    const { id } = req.params
+    
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({error : 'รหัสผู้ใช้งานไม่ถูกต้อง'})
+    }
+
+    try {
+        const paper = await Paper.find({owner: id})
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({error : error.message})
     }
 }
 
@@ -694,6 +738,79 @@ const sendEmailPdf = async (req, res) => {
     }
 }
 
+// ส่ง mail ใบประกาศ
+const sendCertificate = async (req, res) => {
+
+    const { recipient, confr_title, owner, paper_id } = req.body
+
+    
+    if (!req.file) {
+        return res.status(400).json({ error: 'เกิดข้อผิดพลาดเกี่ยวกับการ upload file' })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(paper_id)) {
+        fs.unlink(req.file.path, (err) => {
+            if(err) {
+                console.error('ไม่สามารถลบไฟล์ได้: ', err)
+            } else {
+                console.log('ลบไฟล์สำเร็จ')
+            }
+        })
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+    
+    
+    let transpoter = nodemailer.createTransport({
+        service: 'Gmail', //สามารถเปลี่ยนเป็นบริการ SMTP ของที่อื่นได้นอกจาก Gmail
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.GMAIL_PASS,
+        }
+    })
+
+    let mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: recipient,
+        subject: `หนังสือรับรองโดย ${confr_title}`,
+        attachments: [
+            {
+                filename: req.file.original_file,
+                path: req.file.path
+            }
+        ]
+    }
+
+    transpoter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            fs.unlink(req.file.path, (unlinkError) => {
+                if (unlinkError) {
+                    console.error('ลบไฟล์ล้มเหลว: ', unlinkError)
+                } else {
+                    console.log('ลบไฟล์สำเร็จ')
+                }
+            })
+            console.log(error)
+            return res.status(500).json({ error: error.message })
+        } else {
+            console.log('Email send: ' + info.response)
+        }
+    })
+
+    try {
+        const paper = await Paper.findById(paper_id)
+        if(!paper) {
+            return res.status(404).json({error : 'ไม่พบบทความ'})
+        }
+        paper.certificate = req.file.filename
+        paper.save()
+        await Notification.create({ user_id: owner, title: 'คุณได้รับใบรับรอง', message: `กรุณาตรวจสอบอีเมล ${recipient} เพื่อตรวจสอบใบรับรอง` })
+        res.status(200).json(paper)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({error : error.message})
+    }
+}
+
 
 module.exports = {
     getPapers,
@@ -719,5 +836,8 @@ module.exports = {
     updatePaperAward,
     getPaperByCategory,
     getPaperAward,
-    sendEmailPdf
+    sendEmailPdf,
+    sendCertificate,
+    getPaperArchive,
+    getPaperOwnerAdmin
 }

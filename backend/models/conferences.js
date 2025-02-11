@@ -76,11 +76,19 @@ conferencesSchema.pre('deleteOne', { document: true, query: false }, async funct
       for (const file of inv) {
         if (file.img)
           fs.unlink(`public/uploads/${file.img}`, (err) => {
-            if(err) throw err
+            if(err) {
+              console.log('ลบรูปพิธีกรไม่สำเร็จ',err)
+            } else {
+              console.log('ลบรูปพิธีกรแล้ว')
+            }
           })
         if (file.cv)
           fs.unlink(`public/uploads/${file.cv}`, (err) => {
-            if(err) throw err
+            if(err) {
+              console.log('ลบ cv ไม่สำเร็จ',err)
+            } else {
+              console.log("ลบ cv แล้ว")
+            }
           })
       }
     }
@@ -93,7 +101,11 @@ conferencesSchema.pre('deleteOne', { document: true, query: false }, async funct
     if(template.length > 0) {
       for(const file of template) {
         fs.unlink(`public/uploads/${file.file}`, (err) => {
-          if(err) throw err
+          if(err) {
+            console.log('ลบไฟล์ template error',err)
+          } else {
+            console.log('ลบเทรมเพลตแล้ว')
+          }
         })
       }
     }
@@ -109,7 +121,11 @@ conferencesSchema.pre('deleteOne', { document: true, query: false }, async funct
     if(partner.length > 0) {
       for(const file of partner) {
         fs.unlinkSync(`public/uploads/${file.image}`, (err) => {
-          if(err) throw err
+          if(err) {
+            console.log('ลบรูป partner ไม่สำเร็จ',err)
+          } else {
+            console.log('ลบผู้สนับสนุนแล้ว')
+          }
         })
       }
     }

@@ -140,10 +140,6 @@ const paperSchema = mongoose.Schema(
 
 paperSchema.index({confr_code: 1, title: 'text'})
 
-paperSchema.post('findByIdAndUpdate', function(doc) {
-    console.log(`Notification: User ${doc.username}`)
-})
-
 paperSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
     try {
         await mongoose.model('paper_assign').deleteMany({paper_id: this._id})

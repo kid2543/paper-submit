@@ -31,7 +31,7 @@ const assignPaper = async (req, res) => {
         // create assignment 
         const assign = await paperAssign.create({ reviewer, paper_id })
         // create notification
-        await Notification.create({user_id: reviewer, title: 'บทความใหม่', message: 'มีบทความใหม่รอการให้คะแนน'})
+        await Notification.create({ user_id: reviewer, title: 'บทความใหม่', message: 'มีบทความใหม่รอการให้คะแนน' })
         res.status(200).json(assign)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -50,8 +50,6 @@ const reviewPaper = async (req, res) => {
         confr_id,
         paper_code,
     } = req.body
-
-    let empty = []
 
     if (!mongoose.Types.ObjectId.isValid(_id)) {
         if (req.file) {
@@ -79,34 +77,6 @@ const reviewPaper = async (req, res) => {
         return res.status(400).json({ error: 'ไม่พบข้อมูล' })
     }
 
-    if (!suggestion) {
-        empty.push('suggestion')
-    }
-
-    if (!rate) {
-        empty.push('rate')
-    }
-
-    if (!total) {
-        empty.push('total')
-    }
-
-    if (!result) {
-        empty.push('result')
-    }
-
-    if (empty.length > 0) {
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Error deleting the file:', err)
-                }
-                console.log("file is deleted")
-            })
-        }
-        return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบ', empty })
-    }
-
     if (req.file) {
         try {
             const { filename } = req.file
@@ -123,7 +93,7 @@ const reviewPaper = async (req, res) => {
                 { new: true, runValidators: true }
             )
             // create notification
-            await Notification.create({user_id: confr_id, title: 'แจ้งเตือนการตรวจบทความ', message: 'บทความ ' + paper_code + ' ตรวจแล้ว'})
+            await Notification.create({ user_id: confr_id, title: 'แจ้งเตือนการตรวจบทความ', message: 'บทความ ' + paper_code + ' ตรวจแล้ว' })
             res.status(200).json(review)
         } catch (error) {
             res.status(400).json({ error: error.message })
@@ -142,7 +112,7 @@ const reviewPaper = async (req, res) => {
                 { new: true, runValidators: true }
             )
             // create notification
-            await Notification.create({user_id: confr_id, title: 'แจ้งเตือนการตรวจบทความ', message: 'บทความ ' + paper_code + ' ตรวจแล้ว'})
+            await Notification.create({ user_id: confr_id, title: 'แจ้งเตือนการตรวจบทความ', message: 'บทความ ' + paper_code + ' ตรวจแล้ว' })
             res.status(200).json(review)
         } catch (error) {
             if (req.file) {
@@ -164,33 +134,33 @@ const uploadSuggestionFile = async (req, res) => {
     const { id } = req.params
 
     if (!req.file) {
-        return res.status(400).json({error : "not found the file"})
+        return res.status(400).json({ error: "not found the file" })
     }
 
-    if(!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
                 console.error('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
-        return res.status(400).json({error : 'รหัสแบบประเมินไม่ถูกต้อง'})
+        return res.status(400).json({ error: 'รหัสแบบประเมินไม่ถูกต้อง' })
     }
 
-        try {
-            const assign = await paperAssign.findByIdAndUpdate(id, {
-                suggestion_file: filename
-            }, { new: true })
-            res.status(200).json(assign)
-        } catch (error) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Error deleting the file:', err)
-                }
-                console.log("file is deleted")
-            })
-            res.status(400).json({ error: error.message })
-        }
+    try {
+        const assign = await paperAssign.findByIdAndUpdate(id, {
+            suggestion_file: filename
+        }, { new: true })
+        res.status(200).json(assign)
+    } catch (error) {
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                console.error('Error deleting the file:', err)
+            }
+            console.log("file is deleted")
+        })
+        res.status(400).json({ error: error.message })
+    }
 }
 
 // read paper review
@@ -234,23 +204,23 @@ const getReview = async (req, res) => {
         return res.status(400).json({ error: 'รหัสกรรมการไม่ถูกต้อง' })
     }
 
-//     const items = await Paper.find(query)
-//     .limit(limit * 1)
-//     .skip((page - 1) * limit)
-//     .exec()
-// const count = await Paper.countDocuments(query)
-// res.status(200).json({
-//     items,
-//     totalPages: Math.ceil(count / limit),
-//     currentPage: page,
-// })
+    //     const items = await Paper.find(query)
+    //     .limit(limit * 1)
+    //     .skip((page - 1) * limit)
+    //     .exec()
+    // const count = await Paper.countDocuments(query)
+    // res.status(200).json({
+    //     items,
+    //     totalPages: Math.ceil(count / limit),
+    //     currentPage: page,
+    // })
 
     try {
         const items = await paperAssign.find({ reviewer: _id })
-        .populate('paper_id')
-        .limit(limit * 1)
-        .skip((page - 1) * limit)
-        const count = await paperAssign.countDocuments({reviewer: _id})
+            .populate('paper_id')
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+        const count = await paperAssign.countDocuments({ reviewer: _id })
         res.status(200).json({
             items,
             totalPages: Math.ceil(count / limit),
@@ -279,18 +249,18 @@ const getOneReview = async (req, res) => {
 
 // edit review version
 const editReview = async (req, res) => {
-    const { id, paper_code } =  req.params
+    const { id, paper_code } = req.params
 
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error : 'รหัสบทความไม่ถูกต้อง'})
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
     }
 
     try {
-        const find = await paperAssign.find({paper_id: id})
-        if(!find) {
-            return res.status(404).json({error: 'ไม่พบข้อมูลรายการตรวจบทความ'})
+        const find = await paperAssign.find({ paper_id: id })
+        if (!find) {
+            return res.status(404).json({ error: 'ไม่พบข้อมูลรายการตรวจบทความ' })
         }
-        for(let i in find) {
+        for (let i in find) {
             const data = {
                 status: find[i].status,
                 review_id: find[i]._id,
@@ -300,21 +270,21 @@ const editReview = async (req, res) => {
                 total: find[i].total,
                 result: find[i].result
             }
-           await paperAssignHistory.create(data)
-           await paperAssign.findByIdAndUpdate(find[i]._id, {
-            status: 'PENDING',
-            result: 'PENDING',
-            suggestion: "",
-            suggestion_file: "",
-            rate: [],
-            total: 0,
-           })
-           await createNotification(find[i].reviewer, `มีการมอบหมายบทความฉบับแก้ไข`, `บทความ ${paper_code} แก้ไขเรียบร้อยรอการประเมิน`)
+            await paperAssignHistory.create(data)
+            await paperAssign.findByIdAndUpdate(find[i]._id, {
+                status: 'PENDING',
+                result: 'PENDING',
+                suggestion: "",
+                suggestion_file: "",
+                rate: [],
+                total: 0,
+            })
+            await createNotification(find[i].reviewer, `มีการมอบหมายบทความฉบับแก้ไข`, `บทความ ${paper_code} แก้ไขเรียบร้อยรอการประเมิน`)
         }
-        await Paper.findByIdAndUpdate(id, {status: "REVIEW"})
+        await Paper.findByIdAndUpdate(id, { status: "REVIEW" })
     } catch (error) {
         console.log(error)
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 

@@ -8,6 +8,7 @@ import SearchItemNotFound from '../SearchItemNotFound'
 // react bootstrap
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import { toast } from 'react-toastify'
 
 function Registration() {
 
@@ -29,15 +30,17 @@ function Registration() {
 
 
     return (
-        <div className='py-5'>
-            <div className='mb-4'>
-                <h4 className='fw-bold'>ข้อมูลการลงทะเบียน</h4>
-                <p className='text-muted'>แก้ไขข้อมูลการลงทะเบียนได้ที่นี่</p>
+        <div>
+            <div className='mb-3 card'>
+                <div className='card-body'>
+                    <h4 className='fw-bold card-title'>ข้อมูลการลงทะเบียน</h4>
+                    <p className='card-text text-muted'>แก้ไขข้อมูลการลงทะเบียนได้ที่นี่</p>
+                </div>
             </div>
-            <div className='row gy-5'>
+            <div className='row g-3'>
                 <ModalAcc data={data} show={showModalA} handleClose={() => setShowModalA(false)} setData={setData} />
-                <div className='col-12'>
-                    <div className='card border-0 shadow-sm'>
+                <div className='col-12 col-lg-6'>
+                    <div className='card  shadow-sm h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
                                 <h6 className='fw-bold mb-0'>รายละเอียดบัญชี</h6>
@@ -70,9 +73,9 @@ function Registration() {
                         </div>
                     </div>
                 </div>
-                <div className='col-12'>
+                <div className='col-12 col-lg-6'>
                     <ModalRegis data={data} show={showModalB} handleClose={() => setShowModalB(false)} setData={setData} />
-                    <div className='card border-0 shadow-sm'>
+                    <div className='card  shadow-sm h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
                                 <h6 className='fw-bold mb-0'>อัตราค่าลงทะเบียน</h6>
@@ -108,7 +111,7 @@ function Registration() {
                     </div>
                 </div>
                 <div className='col-12'>
-                    <div className='card border-0 shadow-sm'>
+                    <div className='card  shadow-sm'>
                         <div className='card-body'>
                             <div>
                                 <ModalRegisDate data={data} setData={setData} handleClose={() => setShowModalC(false)} show={showModalC} />
@@ -118,8 +121,8 @@ function Registration() {
                                         <i className='bi bi-pencil-square'></i>
                                     </button>
                                 </div>
-                                <p>Early bird registration : {data?.regis_eb_start_date && dayjs(data?.regis_eb_start_date).format("DD/MMM/YYYY")} - {data?.regis_eb_end_date && dayjs(data?.regis_eb_end_date).format("DD/MMM/YYYY")}</p>
-                                <p>Regular registration : {data?.regis_rl_start_date && dayjs(data?.regis_rl_start_date).format("DD/MMM/YYYY")} - {data?.regis_rl_end_date && dayjs(data?.regis_rl_end_date).format("DD/MMM/YYYY")}</p>
+                                <p>Early bird registration : {data?.regis_eb_start_date && dayjs(data?.regis_eb_start_date).format("DD MMM YYYY")} - {data?.regis_eb_end_date && dayjs(data?.regis_eb_end_date).format("DD MMM YYYY")}</p>
+                                <p>Regular registration : {data?.regis_rl_start_date && dayjs(data?.regis_rl_start_date).format("DD MMM YYYY")} - {data?.regis_rl_end_date && dayjs(data?.regis_rl_end_date).format("DD MMM YYYY")}</p>
                             </div>
                         </div>
                     </div>
@@ -141,10 +144,10 @@ function ModalAcc(props) {
             const json = Object.fromEntries(formData.entries())
             const update = await axios.patch('/api/conference', json)
             props.setData(update.data)
-            alert('Success')
+            toast.success('อัพเดทสำเร็จ')
             props.handleClose()
         } catch (error) {
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
         }
     }
@@ -155,7 +158,7 @@ function ModalAcc(props) {
                 <Modal.Title>รายละเอียดบัญชี</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
-                <Modal.Body className='row'>
+                <Modal.Body className='row g-3'>
                     <div className='col-12'>
                         <label className='form-label'>ชื่อธนาคาร</label>
                         <input className='form-control' name='bank_name' defaultValue={props.data?.bank_name} />
@@ -171,15 +174,15 @@ function ModalAcc(props) {
                     <div className='col-12'>
                         <label className='form-label'>เลขบัญชี</label>
                         <input className='form-control' name='acc_no' defaultValue={props.data?.acc_no} pattern='[0-9]{10}' />
-                        <small>เฉพาะตัวเลขเท่านั้น</small>
+                        <div className="form-text">เฉพาะตัวเลขเท่านั้น</div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        แก้ไข
                     </Button>
                 </Modal.Footer>
             </form>
@@ -200,10 +203,10 @@ function ModalRegis(props) {
                 regis_type: edit
             })
             props.setData(update.data)
-            alert('Success')
+            toast.success('แก้ไขสำเร็จ')
             props.handleClose()
         } catch (error) {
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
         }
     }
@@ -227,7 +230,10 @@ function ModalRegis(props) {
             <form onSubmit={handleUpdate}>
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
-                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>Add +</button>
+                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+                            <i className="me-2 bi bi-plus-lg"></i>
+                            เพิ่ม
+                        </button>
                     </div>
                     {edit?.map((items, index) => (
                         <div key={index} className='row gy-2'>
@@ -249,10 +255,10 @@ function ModalRegis(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" type='button' onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>
@@ -272,11 +278,11 @@ function ModalRegisDate(props) {
             const json = Object.fromEntries(formData.entries())
             const update = await axios.patch('/api/conference', json)
             props.setData(update.data)
-            alert('Success')
+            toast.success('อัพเดทสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -314,10 +320,10 @@ function ModalRegisDate(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={handleCancel}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit' disabled={!editStatus}>
-                        Update
+                        อัพเดท
                     </Button>
                 </Modal.Footer>
             </form>

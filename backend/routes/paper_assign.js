@@ -10,7 +10,7 @@ const checkRole = require('../middlewares/checkRole')
 
 const router = express.Router()
 
-// assign paper
+// assign paper to committee
 router.post('/', verifyToken, checkRole(['HOST', 'ADMIN']), assignPaper)
 
 // review paper

@@ -11,7 +11,7 @@ function Layout({ children }) {
             <main style={{minHeight: "100vh", marginTop: "120px"}}>
                 {children}
             </main>
-            <div className='container'>
+            <div className='container-fluid'>
                 <Footer />
             </div>
         </>

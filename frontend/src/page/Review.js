@@ -3,9 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import LoadingPage from '../components/LoadingPage'
 import useFetch from '../hook/useFetch'
-import { useAuthContext } from '../hook/useAuthContext'
-import Dropdown from 'react-bootstrap/Dropdown';
-import { useLogout } from '../hook/useLogout'
+import { toast } from 'react-toastify'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { UserDropdown } from '../components/UserDropdown'
 
 const api = process.env.REACT_APP_API_URL
 
@@ -13,11 +13,14 @@ function Review() {
 
     const { id } = useParams()
     const confr_id = sessionStorage.getItem('confr_id')
+
+
+    // fetch data
     const paper = useFetch('/api/assign/one/' + id)
     const question = useFetch('/api/conference/question/' + confr_id)
+
+
     const [PaperFile, setPaperFile] = useState([])
-    const { user } = useAuthContext()
-    const { logout } = useLogout()
     const [suggestionFile, setSuggestionFile] = useState(null)
     const [totalArr, setTotalArr] = useState([])
     const [totalNumber, setTotalNumber] = useState(0)
@@ -40,39 +43,47 @@ function Review() {
 
     const navigate = useNavigate()
 
-    const handleRate = async (e) => {
-        e.preventDefault()
-        if (window.confirm("ยืนยันการให้คะแนนหรือไม่? เนื่องจากจะไม่สามารถกลับมาแก้ไขได้")) {
-            try {
-                const input = e.target
-                if (suggestionFile !== null) {
-                    const formData = new FormData()
-                    formData.append("file", suggestionFile)
-                    formData.append('_id', id)
-                    formData.append('suggestion', input.suggestion.value)
-                    for(let i in totalArr) {
-                        formData.append('rate', totalArr[i])
-                    }
-                    formData.append('total', totalNumber)
-                    formData.append('result', input.result.value)
-                    await axios.patch('/api/assign/', formData)
-                    alert('Success')
-                    navigate('/committee')
-                } else {
-                    await axios.patch('/api/assign/', {
-                        _id: id,
-                        suggestion: input.suggestion.value,
-                        rate: totalArr,
-                        total: totalNumber,
-                        result: input.result.value
-                    })
-                    alert('Success')
-                    navigate('/committee')
+    // confirm submit score
+    const [showConfirm, setShowConfirm] = useState(false)
+    const [suggestion, setSuggestion] = useState('')
+    const [result, setResult] = useState('')
+
+    const handleRate = async () => {
+        try {
+            if (suggestionFile !== null) {
+                const formData = new FormData()
+                formData.append("file", suggestionFile)
+                formData.append('_id', id)
+                formData.append('suggestion', suggestion)
+                for (let i in totalArr) {
+                    formData.append('rate', totalArr[i])
                 }
-            } catch (error) {
-                console.log(error)
-                alert('Error')
+                formData.append('total', totalNumber)
+                formData.append('result', result)
+                await axios.patch('/api/assign', formData)
+                toast.success('ให้คะแนน และอัพโหลดไฟล์สำเร็จ')
+                setTimeout(
+                    navigate('/committee'),
+                    1000
+                )
+            } else {
+                await axios.patch('/api/assign', {
+                    _id: id,
+                    suggestion: suggestion,
+                    rate: totalArr,
+                    total: totalNumber,
+                    result: result
+                })
+                toast.success('ให้คะแนนสำเร็จ')
+                setTimeout(
+                    navigate('/committee'), 1000
+                )
             }
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setShowConfirm(false)
         }
     }
 
@@ -85,11 +96,6 @@ function Review() {
         for (let i in copy) {
             setTotalNumber(num += copy[i])
         }
-    }
-
-    const handleLogout = () => {
-        logout()
-        navigate('/')
     }
 
     if (paper.loading === 'idle' || paper.loading === 'loading') {
@@ -110,29 +116,23 @@ function Review() {
 
     return (
         <div className='container my-5'>
-            <div className='card border-0 shadow-sm mb-5'>
+            <ConfirmDialog
+                show={showConfirm}
+                handleClose={() => setShowConfirm(false)}
+                handleSubmit={handleRate}
+                header='ยืนยันการให้คะแนน'
+                text='ต้องการยืนยันการให้คะแนนหรือไม่เนื่องจากจะไม่สามารถกลับมาแก้ไขได้'
+            />
+            <div className='card  shadow-sm mb-5'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
                         <h5 className='fw-bold mb-0'>ตรวจบทความ</h5>
-                        <Dropdown>
-                            <Dropdown.Toggle className='text-primary' variant="" id="dropdown-basic">
-                                <span className='me-2'>
-                                    <i className="bi bi-person-circle"></i>
-                                </span>
-                                {user}
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-                                <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                                <Dropdown.Item href="/setting">Dashboard</Dropdown.Item>
-                                <Dropdown.Item className='text-danger' type='button' onClick={handleLogout}>Logout</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
+                        <UserDropdown />
                     </div>
                 </div>
             </div>
             {paper.data &&
-                <div className='card border-0 shadow-sm mb-5'>
+                <div className='card  shadow-sm mb-5'>
                     <div className='card-body'>
                         <p>รายละเอียดบทความ</p>
                         <div className='row g-3'>
@@ -176,7 +176,7 @@ function Review() {
             <div className='card p-3 mb-3'>
                 <div className='card-body'>
                     <p className='fw-bold'>แบบประเมิน <span className='text-danger'>*</span></p>
-                    <form onSubmit={handleRate}>
+                    <form>
                         <div className='table-responsive mb-3'>
                             <table className='table table-hover table-bordered align-middle'>
                                 <thead>
@@ -213,7 +213,14 @@ function Review() {
                         </div>
                         <div className='mb-3'>
                             <label className='form-label text-muted'>ข้อเสนอแนะ <span className='text-danger'>*</span></label>
-                            <textarea aria-label='suggestion' name='suggestion' className='form-control mb-3' required />
+                            <textarea
+                                value={suggestion}
+                                onChange={e => setSuggestion(e.target.value)}
+                                aria-label='suggestion'
+                                name='suggestion'
+                                className='form-control mb-3'
+                                required
+                            />
                             <small className='text-muted'>ถ้าไม่มีให้ใส่ -</small>
                         </div>
                         <div className='mb-3'>
@@ -225,26 +232,53 @@ function Review() {
                         <div className='mb-3'>
                             <p className='fw-bold'>ผลลัพธ์</p>
                             <div className="form-check">
-                                <input className="form-check-input" type="radio" name="result" value="ACCEPT" required />
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="result"
+                                    value="ACCEPT"
+                                    onChange={e => setResult(e.target.value)}
+                                    required
+                                />
                                 <label className="form-check-label">
                                     Accept submission (ผ่าน)
                                 </label>
                             </div>
                             <div className="form-check">
-                                <input className="form-check-input" type="radio" name="result" value="REVISE" required />
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="result"
+                                    value="REVISE"
+                                    onChange={e => setResult(e.target.value)}
+                                    required
+                                />
                                 <label className="form-check-label">
                                     Revisions required (ผ่านแบบมีเงื่อนไข)
                                 </label>
                             </div>
                             <div className="form-check">
-                                <input className="form-check-input" type="radio" name="result" value="REJECT" required />
+                                <input 
+                                className="form-check-input" 
+                                type="radio" 
+                                name="result" 
+                                value="REJECT"
+                                onChange={e => setResult(e.target.value)}
+                                required />
                                 <label className="form-check-label">
                                     Decline submission (ไม่ผ่าน)
                                 </label>
                             </div>
                         </div>
                         <div>
-                            <button className='btn btn-primary'>Submit</button>
+                            <button
+                                type='button'
+                                onClick={() => setShowConfirm(true)}
+                                className='btn btn-primary'
+                                disabled={!result || !suggestion || totalArr.length < question.data?.length || totalArr.length <= 0}
+                            >
+                                ยืนยันการให้คะแนน
+                            </button>
                         </div>
                     </form>
                 </div>

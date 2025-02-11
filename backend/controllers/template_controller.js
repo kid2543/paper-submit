@@ -82,7 +82,9 @@ const deleteTemplate = async (req, res) => {
         }
         fs.unlink('public/uploads/' + find.file, (err) => {
             if(err) {
-                return res.status(400).json({error : err.message})
+                console.log({err})
+            } else {
+                console.log('ไฟล์ลบแล้ว')
             }
         })
         await Template.deleteOne({_id : id})

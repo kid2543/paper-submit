@@ -5,6 +5,7 @@ import useFetch from '../hook/useFetch'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function HostEditPresentation() {
 
@@ -25,49 +26,49 @@ function HostEditPresentation() {
     }
 
     return (
-        <div className='py-5'>
-            <div>
-                <div className='mb-4'>
-                    <h4 className='fw-bold'>ข้อแนะนำการนำเสนอ</h4>
-                    <p className='text-muted'>เพิ่มและแก้ไขข้อแนะนำการเสนอสำหรับ ผู้นำเสนอ กรรมการ และผู้ชม ได้ที่นี่</p>
+        <div>
+            <div className='mb-3 card'>
+                <div className='card-body'>
+                    <h4 className='fw-bold card-title'>ข้อแนะนำการนำเสนอ</h4>
+                    <p className='text-muted card-text'>เพิ่มและแก้ไขข้อแนะนำการเสนอสำหรับ ผู้นำเสนอ กรรมการ และผู้ชม ได้ที่นี่</p>
                 </div>
-                <div className='card border-0 shadow-sm mb-5'>
-                    <div className='card-body'>
-                        <div className='d-flex justify-content-between align-items-center mb-4'>
-                            <h6 className='fw-bold mb-0'>ข้อแนะการนำเสนอบทความ</h6>
-                            <div>
-                                <button className='btn' type='button' onClick={() => setShowA((true))}>
-                                    <i className='bi bi-pencil-square'></i>
-                                </button>
-                            </div>
+            </div>
+            <div className='card  shadow-sm mb-3'>
+                <div className='card-body'>
+                    <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <h6 className='fw-bold mb-0'>ข้อแนะการนำเสนอบทความ</h6>
+                        <div>
+                            <button className='btn' type='button' onClick={() => setShowA((true))}>
+                                <i className='bi bi-pencil-square'></i>
+                            </button>
                         </div>
-                        {data &&
-                            <ul>
-                                <GuidelineModal show={showA} handleClose={() => setShowA(false)} setData={setData} id={id} data={data.presentation_guideline} />
-                                {data.presentation_guideline.map((items, index) => (
-                                    <li key={index}>{items}</li>
-                                ))}
-                            </ul>
-                        }
                     </div>
+                    {data &&
+                        <ul>
+                            <GuidelineModal show={showA} handleClose={() => setShowA(false)} setData={setData} id={id} data={data.presentation_guideline} />
+                            {data.presentation_guideline.map((items, index) => (
+                                <li key={index}>{items}</li>
+                            ))}
+                        </ul>
+                    }
                 </div>
-                <div className='card border-0 shadow-sm my-5'>
-                    <div className='card-body'>
-                        <div className='d-flex justify-content-between align-items-center mb-4'>
-                            <h6 className='fw-bold mb-0'>รายละเอียดเพิ่มเติม</h6>
-                            <div>
-                                <button className='btn' type='button' onClick={() => setShowB(true)}>
-                                    <i className='bi bi-pencil-square'></i>
-                                </button>
-                            </div>
+            </div>
+            <div className='card shadow-sm'>
+                <div className='card-body'>
+                    <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <h6 className='fw-bold mb-0'>รายละเอียดเพิ่มเติม</h6>
+                        <div>
+                            <button className='btn' type='button' onClick={() => setShowB(true)}>
+                                <i className='bi bi-pencil-square'></i>
+                            </button>
                         </div>
-                        {data &&
-                            <div>
-                                <RemarkModal show={showB} handleClose={() => setShowB(false)} data={data.presentation_remark} setData={setData} id={id} />
-                                {data.presentation_remark}
-                            </div>
-                        }
                     </div>
+                    {data &&
+                        <div>
+                            <RemarkModal show={showB} handleClose={() => setShowB(false)} data={data.presentation_remark} setData={setData} id={id} />
+                            {data.presentation_remark}
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -100,11 +101,11 @@ function GuidelineModal(props) {
                 presentation_guideline: guideline
             })
             props.setData(res.data)
-            alert('Success')
+            toast.success('แก้ไขสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -117,7 +118,10 @@ function GuidelineModal(props) {
             <form onSubmit={handleUpdate}>
                 <Modal.Body className='row gy-3'>
                     <div>
-                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>Add +</button>
+                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+                            <i className="me-2 bi bi-plus-lg"></i>
+                            เพิ่มหัวข้อ
+                        </button>
                     </div>
                     {guideline.map((items, index) => (
                         <div className='col-12' key={index}>
@@ -128,10 +132,10 @@ function GuidelineModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>
@@ -151,11 +155,11 @@ function RemarkModal(props) {
                 presentation_remark: remark
             })
             props.setData(res.data)
-            alert('Success')
+            toast.success('แก้ไขสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -173,10 +177,10 @@ function RemarkModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        Close
+                        ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        Update
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>

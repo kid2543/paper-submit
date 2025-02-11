@@ -23,7 +23,7 @@ router.post('/edit/:id', verifyToken, checkRole(['HOST', 'AUTHOR']), uploadPdf.s
 router.get('/read/:id', verifyToken, getPaperFile)
 
 // update read original_file
-router.patch('/original/read/:id', verifyToken, checkRole(['HOST']), readOriginalFile)
+router.patch('/original/read/:id', verifyToken, checkRole(['HOST', 'ADMIN']), readOriginalFile)
 
 module.exports = router
 

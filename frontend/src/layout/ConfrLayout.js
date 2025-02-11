@@ -3,6 +3,7 @@ import { ConfrNavbar } from '../components/Navbar'
 import Footer from '../components/Footer'
 
 function ConfrLayout({ children }) {
+
   return (
     <>
       <div>

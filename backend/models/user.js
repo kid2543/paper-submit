@@ -111,19 +111,19 @@ userSchema.statics.signup = async function (username, password, role) {
 userSchema.statics.login = async function (username, password) {
 
     if (!username || !password) {
-        throw Error('All fields must be filled')
+        throw Error('กรุณากรอกข้อมูลให้ครบ')
     }
 
     const user = await this.findOne({ username })
 
     if (!user) {
-        throw Error('Incorrect username')
+        throw Error('ไม่พบชื่อผู้ใช้งานนี้ในระบบ')
     }
 
     const match = await bcrypt.compare(password, user.password)
 
     if (!match) {
-        throw Error('Incorrect password')
+        throw Error('รหัสผ่านไม่ถูกต้อง')
     }
 
     return user

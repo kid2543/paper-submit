@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import Breadcrumb from 'react-bootstrap/Breadcrumb';
 
 // component
 import Host from '../components/Admin/Host';
@@ -62,22 +61,16 @@ function Admin() {
     let comitNumber = user.filter(items => items.role === 'COMMITTEE')
 
     return (
-        <div className='px-5 py-4'>
-            <Breadcrumb>
-                <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-                <Breadcrumb.Item active>
-                    Admin
-                </Breadcrumb.Item>
-            </Breadcrumb>
-            <div className='card border-0 shadow-sm bg-primary text-white py-3 mb-5'>
+        <div className='py-4'>
+            <div className='card  shadow-sm bg-primary text-white py-3 mb-3'>
                 <div className='card-body'>
                     <h3 className='fw-bold'>Welcome to <br />Admin Dashboard</h3>
                 </div>
             </div>
             {user.length > 0 &&
-                <div className='row g-3 mb-5'>
-                    <div className='col-12 col-md-6 col-lg-4'>
-                        <div className='card border-0 shadow-sm'>
+                <div className='row g-3 mb-3'>
+                    <div className='col-6 col-lg-4'>
+                        <div className='card  shadow-sm'>
                             <div className='card-body text-center'>
                                 <h1>{authorNumber.length}</h1>
                                 <h5 className='text-muted'>ผู้ส่งบทความ</h5>
@@ -85,8 +78,8 @@ function Admin() {
                         </div>
                     </div>
                     {paper &&
-                        <div className='col-12 col-md-6 col-lg-4'>
-                            <div className='card border-0 shadow-sm'>
+                        <div className='col-6 col-lg-4'>
+                            <div className='card  shadow-sm'>
                                 <div className='card-body text-center'>
                                     <h1>{paper.length}</h1>
                                     <h5 className='text-muted'>บทความ</h5>
@@ -94,8 +87,8 @@ function Admin() {
                             </div>
                         </div>
                     }
-                    <div className='col-12 col-md-6 col-lg-4'>
-                        <div className='card border-0 shadow-sm'>
+                    <div className='col-6 col-lg-4'>
+                        <div className='card  shadow-sm'>
                             <div className='card-body text-center'>
                                 <h1>{comitNumber.length}</h1>
                                 <h5 className='text-muted'>กรรมการ</h5>
@@ -103,8 +96,8 @@ function Admin() {
                         </div>
                     </div>
                     {pub &&
-                        <div className='col-12 col-md-6 col-lg-4'>
-                            <div className='card border-0 shadow-sm'>
+                        <div className='col-6 col-lg-4'>
+                            <div className='card  shadow-sm'>
                                 <div className='card-body text-center'>
                                     <h1>{pub.length}</h1>
                                     <h5 className='text-muted'>วารสาร</h5>
@@ -112,8 +105,8 @@ function Admin() {
                             </div>
                         </div>
                     }
-                    <div className='col-12 col-md-6 col-lg-4'>
-                        <div className='card border-0 shadow-sm'>
+                    <div className='col-6 col-lg-4'>
+                        <div className='card  shadow-sm'>
                             <div className='card-body text-center'>
                                 <h1>{hostNumber.length}</h1>
                                 <h5 className='text-muted'>ผู้จัดงานประชุม</h5>
@@ -121,8 +114,8 @@ function Admin() {
                         </div>
                     </div>
                     {confr &&
-                        <div className='col-12 col-md-6 col-lg-4'>
-                            <div className='card border-0 shadow-sm'>
+                        <div className='col-6 col-lg-4'>
+                            <div className='card  shadow-sm'>
                                 <div className='card-body text-center'>
                                     <h1>{confr.length}</h1>
                                     <h5 className='text-muted'>งานประชุม</h5>
@@ -132,13 +125,13 @@ function Admin() {
                     }
                 </div>
             }
-            <div className='card border-0 shadow-sm'>
+            <div className='card shadow-sm'>
                 <div className='card-body'>
-                    <h5 className='fw-bold mb-3'>รายการผู้ใช้งาน</h5>
+                    <h4 className='fw-bold mb-3'>รายการผู้ใช้งาน</h4>
                     <Tabs
                         defaultActiveKey="host"
                         id="uncontrolled-tab-example"
-                        className='mb-4'
+                        className='mb-3 w-100'
                     >
                         <Tab eventKey="host" title="ผู้จัดงานประชุม">
                             <Host />

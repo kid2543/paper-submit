@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 
 function PageNotFound() {
     return (
-        <div>
+        <div style={{padding: '128px 0px'}}>
             <HomeNavbar />
             <main>
                 <h1 className='display-1 fw-bold text-center my-5'>
@@ -17,9 +17,8 @@ function PageNotFound() {
                     <img src={NotfoundIcon} alt='page not found' />
                 </div>
                 <div className='text-center'>
-                    <p className='fw-bold'>Page is not found</p>
                     <div>
-                        <Link to='/' className='btn btn-primary'>GO BACK HOME</Link>
+                        <Link to='/' className='btn btn-primary'>กลับไปหน้าแรก</Link>
                     </div>
                 </div>
             </main>

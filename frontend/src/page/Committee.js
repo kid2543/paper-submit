@@ -73,18 +73,18 @@ function Committee() {
     }
 
     return (
-        <div className='container my-5'>
-            <div className='card border-0 shadow-sm mb-5'>
+        <div className='container py-5'>
+            <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between'>
-                        <h4 className='fw-bold'>
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <h4 className='fw-bold mb-0'>
                             รายการบทความ
                         </h4>
                         <UserDropdown />
                     </div>
                 </div>
             </div>
-            <div className='card border-0 shadow-sm'>
+            <div className='card  shadow-sm'>
                 <div className='card-body'>
                     <section>
                         <div className='mb-5'>
@@ -178,7 +178,7 @@ function ViewHistory(props) {
                                         <PaperResult status={items.result} />
                                         <div>
                                             <small>
-                                                {dayjs(items.createdAt).format('DD MMM, YYYY HH:mm')}
+                                                {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
                                             </small>
                                         </div>
                                     </div>
@@ -198,7 +198,7 @@ function ViewHistory(props) {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.handleClose}>
-                    Close
+                    ปิด
                 </Button>
             </Modal.Footer>
         </Modal>

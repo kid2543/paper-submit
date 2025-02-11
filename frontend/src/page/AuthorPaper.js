@@ -1,46 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus'
 import PaymentStatus from '../components/PaymentStatus'
 import useFetch from '../hook/useFetch'
 
 // react bootstrap
-import Dropdown from 'react-bootstrap/Dropdown';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import {
+  Modal,
+  Button,
+  Breadcrumb
+} from 'react-bootstrap'
 
-import { useAuthContext } from '../hook/useAuthContext'
-import { useLogout } from '../hook/useLogout'
 import axios from 'axios'
+import { toast } from 'react-toastify'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 const api = process.env.REACT_APP_API_URL
 
 function AuthorPaper() {
 
   const { id } = useParams()
-  const { user } = useAuthContext()
   const { data, error, loading } = useFetch('/api/paper/owner/' + id)
   const paperFile = useFetch('/api/paperfile/read/' + id)
-  const { logout } = useLogout()
   const comment = useFetch(`/api/assign/${id}`)
-  const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
   const handleUpdate = async (e) => {
     e.preventDefault()
     try {
       const formData = new FormData(e.target)
       const json = Object.fromEntries(formData.entries())
       const res = await axios.patch('/api/paper/update/' + id, json)
-      alert('Success')
+      toast.success('Success')
       console.log(res.data)
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('Error')
     }
   }
 
@@ -92,15 +87,17 @@ function AuthorPaper() {
     }
   }
 
+  // confirm edit status
+
+  const [showConfirmEdit, setShowConfirmEdit] = useState(false)
+
   const handleEditStatus = async () => {
-    if (window.confirm('ยืนยันการแก้ไขบทความหรือไม่')) {
-      try {
-        await axios.patch('/api/paper/edit/status/' + id)
-        alert('Updated')
-      } catch (error) {
-        console.log(error)
-        alert('Error')
-      }
+    try {
+      await axios.patch('/api/paper/edit/status/' + id)
+      toast.success('แก้ไขบทความสำเร็จ')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -115,30 +112,30 @@ function AuthorPaper() {
   }
 
   return (
-    <div className='container my-5'>
+    <div className="py-3">
+      <ConfirmDialog 
+        show={showConfirmEdit}
+        handleClose={() => setShowConfirmEdit(false)}
+        handleSubmit={handleEditStatus}
+        header='ยืนยันการแก้ไข'
+        text='ต้องการยืนยันการแก้ไขบทความหรือไม่ ?'
+      />
       {data &&
         <div>
-          <section className='card border-0 shadow-sm'>
-            <div className='card-body d-flex justify-content-between align-items-center'>
-              <h5 className='fw-bold mb-0'>{data.paper_code}</h5>
-              <Dropdown>
-                <Dropdown.Toggle variant="" className='text-primary border-0' id="dropdown-basic">
-                  <span className='me-2'>
-                    <i className="bi bi-person-circle"></i>
-                  </span>{user}
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item href="/author">Dashboard</Dropdown.Item>
-                  <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                  <Dropdown.Item type='button' onClick={handleLogout} className='text-danger'>Logout</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
+          <section className='card  shadow-sm'>
+            <div className='card-body'>
+              <Breadcrumb>
+                <Breadcrumb.Item href="/author">รายการบทความ</Breadcrumb.Item>
+                <Breadcrumb.Item active>
+                  แก้ไขรายละเอียดบทความ
+                </Breadcrumb.Item>
+              </Breadcrumb>
+              <h4 className='fw-bold card-title'>{data.paper_code}</h4>
             </div>
           </section>
-          <section className='card border-0 shadow-sm my-5'>
+          <section className='card  shadow-sm my-3'>
             <div className='card-body'>
-              <p>รายละเอียดบทความ</p>
+              <h6 className="fw-bold mb-3">รายละเอียดบทความ</h6>
               <div className='row gy-3'>
                 <div className='col-12'>
                   <label className='form-label'>อาจารย์ประจำวิชา</label>
@@ -190,7 +187,7 @@ function AuthorPaper() {
                   <label className='form-label'>ส่งบทความเมื่อ</label>
                   <p>
                     <span className='badge bg-success'>
-                      {dayjs(data.createdAt).format('DD/MM/YYYY HH:MM')}
+                      {dayjs(data.createdAt).format('DD MMM YYYY HH:MM')}
                     </span>
                   </p>
                 </div>
@@ -198,7 +195,7 @@ function AuthorPaper() {
                   <label className='form-label'>แก้ไขล่าสุดเมื่อ</label>
                   <p>
                     <span className='badge bg-success'>
-                      {dayjs(data.updatedAt).format('DD/MM/YYYY HH:MM')}
+                      {dayjs(data.updatedAt).format('DD MMM YYYY HH:MM')}
                     </span>
                   </p>
                 </div>
@@ -206,38 +203,43 @@ function AuthorPaper() {
                   <hr />
                 </div>
                 <form onSubmit={handleUpdate}>
-                  <p className='mb-0'>แก้ไขรายละเอียดบทความ</p>
+                  <h6 className='fw-bold mb-3'>แก้ไขรายละเอียดบทความ</h6>
                   <div className='mb-3'>
                     <label className='form-label'>คำสำคัญ</label>
-                    <input name='keyword' className='form-control' defaultValue={data.keyword} />
-                    <small>ใช้ ',' ในการแบ่ง keyword</small>
+                    <textarea rows={3} name='keyword' className='form-control' defaultValue={data.keyword} />
+                    <div className='form-text'>ใช้ ',' ในการแบ่ง keyword</div>
                   </div>
                   <div className='mb-3'>
                     <label className='form-label'>ชื่อผู้แต่ง</label>
-                    <input name='author' className='form-control' defaultValue={data.author} />
+                    <textarea rows={3} name='author' className='form-control' defaultValue={data.author} />
+                    <div className="form-text">
+                      ระบุชื่อผู้แต่งทุกท่าน
+                    </div>
                   </div>
                   <div className='mb-3'>
                     <label className='form-label'>ที่อยู่ในการติดต่อ</label>
-                    <textarea name='address' className='form-control' defaultValue={data.address} />
+                    <textarea rows={3} name='address' className='form-control' defaultValue={data.address} />
                   </div>
-                  <div className='mb-3'>
-                    <label className='form-label'>เบอร์โทร</label>
-                    <input type='tel' pattern='[0-9]{10}' maxLength={10} name='contact' className='form-control' defaultValue={data.contact} />
-                  </div>
-                  <div className='mb-3'>
-                    <label className='form-label'>อีเมล</label>
-                    <input type='email' name='email' className='form-control' defaultValue={data.email} />
+                  <div className='row gy-3'>
+                    <div className='col-md-6 mb-3'>
+                      <label className='form-label'>เบอร์โทร</label>
+                      <input type='tel' pattern='[0-9]{10}' maxLength={10} name='contact' className='form-control' defaultValue={data.contact} />
+                    </div>
+                    <div className='col-md-6 mb-3'>
+                      <label className='form-label'>อีเมล</label>
+                      <input type='email' name='email' className='form-control' defaultValue={data.email} />
+                    </div>
                   </div>
                   {paperFile.data &&
-                    <div className='mb-3'>
-                      <p className='fw-bold'>ไฟล์เอกสาร</p>
+                    <div>
+                      <h6 className='fw-bold mb-3'>ไฟล์เอกสาร</h6>
                       <div className='table-responsive'>
                         <table className='table'>
                           <thead className='table-info'>
                             <tr>
                               <th>แก้ไขล่าสุด</th>
                               <th>ชื่อ</th>
-                              <th>ดูเอกสาร</th>
+                              <th>บทความ</th>
                               <th>ประวัติ</th>
                             </tr>
                           </thead>
@@ -245,13 +247,13 @@ function AuthorPaper() {
                             {paperFile.data.map(items => (
                               <tr key={items._id}>
                                 <td>
-                                  {dayjs(items.updatedAt).format('DD/MM/YYYY HH:mm')}
+                                  {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
                                 </td>
                                 <td>
                                   {items.name}
                                 </td>
                                 <td>
-                                  <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>View</Link>
+                                  <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>เพิ่มเติม</Link>
                                 </td>
                                 <td>
                                   <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
@@ -265,7 +267,7 @@ function AuthorPaper() {
                     </div>
                   }
                   <div className='text-end'>
-                    <button className='btn btn-primary' type='submit'>Update</button>
+                    <button className='btn btn-primary' type='submit'>ยืนยันการแก้ไข</button>
                   </div>
                 </form>
                 {data.edit_paper?.map((items, index) => (
@@ -276,17 +278,17 @@ function AuthorPaper() {
               </div>
             </div>
           </section>
-          <section className='card border-0 shadow-sm'>
+          <section className='card  shadow-sm'>
             {data.result === 'REVISE' && data.status === 'SUCCESS' &&
               <div className='card-body'>
                 <div>
-                  <p className='fw-bold'>Upload บทความฉบับแก้ไข</p>
+                  <h6 className='fw-bold card-title'>Upload บทความฉบับแก้ไข</h6>
                   <p>
-                    Deadline:
+                    แก้ไขให้แล้วเสร็จภายใน:
                   </p>
                   <ol>
                     {data.deadline?.map((date, index) => (
-                      <li key={date._id}>{data.deadline.length > index + 1 ? <del>{dayjs(date.date).format('DD/MM/YYYY')}</del> : <p>{dayjs(date.date).format('DD/MM/YYYY')}</p>}</li>
+                      <li key={date._id}>{data.deadline.length > index + 1 ? <del>{dayjs(date.date).format('DD MM YYYY')}</del> : <p>{dayjs(date.date).format('DD MM YYYY')}</p>}</li>
                     ))}
                   </ol>
                   {paperFile.data &&
@@ -305,7 +307,7 @@ function AuthorPaper() {
                     </div>
                   }
                   <div className='text-end mt-3'>
-                    <button type='button' onClick={handleEditStatus} className='btn btn-primary'>ยืนยันการแก้ไข</button>
+                    <button type='button' onClick={() => setShowConfirmEdit(true)} className='btn btn-primary'>ยืนยันการแก้ไข</button>
                   </div>
                 </div>
               </div>
@@ -314,9 +316,12 @@ function AuthorPaper() {
         </div>
       }
 
-      <section className='card border-0 shadow-sm my-5'>
+      <section className='card shadow-sm my-3'>
         <div className='card-body'>
-          <p>ความคิดเห็นกรรมการ</p>
+          <h6 className="fw-bold mb-3 card-title">ความคิดเห็นกรรมการ</h6>
+          {data?.status !== 'SUCCESS' && 
+            <p>รอการดำเนินการบทความ</p>
+          }
           {comment.data && data?.status === 'SUCCESS' &&
             <div>
               {comment.data.length <= 0 &&
@@ -353,9 +358,9 @@ function AuthorPaper() {
           }
         </div>
       </section>
-      <section className='card border-0 shadow-sm my-5'>
+      <section className='card  shadow-sm my-3'>
         <div className='card-body'>
-          <p>ประวัติความคิดเห็นกรรมการ</p>
+          <h6 className="fw-bold mb-3 card-title">ระวัติความคิดเห็นกรรมการ</h6>
           {comment.data &&
             <div>
               {comment.data.length <= 0 ?
@@ -430,7 +435,7 @@ function HistoryPaper(props) {
                 {data.map((items) => (
                   <tr key={items._id}>
                     <td>
-                      {dayjs(items.createdAt).format('DD/MM/YYYY HH:mm')}
+                      {dayjs(items.createdAt).format('DD MM YYYY HH:mm')}
                     </td>
                     <td>
                       <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>View</Link>
@@ -444,7 +449,7 @@ function HistoryPaper(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
-          Close
+          ปิด
         </Button>
       </Modal.Footer>
     </Modal>
@@ -485,7 +490,7 @@ function HistoryComment(props) {
                     <PaperResult status={items.result} />
                     <div>
                       <small>
-                        {dayjs(items.createdAt).format('DD MMM, YYYY HH:mm')}
+                        {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
                       </small>
                     </div>
                   </div>
@@ -505,7 +510,7 @@ function HistoryComment(props) {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
-          Close
+          ปิด
         </Button>
       </Modal.Footer>
     </Modal>

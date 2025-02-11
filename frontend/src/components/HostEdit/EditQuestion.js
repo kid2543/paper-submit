@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 
 
 function EditQuestion() {
@@ -43,10 +44,10 @@ function EditQuestion() {
                 question
             })
             setQuestion(res.data.question)
-            alert('Success')
+            toast.success('Success')
         } catch (error) {
             console.log(error)
-            alert('Error')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -68,17 +69,19 @@ function EditQuestion() {
     }
 
     return (
-        <div className='py-5'>
-            <div className='mb-4'>
-                <h4 className='fw-bold'>แบบประเมิน</h4>
-                <p className='text-muted'>เพิ่มแบบประเมินและแก้ไขเพื่อให้กรรมการอ่านและให้คะแนนได้ถูกต้อง</p>
+        <div>
+            <div className='mb-3 card'>
+                <div className='card-body'>
+                    <h4 className='fw-bold card-title'>แบบประเมิน</h4>
+                    <p className='text-muted card-text'>เพิ่มแบบประเมินและแก้ไขเพื่อให้กรรมการอ่านและให้คะแนนได้ถูกต้อง</p>
+                </div>
             </div>
-            <div className='card border-0 shadow-sm'>
+            <div className='card shadow-sm'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-4'>
                         <h6 className='fw-bold mb-0'>รายการคำถาม</h6>
                         <div>
-                            <button onClick={handleAdd} type='button' className='btn btn-primary btn-sm'>
+                            <button onClick={handleAdd} type='button' className='btn btn-primary'>
                                 <span className='me-2'>
                                     <i className='bi bi-plus-lg'></i>
                                 </span>
@@ -87,42 +90,50 @@ function EditQuestion() {
                         </div>
                     </div>
                     {question && (
-                        <div className='table-responsive' style={{ minHeight: "480px" }}>
-                            <div className='mb-3'>
-                                <button type='button' onClick={handleUpdate} className='btn btn-success text-white'>
-                                    <span className='me-2'>
-                                        <i className='bi bi-floppy'></i>
-                                    </span>
-                                    บันทึก
-                                </button>
-                            </div>
-                            <table className='table table-hover h-100'>
-                                <thead>
-                                    <tr>
-                                        <th>ลำดับ</th>
-                                        <th>คำถาม</th>
-                                        <th>เครื่องมือ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {question.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>
-                                                {index + 1}
-                                            </td>
-                                            <td>
-                                                <textarea key={key} defaultValue={item} onChange={e => handleChange(e, index)} className='form-control' />
-                                            </td>
-                                            <td>
-                                                <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
-                                                    <i className='bi bi-trash'></i>
-                                                </button>
-                                            </td>
+                        <form onSubmit={handleUpdate}>
+                            <div className='table-responsive' style={{ minHeight: "480px" }}>
+                                <div className='mb-3'>
+                                    <button type='submit' className='btn btn-success text-white'>
+                                        <span className='me-2'>
+                                            <i className='bi bi-floppy'></i>
+                                        </span>
+                                        บันทึก
+                                    </button>
+                                </div>
+                                <table className='table table-hover h-100'>
+                                    <thead>
+                                        <tr>
+                                            <th>ลำดับ</th>
+                                            <th>คำถาม</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div >
+                                    </thead>
+                                    <tbody>
+                                        {question.map((item, index) => (
+                                            <tr key={index}>
+                                                <td>
+                                                    {index + 1}
+                                                </td>
+                                                <td>
+                                                    <div className="input-group">
+                                                        <textarea
+                                                            key={key}
+                                                            defaultValue={item}
+                                                            onChange={e => handleChange(e, index)}
+                                                            className='form-control'
+                                                            required
+                                                            rows={3}
+                                                        />
+                                                        <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
+                                                            <i className='bi bi-trash'></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div >
+                        </form>
                     )
                     }
                 </div>

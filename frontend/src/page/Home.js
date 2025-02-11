@@ -15,7 +15,7 @@ import LoadingPage from '../components/LoadingPage'
 function Home() {
 
   const { user } = useAuthContext()
-  const { data, error, status } = useFetch('/api/conference/three')
+  const { data, error, status } = useFetch('/api/conference/current')
 
   if (status === 'loading' || status === 'idle') {
     return <LoadingPage />
@@ -38,14 +38,14 @@ function Home() {
                 <h5 className='my-5 fw-normal'>สร้างงานประชุม และส่งบทความวิชาการตามหัวข้อที่สนใจได้ที่ Paper submission</h5>
               </div>
               <div className='col-12 align-middle'>
-                <div className='row g-3'>
+                <div className='row gy-3 gx-5 align-items-center'>
                   <div className='col-6'>
-                    <Link to={user ? "/setting" : "/signup"} className='btn btn-outline-primary w-100'>
+                    <Link to={user ? "/setting" : "/signup"} className='btn btn-primary w-100'>
                       เริ่มต้นใช้งาน
                     </Link>
                   </div>
                   <div className='col-6'>
-                    <Link to='/confr' className='text-secondary'>
+                    <Link to='/confr' className='text-primary'>
                       <i className='bi bi-search me-1'></i> ค้นหางานประชุม
                     </Link>
                   </div>
@@ -71,12 +71,12 @@ function Home() {
               <div className='row g-4 hover-card'>
                 {data.map(items => (
                   <a href={`/confr/${items._id}`} key={items._id} className='col-lg-4'>
-                    <div className='card border-0 h-100'>
+                    <div className='card  h-100'>
                       <div className='card-body'>
                         <h4 className='fw-bold card-title'>{items.confr_code}</h4>
                         <p>
                           <i className='bi bi-calendar-event-fill me-2 text-primary'></i>
-                          {dayjs(items.confr_end_date).format('DD MMM, YYYY')}
+                          {dayjs(items.confr_end_date).format('DD MMM YYYY')}
                         </p>
                         <p>{items.title}</p>
                         {items.cate &&
@@ -208,13 +208,13 @@ function Home() {
             </div>
           </div>
           <div className='col-12 col-lg-6 text-center'>
-            <img src={Guide} alt='how to' />
+            <img src={Guide} alt='how to' width={375} />
           </div>
         </div>
 
       </section>
       <section className='container' style={{ paddingBottom: "128px" }}>
-        <div className='card border-0 text-center shadow p-5'>
+        <div className='card  text-center shadow p-5'>
           <div className='card-body'>
             <div>
               <div className='mb-3'>

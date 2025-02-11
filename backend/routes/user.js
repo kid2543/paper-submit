@@ -24,7 +24,8 @@ const {
     getAll,
     adminViewUser,
     updateUser,
-    userUpdateDetail
+    userUpdateDetail,
+    changePassword
 } = require('../controllers/user_controller')
 const checkRole = require('../middlewares/checkRole')
 
@@ -88,7 +89,7 @@ router.get('/all', verifyToken, checkRole(['ADMIN']), getAll)
 router.get('/search/host', verifyToken, checkRole(['ADMIN']), searchHost)
 
 // search Committee
-router.get('/search/committee', verifyToken, checkRole(['ADMIN']), searchComit)
+router.get('/search/committee', verifyToken, checkRole(['ADMIN', 'HOST']), searchComit)
 
 // search author
 router.get('/search/author', verifyToken, checkRole(['ADMIN']), searchAuthor)
@@ -113,6 +114,9 @@ router.patch('/update/:id', verifyToken, checkRole(['ADMIN']), updateUser)
 
 // user update user detail
 router.patch('/detail/update', verifyToken, userUpdateDetail)
+
+// change password
+router.patch('/password/change', verifyToken, changePassword)
 
 module.exports = router
 

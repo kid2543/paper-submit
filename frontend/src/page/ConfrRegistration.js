@@ -78,17 +78,17 @@ function ConfrRegistration() {
                     <section style={{ padding: "64px 0px" }}>
                         <div className='container'>
                             <h4 className='fw-bold mb-4'>ข้อมูลการลงทะเบียน</h4>
-                            <div className='card border-0 shadow'>
+                            <div className='card  shadow'>
                                 <div className='card-body'>
                                     {data.regis_eb_start_date &&
                                         <div>
                                             <p>Early Bird:
-                                                <span className='mx-2 badge bg-dark'>
-                                                    {data.regis_eb_start_date && dayjs(data.regis_eb_start_date).format('DD/MM/YYYY')}
+                                                <span className='mx-2 badge text-bg-light'>
+                                                    {data.regis_eb_start_date && dayjs(data.regis_eb_start_date).format('DD MMM YYYY')}
                                                 </span>
                                                 -
-                                                <span className='mx-2 badge bg-dark'>
-                                                    {data.regis_eb_end_date && dayjs(data.regis_eb_end_date).format('DD/MM/YYYY')}
+                                                <span className='mx-2 badge text-bg-light'>
+                                                    {data.regis_eb_end_date && dayjs(data.regis_eb_end_date).format('DD MMM YYYY')}
                                                 </span>
                                             </p>
                                         </div>
@@ -96,22 +96,22 @@ function ConfrRegistration() {
                                     {data.regis_rl_start_date &&
                                         <div>
                                             <p>Regular:
-                                                <span className='badge bg-dark mx-2'>
+                                                <span className='badge text-bg-light mx-2'>
                                                     {data.regis_rl_start_date &&
-                                                        dayjs(data.regis_rl_start_date).format('DD/MM/YYYY')
+                                                        dayjs(data.regis_rl_start_date).format('DD MMM YYYY')
                                                     }
                                                 </span>
                                                 -
-                                                <span className='badge bg-dark mx-2'>
+                                                <span className='badge text-bg-light mx-2'>
                                                     {data.regis_rl_end_date &&
-                                                        dayjs(data.regis_rl_end_date).format('DD/MM/YYYY')
+                                                        dayjs(data.regis_rl_end_date).format('DD MMM YYYY')
                                                     }
                                                 </span>
                                             </p>
                                         </div>
                                     }
                                     <div className='table-responsive'>
-                                        <table className='table table-hover'>
+                                        <table className='table table-hover' style={{width: "800px"}}>
                                             <thead>
                                                 <tr>
                                                     <th>-</th>

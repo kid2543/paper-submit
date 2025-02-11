@@ -10,12 +10,22 @@ import LoadingPage from "../LoadingPage";
 // react boostatrap
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { toast } from "react-toastify";
+import ConfirmDeleteDialog from "../ConfirmDeleteDialog";
 
 function Conference() {
 
-    const { data, error, status, page, totalPages, setData, handleSearchChange, handleNextPage, handlePreviousPage } = useSearch("/api/conference/search")
+    const {
+        data,
+        error,
+        status,
+        page,
+        totalPages,
+        setData,
+        handleSearchChange,
+        handleNextPage,
+        handlePreviousPage
+    } = useSearch("/api/conference/search")
     const [show, setShow] = useState(false)
     const [errorText, setErrorText] = useState('')
 
@@ -47,126 +57,110 @@ function Conference() {
 
     const handleDelete = async (confr_id, confr_code, status) => {
         if (status === true) {
+            handleCloseDelete()
             return toast.warning('กรุณาปิดงานประชุมก่อนทำการลบ')
         }
 
-        if (window.confirm(`ต้องการลบงานประชุม ${confr_code} หรือไม่ ?`)) {
-            try {
-                await axios.delete('/api/conference/delete/' + confr_id)
-                setData(data.filter(items => items._id !== confr_id))
-                toast.success(`ลบงานประชุม ${confr_code} แล้ว`)
-            } catch (error) {
-                console.log(error)
-                toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
-            }
+        try {
+            await axios.delete('/api/conference/delete/' + confr_id)
+            setData(data.filter(items => items._id !== confr_id))
+            toast.success(`ลบงานประชุม ${confr_code} แล้ว`)
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด ' + error.response.data?.error)
+        } finally {
+            handleCloseDelete()
         }
     }
 
-    const handleStatus = async (e, confr_id, confr_code) => {
-        const { checked } = e.target
-        if (window.confirm(`ต้องการเปลี่ยนสถานงานประชุม ${confr_code} หรือไม่ ?`)) {
-            if (checked) {
-                try {
-                    await axios.patch(`/api/conference`, {
-                        _id: confr_id,
-                        status: true
-                    })
-                    setData(data.map(items =>
-                        items._id === confr_id ?
-                            {
-                                ...items,
-                                status: true
-                            } : {
-                                items
-                            }
-                    ))
-                    toast.success("เปิดงานประชุมสำเร็จ")
-                } catch (error) {
-                    console.log(error)
-                    toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
-                }
-            } else {
-                try {
-                    await axios.patch(`/api/conference`, {
-                        _id: confr_id,
-                        status: false
-                    })
-                    setData(data.map(items =>
-                        items._id === confr_id ?
-                            {
-                                ...items,
-                                status: false
-                            } : {
-                                items
-                            }
-                    ))
-                    toast.success('ปิดงานประชุมแล้ว')
-                } catch (error) {
-                    console.log(error)
-                    toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
-                }
-            }
-        }
-    }
+    // confirm delete
+    const [showDelete, setShowDelete] = useState(false)
+    const [deleteId, setDeleteId] = useState({
+        id: '',
+        code: '',
+        status: null
+    })
 
-    if (status === 'idie' || status === 'loading') {
-        return <LoadingPage />
+    const handleShowDelete = (id, code, status) => {
+        setShowDelete(true)
+        setDeleteId({
+            id,
+            code,
+            status
+        })
     }
-
+    const handleCloseDelete = () => {
+        setShowDelete(false)
+        setDeleteId({
+            id: '',
+            code: '',
+            status: null
+        })
+    }
 
     if (error) {
         return <div>Error</div>
     }
 
     return (
-            <div className="px-5 py-4">
-                <Modal show={show} onHide={handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>สร้างงานประชุม</Modal.Title>
-                    </Modal.Header>
-                    <form onSubmit={handleCreateConfr}>
-                        <Modal.Body className='row g-3'>
-                            <div className='col-12'>
-                                <label className='form-label'>ชื่องานประชุม</label>
-                                <input className='form-control' name='title' required />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>รหัสงานประชุม</label>
-                                <input className='form-control' name='confr_code' required onFocus={() => setErrorText('')} />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>เริ่ม</label>
-                                <input className='form-control' type='date' name='confr_start_date' required />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>สิ้นสุด</label>
-                                <input className='form-control' type='date' name='confr_end_date' required />
-                            </div>
-                            {errorText &&
-                                <p className="text-danger">{errorText}</p>
-                            }
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleClose}>
-                                ปิด
-                            </Button>
-                            <Button variant="primary" type='submit'>
-                                สร้าง
-                            </Button>
-                        </Modal.Footer>
-                    </form>
-                </Modal>
-                <div className="card border-0 shadow-sm">
-                    <div className="card-body">
-                        <p className="fw-bold">รายการงานประชุม</p>
-                        <div className='d-flex justify-content-between mb-3'>
-                            <form onSubmit={handleSearchChange}>
-                                <input className='form-control' placeholder='ค้นหา' name='search' />
-                            </form>
-                            <div>
-                                <button className='btn btn-primary' type='button' onClick={handleShow}>เพิ่มงานประชุม</button>
-                            </div>
+        <div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>สร้างงานประชุม</Modal.Title>
+                </Modal.Header>
+                <form onSubmit={handleCreateConfr}>
+                    <Modal.Body className='row g-3'>
+                        <div className='col-12'>
+                            <label className='form-label'>ชื่องานประชุม</label>
+                            <input className='form-control' name='title' required />
                         </div>
+                        <div className='col-12'>
+                            <label className='form-label'>รหัสงานประชุม</label>
+                            <input className='form-control' name='confr_code' required onFocus={() => setErrorText('')} />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>เริ่ม</label>
+                            <input className='form-control' type='date' name='confr_start_date' required />
+                        </div>
+                        <div className='col-12'>
+                            <label className='form-label'>สิ้นสุด</label>
+                            <input className='form-control' type='date' name='confr_end_date' required />
+                        </div>
+                        {errorText &&
+                            <p className="text-danger">{errorText}</p>
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="" onClick={handleClose}>
+                            ปิด
+                        </Button>
+                        <Button variant="primary" type='submit'>
+                            สร้าง
+                        </Button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+            <ConfirmDeleteDialog
+                header={`ยืนยันการลบงานประชุม ${deleteId.code} ?`}
+                message='หากมีบทความที่ถูกส่งเข้ามายังงานประชุมนี้ จะไม่สามารถลบได้'
+                onCancel={handleCloseDelete}
+                onConfirm={() => handleDelete(deleteId.id, deleteId.code, deleteId.status)}
+                show={showDelete}
+            />
+            <div className="card shadow-sm">
+                <div className="card-body">
+                    <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <h4 className="mb-0 fw-bold">รายการงานประชุม</h4>
+                        <div>
+                            <button className='btn btn-primary' type='button' onClick={handleShow}>เพิ่มงานประชุม</button>
+                        </div>
+                    </div>
+                    <form onSubmit={handleSearchChange} className="mb-3">
+                        <input className='form-control' placeholder='ค้นหา' name='search' />
+                    </form>
+                    {status === 'idle' || status === 'loading' ? (
+                        <LoadingPage />
+                    ) : (
                         <div className="table-responsive">
                             <table className='table' style={{ minWidth: "1000px", minHeight: '400px' }}>
                                 <thead>
@@ -186,26 +180,25 @@ function Conference() {
                                                 <td>{item.confr_code}</td>
                                                 <td>{dayjs(item.confr_end_date).format("DD MMM YYYY")}</td>
                                                 <td>
-                                                    <div className='form-check form-switch'>
-                                                        <input className='form-check-input' type='checkbox' defaultChecked={item.status} onChange={e => handleStatus(e, item._id, item.confr_code)} />
                                                         {item.status ? (
-                                                            <label className='form-check-label'>
-                                                                Active
-                                                            </label>
+                                                            <span className="badge bg-success">
+                                                                เปิด
+                                                            </span>
                                                         ) : (
-                                                            <label className='form-check-label text-muted'>
-                                                                Inactive
-                                                            </label>
+                                                            <span className="badge bg-secondary">
+                                                                ปิด
+                                                            </span>
                                                         )}
-                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <button type="button" className="btn btn-primary me-2" onClick={() => handleEdit(item._id)}>
-                                                        <i className="bi bi-pencil-square"></i>
-                                                    </button>
-                                                    <button className="btn btn-danger" type="button" onClick={() => handleDelete(item._id, item.confr_code, item.status)}>
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
+                                                    <div className="btn-group">
+                                                        <button type="button" className="btn btn-light" onClick={() => handleEdit(item._id)}>
+                                                            <i className="bi bi-pencil-square"></i>
+                                                        </button>
+                                                        <button className="btn btn-light text-danger" type="button" onClick={() => handleShowDelete(item._id, item.confr_code, item.status)}>
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
                                                     {/* <Dropdown>
                                                     <Dropdown.Toggle variant="" id="dropdown-basic">
                                                         <i className="bi bi-three-dots"></i>
@@ -239,21 +232,22 @@ function Conference() {
                                 )}
                             </table>
                         </div>
-                        <div className='d-flex justify-content-between align-items-center'>
-                            <span>{`Page ${page} of ${totalPages}`}</span>
-                            <div>
-                                <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                                    <i className="bi bi-arrow-left"></i> ก่อนหน้า
-                                </button>
-                                <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link'>
-                                    ถัดไป <i className="bi bi-arrow-right"></i>
-                                </button>
-                            </div>
+                    )}
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <span>{`Page ${page} of ${totalPages}`}</span>
+                        <div>
+                            <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
+                                <i className="bi bi-arrow-left"></i> ก่อนหน้า
+                            </button>
+                            <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link'>
+                                ถัดไป <i className="bi bi-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-
             </div>
+
+        </div>
     )
 
 }

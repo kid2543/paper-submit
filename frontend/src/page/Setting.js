@@ -33,7 +33,7 @@ function Setting() {
         if (user) {
             fetchRole()
         }
-    }, [user])
+    }, [user, dispatch])
 
     if (!user) {
         return <Navigate to='/' />

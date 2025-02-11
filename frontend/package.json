@@ -1,5 +1,6 @@
 {
-  "proxy": "http://localhost:4000/",
+  "proxy": "http://localhost:4000",
+  "homepage": "https://4aa6-2001-fb1-10f-81d9-f9d-38b7-cecf-40ac.ngrok-free.app",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
@@ -19,7 +20,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
     "react-scripts": "5.0.1",
-    "react-toastify": "^10.0.5",
+    "react-toastify": "^10.0.6",
     "sass": "^1.70.0",
     "swiper": "^11.1.0",
     "web-vitals": "^2.1.4"

@@ -39,6 +39,22 @@ const readNotification = async (req, res) => {
     }
 }
 
+// confr read notification
+const getConfrNotification = async (req, res) => {
+    const { id } = req.params
+    
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({error : 'รหัสงานประชุมไม่ถูกต้อง'})
+    }
+
+    try {
+        const noti = await Notification.find({user_id: id})
+        res.status(200).json(noti)
+    } catch (error) {
+        res.status(400).json({error : error.message})
+    }
+}
+
 // clear all notification
 const clearNotification = async (req, res) => {
     const { _id } = req.user
@@ -61,5 +77,6 @@ const clearNotification = async (req, res) => {
 module.exports = {
     getAllNotification,
     readNotification,
-    clearNotification
+    clearNotification,
+    getConfrNotification
 }

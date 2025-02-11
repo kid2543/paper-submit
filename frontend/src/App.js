@@ -2,6 +2,8 @@ import './App.css';
 
 import { Route, Routes, Navigate } from 'react-router-dom'
 import { useAuthContext } from './hook/useAuthContext';
+import { ToastContainer } from 'react-toastify';
+
 
 // component
 import PrivateRoute from './components/PrivateRoute';
@@ -19,7 +21,6 @@ import PaperDetail from './page/PaperDetail';
 import ConfrList from './page/ConfrList';
 import Confr from './page/Confr';
 import Submit from './page/Submit';
-import UnAuthorized from './page/UnAuthorized';
 import Author from './page/Author';
 import AuthorPaper from './page/AuthorPaper';
 import HostDashboard from './page/HostDashboard';
@@ -62,6 +63,8 @@ import Award from './components/HostEdit/Award';
 import ViewAward from './components/ViewAward';
 import AwardCateList from './components/HostEdit/AwardCateList';
 import AdminSignUp from './page/AdminSignUp';
+import AuthorLayout from './layout/AuthorLayout';
+import Archive from './page/Archive';
 
 
 function App() {
@@ -79,11 +82,11 @@ function App() {
 
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path='/login' element={!user ? <Login /> : <Navigate to='/' />} />
         <Route path='/signup' element={!user ? <SignUp /> : <Navigate to='/' />} />
         <Route path='/' element={<HomeLayout><Home /></HomeLayout>} />
-        <Route path='/unauthorized' element={<UnAuthorized />} />
         <Route path='/confr' element={<HomeLayout><ConfrList /></HomeLayout>} />
         <Route path='/paper' element={<HomeLayout><Paper /></HomeLayout>} />
         <Route path='/paper/:id' element={<HomeLayout><PaperDetail /></HomeLayout>} />
@@ -132,7 +135,7 @@ function App() {
             </ConfrLayout>
           }
         />
-        <Route path='/submit/:id'
+        <Route path='/submit'
           element={
             <PrivateRoute api={authorApi}>
               <HomeLayout>
@@ -144,15 +147,29 @@ function App() {
         <Route path='/author'
           element={
             <PrivateRoute api={authorApi} >
-              <Author />
+              <AuthorLayout>
+                <Author />
+              </AuthorLayout>
             </PrivateRoute>
           }
         />
         <Route
-          path='/author/:id'
+          path='/author/paper/:id'
           element={
             <PrivateRoute api={authorApi}>
-              <AuthorPaper />
+              <AuthorLayout>
+                <AuthorPaper />
+              </AuthorLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/author/archive'
+          element={
+            <PrivateRoute api={authorApi}>
+              <AuthorLayout>
+                <Archive />
+              </AuthorLayout>
             </PrivateRoute>
           }
         />

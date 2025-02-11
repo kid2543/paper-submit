@@ -27,8 +27,11 @@ const uploadVenue = async (req, res) => {
 
     try {
         const oldFile = await Conferences.findById(id)
-        if (oldFile.venue_image) {
-            fs.unlink('public/uploads/' + oldFile.venue, (err) => {
+        const confr = await Conferences.findByIdAndUpdate(id, {
+            venue_image: filename
+        }, { new: true })
+        if (oldFile.venue_image !== '') {
+            fs.unlink('public/uploads/' + oldFile.venue_image, (err) => {
                 if (err) {
                     console.error('Error deleteing the file: ', err)
                 } else {
@@ -36,9 +39,6 @@ const uploadVenue = async (req, res) => {
                 }
             })
         }
-        const confr = await Conferences.findByIdAndUpdate(id, {
-            venue_image: filename
-        }, { new: true })
         res.status(200).json(confr)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -65,7 +65,10 @@ const uploadLogo = async (req, res) => {
 
     try {
         const oldFile = await Conferences.findById(id)
-        if (oldFile.logo) {
+        const confr = await Conferences.findByIdAndUpdate(id, {
+            logo: filename
+        }, { new: true })
+        if (oldFile.logo !== '') {
             fs.unlink('public/uploads/' + oldFile.logo, (err) => {
                 if (err) {
                     console.log('Error deleteing the file oldfile:', err)
@@ -73,9 +76,6 @@ const uploadLogo = async (req, res) => {
                 console.log('old file is deleted')
             })
         }
-        const confr = await Conferences.findByIdAndUpdate(id, {
-            logo: filename
-        }, { new: true })
         res.status(200).json(confr)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -158,15 +158,16 @@ const allConference = async (req, res) => {
 // get 3 conference
 const getHomeConfr = async (req, res) => {
     try {
-        const confr = await Conferences.find({status: true}).sort({confr_start_date : 'asc'}).limit(3)
+        const confr = await Conferences.find({ status: true }).sort({ confr_start_date: 'asc' }).limit(3)
         res.status(200).json(confr)
     } catch (error) {
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
 //get open conference
 const openConference = async (req, res) => {
+    const today = new Date()
     try {
         const confr = await Conferences.find({ status: true })
         res.status(200).json(confr)
@@ -185,7 +186,7 @@ const singleConference = async (req, res) => {
     }
 
     try {
-        const confr = await Conferences.findOne({ _id: id, status: true }).populate("publication")
+        const confr = await Conferences.findOne({ _id: id }).populate("publication")
         if (!confr) {
             return res.status(404).json({ error: 'Item not found' })
         }
@@ -218,16 +219,16 @@ const getConferenceHost = async (req, res) => {
 const getConferenceOwner = async (req, res) => {
     const { id } = req.params
 
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error : 'รหัสผู้ใช้งานไม่ถูกต้อง'})
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสผู้ใช้งานไม่ถูกต้อง' })
     }
 
     try {
-        const confr = await Conferences.find({owner: id})
+        const confr = await Conferences.find({ owner: id })
         res.status(200).json(confr)
     } catch (error) {
         console.log(error)
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -295,7 +296,7 @@ const hostSeachConference = async (req, res) => {
 
     const { _id } = req.user
 
-    let query = {owner: _id}
+    let query = { owner: _id }
 
     if (search) {
         query = { title: { $regex: search, $options: 'i' }, owner: _id }
@@ -326,19 +327,31 @@ const hostSeachConference = async (req, res) => {
 const deleteConference = async (req, res) => {
     const { id } = req.params
 
+    const { role } = req.user
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: 'รหัสงานประชุมไม่ถูกต้อง' })
     }
-
     try {
-        const paper = await Paper.find({ confr_id: id, status: { $ne: 'CANCEL' } })
+        const paper = await Paper.find({ confr_code: id, status: { $ne: 'CANCEL' } })
         if (paper.length > 0)
             return res.status(400).json({ error: 'งานประชุมมีบทความที่กำลังดำเนินการไม่สามารถลบได้' })
-        const confr = await Conferences.findById(id)
+        let confr = {}
+        if(role !== 'ADMIN') {
+            confr = await Conferences.findOne({_id: id, owner: req.user._id})
+            console.log('ไม่ใช่ Admin')
+        } else {
+            confr = await Conferences.findById(id)
+            console.log('ฉันเป็นแอดมิน')
+        }
         if (confr) {
             if (confr.venue_image)
                 fs.unlink(`public/uploads/${confr.venue_image}`, (err) => {
-                    if (err) throw err
+                    if (err) {
+                        console.log('ลบไฟล์สถานที่จัดงานไม่สำเร็จ',err)
+                    } else {
+                        console.log("ลบไฟล์รูปสถานที่จัดงานแล้ว")
+                    }
                 })
             await confr.deleteOne()
         }

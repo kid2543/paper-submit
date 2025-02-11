@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
 import useFetch from '../../hook/useFetch'
 import { useNavigate, useParams } from 'react-router-dom'
-import dayjs from 'dayjs'
 
 // react bootstrap
-import { 
+import {
     Modal,
     Button,
     Breadcrumb
-     } from 'react-bootstrap'
+} from 'react-bootstrap'
 import axios from 'axios'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 function Award() {
 
@@ -35,28 +34,21 @@ function Award() {
         setShow(false)
     }
 
-    if (paper.data?.length === 0) {
-        return <h4 className='py-5'>ไม่พบบทความ</h4>
-    }
-
     return (
-        <div className='py-5'>
-            <Breadcrumb>
-                <Breadcrumb.Item href="/host/edit/award">รางวัลดีเด่น</Breadcrumb.Item>
-                <Breadcrumb.Item active>
-                    แก้ไขรางวัลดีเด่น
-                </Breadcrumb.Item>
-            </Breadcrumb>
-            <ToastContainer />
-            {cate.data &&
-                <div className='mb-4'>
-                    <h4 className='fw-bold'>รางวัลดีเด่นประจำหัวข้อ <span className='text-primary'>{cate.data.name}</span></h4>
-                    <p className='text-muted'>จัดอันดับรางวัลดีเด่นได้ที่นี่!</p>
-                    <div>
-                        <button type='button' onClick={() => navigate(`/host/view/award/${id}`)} className='btn btn-primary text-white'>ดูการจัดอันดับ</button>
-                    </div>
+        <div>
+            <div className='card mb-3'>
+                <div className='card-body'>
+                    <Breadcrumb>
+                        <Breadcrumb.Item href="/host/edit/award">รางวัลดีเด่น</Breadcrumb.Item>
+                        <Breadcrumb.Item active>
+                            แก้ไขรางวัลดีเด่น
+                        </Breadcrumb.Item>
+                    </Breadcrumb>
+                    <h4 className='fw-bold card-title'>รางวัลดีเด่นประจำหัวข้อ <span className='text-primary'>{cate.data?.name}</span></h4>
+                    <p className='text-muted card-text'>จัดอันดับรางวัลดีเด่นได้ที่นี่!</p>
+                    <button type='button' onClick={() => navigate(`/host/view/award/${id}`)} className='btn btn-primary text-white'>ดูการจัดอันดับ</button>
                 </div>
-            }
+            </div>
             {paper.data &&
                 <div>
                     <UpdateAwardRateModal
@@ -66,32 +58,36 @@ function Award() {
                         key={paper.key}
                         setKey={paper.setKey}
                     />
-                    <h6 className='fw-bold mb-4'>รายการบทความในหัวข้อนี้</h6>
-                    <div className='table-responsive'>
-                        <table className='table' style={{ minWidth: '1000px' }}>
-                            <thead>
-                                <tr>
-                                    <th>อันดับปัจจุบัน</th>
-                                    <th>รหัสบทความ</th>
-                                    <th>ชื่อ</th>
-                                    <th>เครื่องมือ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {paper.data.map(papers => (
-                                    <tr key={papers._id}>
-                                        <td>{papers.award_rate}</td>
-                                        <td>{papers.paper_code}</td>
-                                        <td>{papers.title}</td>
-                                        <td>
-                                            <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
-                                                <i className='bi bi-pencil-square'></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className='card'>
+                        <div className="card-body">
+                            <h6 className='fw-bold card-title'>รายการบทความในหัวข้อนี้</h6>
+                            <div className='table-responsive'>
+                                <table className='table' style={{ minWidth: '1000px' }}>
+                                    <thead>
+                                        <tr>
+                                            <th>อันดับปัจจุบัน</th>
+                                            <th>รหัสบทความ</th>
+                                            <th>ชื่อ</th>
+                                            <th>เครื่องมือ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {paper.data.map(papers => (
+                                            <tr key={papers._id}>
+                                                <td>{papers.award_rate}</td>
+                                                <td>{papers.paper_code}</td>
+                                                <td>{papers.title}</td>
+                                                <td>
+                                                    <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
+                                                        <i className='bi bi-pencil-square'></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }

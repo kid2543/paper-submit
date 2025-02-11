@@ -1,84 +1,163 @@
 import React, { useState } from 'react'
 import { useSignup } from '../hook/useSignup'
 import { Link } from 'react-router-dom'
-import Logo from '../asset/logo.png'
 
 // toast
-import { ToastContainer } from 'react-toastify'
+
+// react-bootstrap
+import {
+    Modal,
+} from 'react-bootstrap'
+
+//asset
+import Success from '../asset/checked.png'
 
 const SignUp = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const { signup, error, isLoading } = useSignup()
+    const [Name, setName] = useState('')
+    const [Email, setEmail] = useState('')
+    const { signup, error, isLoading, newUser } = useSignup()
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await signup(username, password)
+        await signup(username, password, '', Name, Email)
+    }
+
+    if (newUser) {
+        return (
+            <div
+                className="modal show bg-dark bg-gradient vh-100 align-items-center d-flex"
+                style={{ display: 'block', position: 'initial' }}
+            >
+                <Modal.Dialog className="w-100">
+                    <Modal.Body className='p-3'>
+                        <div className="text-center">
+                            <div className="mb-3">
+                                <img src={Success} alt='...' width={128} height={128} />
+                                <div className='my-3'>
+                                    <small className="text-success">ยืนดีด้วย!</small>
+                                </div>
+                            </div>
+                            <div className="mb-5">
+                                <h3>คุณลงทะเบียนสำเร็จแล้ว</h3>
+                                <div className="text-muted">เริ่มการใช้งานด้วยการกดปุ่มด้านล่างแล้วลงชื่อเข้าใช้งานเลย</div>
+                            </div>
+                            <Link
+                                to={'/login'}
+                                className="btn btn-primary"
+                            >
+                                <i className='bi bi-box-arrow-in-right me-2'></i>
+                                เข้าสู่ระบบ
+                            </Link>
+                        </div>
+                    </Modal.Body>
+
+                </Modal.Dialog>
+            </div>
+        )
     }
 
     return (
-        <div className='container'>
-            <ToastContainer />
-            <div className='row align-items-center vh-100 py-5 g-5'>
-                <div className='col-12 col-lg-6'>
-                    <form onSubmit={handleSubmit} className='card border-0 shadow text-bg-light'>
-                        <div className='card-body row gy-3'>
-                            <div className='col-12'>
-                                <h2>ลงทะเบียน</h2>
-                                <p className='text-muted'>กรอกรายละเอียดแล้วกดยืนยันเพื่อลงทะเบียน</p>
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>ชื่อ - นามสกุล</label>
-                                <input className='form-control' />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>ชื่อผู้ใช้งาน</label>
-                                <input
-                                    type='text'
-                                    onChange={e => setUsername(e.target.value)}
-                                    value={username}
-                                    className='form-control'
-                                    required
-                                />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>รหัสผ่าน</label>
-                                <input
-                                    type='password'
-                                    onChange={e => setPassword(e.target.value)}
-                                    value={password}
-                                    className='form-control'
-                                    required
-                                />
-                            </div>
-                            <div className='col-12'>
-                                <label className='form-label'>ยืนยันรหัสผ่าน</label>
-                                <input
-                                    type='password'
-                                    pattern={password}
-                                    className='form-control'
-                                    required
-                                />
-                            </div>
-                            <div className='col-12'>
-                                <button className='btn btn-primary w-100' disabled={isLoading}>Submit</button>
-                            </div>
-                            {error && <p className='text-danger'>{error}</p>}
-                            <div className='text-center'>
-                                <small>Back to <Link to='/'>Home</Link> or <Link to='/login'>Login</Link></small>
+        <section className='vh-100 bg-primary bg-gradient'>
+            <div className="d-flex h-100 align-items-center">
+                <div className="card col-md-6 col-lg-4 mx-auto p-3">
+                    <div className="card-body">
+                        <div className="text-center mb-5">
+                            <h1 className="card-title fw-bold">ลงทะเบียน</h1>
+                            <div className="text-muted">
+                                กรอกข้อมูลผู้ใช้งาน และรหัสผ่านเพื่อลงทะเบียนกับ PAPERSS
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div className='col-6 d-none d-lg-flex bg-primary h-100 d-flex align-items-center rounded'>
-                    <div className='w-100'>
-                        <div className='text-center'>
-                            <img src={Logo} alt='paper submission' />
+                        <form onSubmit={handleSubmit} className="mb-3">
+                            <div className="mb-5">
+                                {error &&
+                                    <div className="alert alert-danger">
+                                        <i className="me-2 bi bi-exclamation-triangle-fill"></i> {error}
+                                    </div>
+                                }
+                                <div className="form-floating text-muted mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id='floatingEmail'
+                                        placeholder='อีเมล'
+                                        value={Email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        required
+                                    />
+                                    <label htmlFor='floatingEmail'>อีเมล</label>
+                                </div>
+                                <div className="form-floating text-muted mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id='floatingName'
+                                        placeholder='ชื่อ - นามสกุล'
+                                        value={Name}
+                                        onChange={e => setName(e.target.value)}
+                                        required
+                                    />
+                                    <label htmlFor='floatingName'>ชื่อ - นามสกุล</label>
+                                </div>
+                                <div className="form-floating text-muted mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id='floatingInput'
+                                        placeholder='ชื่อผู้ใช้ (ใช้สำหรับเข้าสู่ระบบ)'
+                                        value={username}
+                                        onChange={e => setUsername(e.target.value)}
+                                        required
+                                    />
+                                    <label htmlFor='floatingInput'>ชื่อผู้ใช้ (ใช้สำหรับเข้าสู่ระบบ)</label>
+                                </div>
+                                <div className="form-floating text-muted mb-3">
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id='floatingPassword'
+                                        placeholder='รหัสผ่าน'
+                                        value={password}
+                                        onChange={e => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <label htmlFor='floatingPassword'>รหัสผ่าน</label>
+                                </div>
+                                <div className="form-floating text-muted mb-3">
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        id='floatingCPassword'
+                                        placeholder='ยืนยันรหัสผ่าน'
+                                        pattern={password}
+                                        required
+                                    />
+                                    <label htmlFor='floatingCPassword'>ยืนยันรหัสผ่าน</label>
+                                </div>
+                            </div>
+                            {isLoading ? (
+                                <button className="btn btn-primary w-100" type="button" disabled>
+                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </button>
+                            ) : (
+                                <button
+                                    type='submit'
+                                    className="btn btn-primary w-100"
+                                >
+                                    ลงทะเบียน
+                                </button>
+                            )}
+                        </form>
+                        <div className="text-center text-muted">
+                            <small>มีบัญชีอยู่แล้ว ? <a href='/login'>เข้าสู่ระบบ</a></small>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 

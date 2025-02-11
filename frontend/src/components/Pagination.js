@@ -1,32 +1,36 @@
 import React from 'react';
+import Pagination from 'react-bootstrap/Pagination';
 
-const Pagination = ({ currentPage, totalPages, onPageNext, onPagePrev }) => {
+const PaginationComponent = ({ currentPage, totalPages, onPageNext, onPagePrev }) => {
   const pageNumbers = [];
 
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
+  if (totalPages < 5) {
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+  } else if (currentPage + 4 > totalPages) {
+    for(let i = totalPages - 4; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+  } else {
+    for(let i = currentPage; i <= currentPage + 4; i++) {
+      pageNumbers.push(i)
+    }
   }
 
+
+
   return (
-    <nav>
-      <div className='mt-4'>
-        {pageNumbers.map(number => (
-          <div key={number} className='d-flex justify-content-between'>
-            <span>page {currentPage} of {totalPages}</span>
-            <div>
-              <button disabled={currentPage - 1 < totalPages} onClick={onPagePrev} className="btn btn-link">
-                ก่อนหน้า
-              </button>
-              {pageNumbers}
-              <button disabled={currentPage + 1 > totalPages} onClick={onPageNext} className="btn btn-link">
-                ถัดไป
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </nav>
+    <Pagination>
+      <Pagination.First disabled={currentPage === 1} />
+      <Pagination.Prev onClick={onPagePrev} disabled={currentPage - 1 <= 0} />
+      {pageNumbers.map((pages) => (
+        <Pagination.Item key={pages} active={currentPage === pages}>{pages}</Pagination.Item>
+      ))}
+      <Pagination.Next onClick={onPageNext} disabled={currentPage + 1 > totalPages} />
+      <Pagination.Last disabled={currentPage === totalPages} />
+    </Pagination>
   );
 };
 
-export default Pagination;
+export default PaginationComponent;

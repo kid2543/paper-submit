@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import Modal from 'react-bootstrap/Modal';
+import {
+    Modal,
+} from 'react-bootstrap';
 import ConfirmModal from '../components/ConfirmModal';
 import { Link } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 
 function HostCateList() {
@@ -12,23 +15,40 @@ function HostCateList() {
     const [searchData, setSearchData] = useState([])
     const [show, setShow] = useState(false)
     const [showCM, setShowCM] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [deleteId, setDeleteId] = useState('')
     const [createError, setCreateError] = useState(null)
 
+
+    // confrim modal
     const handleClose = () => setShow(false)
     const handleShow = () => setShow(true)
+
+    // delete modal
+    const handleShowDelete = (id) => {
+        setShowDeleteModal(true)
+        setDeleteId(id)
+    }
+    const handleCloseDelete = () => {
+        setShowDeleteModal(false)
+        setDeleteId('')
+    }
 
     const id = sessionStorage.getItem('host_confr')
 
     const deleteCate = async (cate_id) => {
-        if (window.confirm("ต้องการจะลบหรือไม่ ?")) {
+        if (cate_id) {
             try {
                 const res = await axios.delete('/api/category/' + cate_id)
                 toast.success(res.data)
                 setSearchData(searchData.filter(items => items._id !== cate_id))
+                handleCloseDelete()
             } catch (error) {
                 console.log(error)
                 toast.error(error.response?.data.error)
             }
+        } else {
+            toast.error('กรุณาเลือกหัวข้อที่จะลบ')
         }
     }
 
@@ -71,21 +91,33 @@ function HostCateList() {
 
 
     return (
-        <div className='py-5'>
-            <ToastContainer />
-            <ConfirmModal show={showCM} setShow={setShowCM} noReturn={true} />
-            <div className='mb-4'>
-                <h4 className='fw-bold'>หัวข้องานประชุม</h4>
-                <p className='text-muted'>เพิ่มหัวข้องานประชุมและแก้ไขกรรมการประจำหัวข้อได้ที่นี่</p>
+        <div>
+            <ConfirmModal
+                show={showCM}
+                setShow={setShowCM}
+                noReturn={true}
+            />
+            <ConfirmDeleteDialog
+                header='ยืนยันการลบหัวข้องานประชุม'
+                message='ต้องการลบหัวข้องานประชุมนี้หรือไม่'
+                onCancel={handleCloseDelete}
+                onConfirm={() => deleteCate(deleteId)}
+                show={showDeleteModal}
+            />
+            <div className='mb-3 card'>
+                <div className="card-body">
+                    <h4 className='fw-bold card-title'>หัวข้องานประชุม</h4>
+                    <p className='text-muted card-text'>เพิ่มหัวข้องานประชุมและแก้ไขกรรมการประจำหัวข้อได้ที่นี่</p>
+                </div>
             </div>
-            <div className='card border-0 shadow-sm'>
+            <div className='card  shadow-sm'>
                 <div className='card-body'>
-                    <div className='d-md-flex justify-content-between mb-4 align-items-center'>
+                    <div className='d-md-flex justify-content-between mb-3 align-items-center'>
                         <h6 className='fw-bold mb-0'>รายการหัวข้องานประชุม</h6>
                         <button type='button' onClick={handleShow} className='btn btn-primary'><i className="bi bi-plus-lg me-2"></i>เพิ่มหัวข้องานประชุม</button>
                         <Modal show={show} onHide={handleClose}>
                             <Modal.Header closeButton>
-                                <Modal.Title>Create Category</Modal.Title>
+                                <Modal.Title>เพิ่มหัวข้องานประชุม</Modal.Title>
                             </Modal.Header>
                             <form onSubmit={handleCreate}>
                                 <Modal.Body className='row g-3 align-items-center'>
@@ -106,10 +138,10 @@ function HostCateList() {
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <button className="btn" onClick={handleClose}>
-                                        Close
+                                        ปิด
                                     </button>
                                     <button type='submit' className="btn btn-primary">
-                                        Create
+                                        สร้าง
                                     </button>
                                 </Modal.Footer>
                             </form>
@@ -121,7 +153,7 @@ function HostCateList() {
                                 <thead>
                                     <tr>
                                         <th>รหัส</th>
-                                        <th>รูป</th>
+                                        <th>ชื่อ</th>
                                         <th>จำนวนกรรมการ</th>
                                         <th>เครื่องมือ</th>
                                     </tr>
@@ -133,12 +165,14 @@ function HostCateList() {
                                             <td>{cate.name}</td>
                                             <td>{cate.reviewer_list.length}</td>
                                             <td>
-                                                <Link to={`/host/edit/category/${cate._id}`} type='button' className='btn btn-primary me-2'>
-                                                    <i className='bi bi-pen'></i>
-                                                </Link>
-                                                <button onClick={() => deleteCate(cate._id)} type='button' className='btn btn-danger'>
-                                                    <i className='bi bi-trash'></i>
-                                                </button>
+                                                <div className="btn-group">
+                                                    <Link to={`/host/edit/category/${cate._id}`} type='button' className='btn btn-primary'>
+                                                        <i className='bi bi-pen'></i>
+                                                    </Link>
+                                                    <button onClick={() => handleShowDelete(cate._id)} type='button' className='btn btn-danger'>
+                                                        <i className='bi bi-trash'></i>
+                                                    </button>
+                                                </div>
                                                 {/* <div className='d-flex'>
                                                     <Dropdown drop='down-centered'>
                                                         <Dropdown.Toggle variant="btn">

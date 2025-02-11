@@ -210,18 +210,20 @@ const removeInv = async (req, res) => {
         if (find.img) {
             fs.unlink("public/uploads/" + find.img, (err) => {
                 if (err) {
-                    return res.status(400).json({ error: err.message })
+                    console.log(err)
+                } else {
+                    console.log('ลบไฟล์แล้ว')
                 }
             })
-            console.log({ image: 'deleted' })
         }
         if (find.cv) {
             fs.unlink("public/uploads/" + find.cv, (err) => {
                 if (err) {
-                    return res.status(400).json({ error: err.message })
+                    console.log(err)
+                } else {
+                    console.log('ลบไฟล์แล้ว')
                 }
             })
-            console.log({ cv: 'deleted' })
         }
         await InvSpeaker.deleteOne({ _id: id })
         res.status(204).send('inv has delted')

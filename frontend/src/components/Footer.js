@@ -2,7 +2,7 @@ import React from 'react'
 
 function Footer() {
   return (
-    <div className='container'>
+    <div className='container-fluid'>
       <footer className='py-3 my-4'>
         <ul className='nav justify-content-center border-bottom mb-3'>
           <li className='nav-item'>

@@ -49,7 +49,7 @@ function ConfrInvSpeaker() {
                                 <div className='card-body'>
                                     <div className="row g-5 align-items-center p-5">
                                         <div className="col-md-3 text-center mb-3">
-                                            <img src={imagePath + item.img} className="img-thumbnail border-0" alt={item.name} />
+                                            <img src={imagePath + item.img} className="img-thumbnail " alt={item.name} />
                                         </div>
                                         <div className="col-md-9">
                                             <div className="card-body">

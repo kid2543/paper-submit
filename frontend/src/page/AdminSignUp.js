@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useSignup } from '../hook/useSignup'
-import { ToastContainer } from 'react-toastify'
 
 function AdminSignUp() {
 
@@ -18,7 +17,6 @@ function AdminSignUp() {
 
     return (
         <div className='py-5 container'>
-            <ToastContainer />
             <form onSubmit={handleSubmit} className='row'>
                 <div className="mb-3">
                     <label className="form-label">ชื่อ - นามสกุล</label>
