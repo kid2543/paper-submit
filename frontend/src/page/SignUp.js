@@ -60,8 +60,8 @@ const SignUp = () => {
     }
 
     return (
-        <section className='vh-100 bg-primary bg-gradient'>
-            <div className="d-flex h-100 align-items-center">
+        <section className='bg-primary bg-gradient'>
+            <div className="d-flex h-100 align-items-center py-4">
                 <div className="card col-md-6 col-lg-4 mx-auto p-3">
                     <div className="card-body">
                         <div className="text-center mb-5">
@@ -112,6 +112,9 @@ const SignUp = () => {
                                         required
                                     />
                                     <label htmlFor='floatingInput'>ชื่อผู้ใช้ (ใช้สำหรับเข้าสู่ระบบ)</label>
+                                    <div className='form-text mt-2'>
+                                        ชื่อผู้ใช้ต้องประกอบด้วย ตัวอักษรและตัวเลขอย่างน้อย 8 ตัวอักษรสามารถใช้ . หรือ _ ได้
+                                    </div>
                                 </div>
                                 <div className="form-floating text-muted mb-3">
                                     <input
@@ -124,6 +127,9 @@ const SignUp = () => {
                                         required
                                     />
                                     <label htmlFor='floatingPassword'>รหัสผ่าน</label>
+                                    <div className='form-text'>
+                                        รหัสผ่านประกอบด้วยตัวอักษรและตัวเลขอย่างน้อย 8 ตัวอักษร และจะต้องมี พิมพ์ใหญ่ พิมพ์เล็ก และ อักษรพิเศษ อย่างละ 1 ตัว
+                                    </div>
                                 </div>
                                 <div className="form-floating text-muted mb-3">
                                     <input
@@ -152,7 +158,7 @@ const SignUp = () => {
                             )}
                         </form>
                         <div className="text-center text-muted">
-                            <small>มีบัญชีอยู่แล้ว ? <a href='/login'>เข้าสู่ระบบ</a></small>
+                            <small>มีบัญชีอยู่แล้ว ? <Link to='/login'>เข้าสู่ระบบ</Link> หรือ <Link to='/'>กลับหน้าแรก</Link></small>
                         </div>
                     </div>
                 </div>

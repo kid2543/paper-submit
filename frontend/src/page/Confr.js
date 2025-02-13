@@ -15,8 +15,6 @@ import {
 } from 'react-bootstrap'
 import UnAuthorized from './UnAuthorized'
 
-const api = process.env.REACT_APP_API_URL
-
 function Confr() {
 
     const [data, setData] = useState({})
@@ -25,6 +23,9 @@ function Confr() {
     const [partner, setPartner] = useState([])
     const [err, setErr] = useState('')
     const [isOpen, setIsOpen] = useState(true)
+
+    // get current date
+    const today = dayjs(new Date()).format('YYYY-MM-DD')
 
     const { id } = useParams()
     const host_confr = sessionStorage.getItem('host_confr')
@@ -72,19 +73,24 @@ function Confr() {
                 <div className='bg-light bg-gradient'>
                     <section id='1' className='container' style={{ padding: "180px 0px" }}>
                         <div className='text-center'>
+                            {data.logo &&
+                                <div className="mb-5">
+                                    <img src={'/uploads/' + data.logo} alt={data.title} width={200} />
+                                </div>
+                            }
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
-                            <p className='text-muted'>{data.sub_title} <br /> {data.confr_code} </p>
-                            <div>
-                                {topic && data.publication ? (
+                            <h5 className='text-muted mb-3'>{data.sub_title} <br /> {data.confr_code} </h5>
+                            {topic && data.publication && dayjs(data.confr_end_date).format('YYYY-MM-DD') > today &&
+                                <div>
                                     <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
                                         <i className="bi bi-send me-2"></i>
                                         ส่งบทความเลย!
                                     </button>
-                                ) : (
-                                    <p>จะเปิดให้ส่งบทความเร็วๆ นี้</p>
-                                )
-                                }
-                            </div>
+                                    <div className="text-muted mt-3">
+                                        ส่งได้ถึงวันที่ {dayjs(data.confr_end_date).format('DD MMM YYYY')}
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </section>
                     <section className="text-bg-secondary">
@@ -107,7 +113,7 @@ function Confr() {
                         <section id='3' className='container'>
                             <div className='row gy-5'>
                                 <div className='col-12 col-md-4'>
-                                    <div className='sticky-top' style={{ top: "32px" }}>
+                                    <div className='sticky-top' style={{ top: "180px" }}>
                                         <div>
                                             <p className='fw-bold text-muted'>ข้อมูลในหน้านี้</p>
                                             <ul className="d-flex flex-column list-unstyled">
@@ -222,50 +228,20 @@ function Confr() {
                                         </div>
                                     </section>
 
-
-                                    {data.schedule &&
-                                        <section id='6' style={{ padding: '64px 0px' }}>
-
-                                            <div className='mb-4'>
-                                                <h4 className='fw-bold'>กำหนดการงานประชุม</h4>
+                                    {data.schedule && 
+                                        <section id='6' style={{padding: '64px 0px'}}>
+                                            <div className="mb-4">
+                                                <h4 className="fw-bold">กำหนดการงานประชุม</h4>
                                             </div>
-                                            <div className="card">
-                                                <div className="card-body">
-                                                    <div className='table-responsive'>
-                                                        <table className='table' style={{ width: "800px" }}>
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style={{ width: '128px' }}>เวลา <small className=' d-block text-muted'>(24-hour clock)</small></th>
-                                                                    <th>รายละเอียด</th>
-                                                                    <th style={{ width: '260px' }}>กรรมการ</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {data.schedule.map(items => (
-                                                                    <tr key={items._id}>
-                                                                        <td>{items.start} - {items.end}</td>
-                                                                        <td>
-                                                                            {items.items?.map((p, index) => (
-                                                                                <p key={index}>{p}</p>
-                                                                            ))}
-                                                                        </td>
-                                                                        <th>
-                                                                            <ol>
-                                                                                {items.session?.map((s, index) => (
-                                                                                    <li key={index} className='mb-0'>{s}</li>
-                                                                                ))}
-                                                                            </ol>
-                                                                        </th>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
+                                            <div>
+                                                <Link
+                                                target='_blank'
+                                                rel='noreferrer' 
+                                                to={`/uploads/${data.schedule}`} 
+                                                className="btn btn-primary">ดูกำหนดการงานประชุมได้ที่นี่</Link>
                                             </div>
                                         </section>
                                     }
-
 
                                     {data.publication &&
                                         <section id='7' style={{ padding: "64px 0px" }}>
@@ -312,7 +288,7 @@ function Confr() {
                                                                 {items.cv &&
                                                                     <p>CV:
                                                                         <Link
-                                                                            to={`${api}/uploads/${items.cv}`}
+                                                                            to={`/uploads/${items.cv}`}
                                                                             target='_blank'
                                                                             rel='noreferrer'
                                                                             className='ms-2'

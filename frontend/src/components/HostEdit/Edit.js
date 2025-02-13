@@ -6,7 +6,6 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios'
 import { toast } from 'react-toastify';
-import ConfirmDeleteDialog from '../ConfirmDeleteDialog';
 
 
 function Edit() {
@@ -37,22 +36,11 @@ function Edit() {
     // modal data
     const [titleModal, setTitleModal] = useState(false)
     const [descModal, setDescModal] = useState(false)
-    const [dateModal, setDateModal] = useState(false)
-    const [editDateData, setEditDateData] = useState({})
     const [importantDate, setImportantDate] = useState(false)
     const [confrModal, setConfrModal] = useState(false)
     const [logoModal, setLogoModal] = useState(false)
     const [tagModal, setTagModal] = useState(false)
     const [cateModal, setCateModal] = useState(false)
-    const [createDateModal, setCreateDateModal] = useState(false)
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-    const [scheduleId, setScheduleId] = useState('')
-
-    const handleShowEditDate = (items) => {
-        console.log(items)
-        setEditDateData(items)
-        setDateModal(true)
-    }
 
     const handleUpdate = async (e, form, modal) => {
         e.preventDefault()
@@ -68,18 +56,6 @@ function Edit() {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
-    }
-
-    const handleShowDeleteDialog = (id) => {
-        setScheduleId(id)
-        setShowDeleteDialog(true)
-    }
-
-    const deleteSchedule = (e, id) => {
-        let temp = { ...data }
-        temp.schedule = temp.schedule.filter(items => items._id !== id)
-        handleUpdate(e, temp)
-        setShowDeleteDialog(false)
     }
 
     if (status === 'idle' || status === 'loading') {
@@ -115,7 +91,7 @@ function Edit() {
                         <Layout>
                             <EditTagModal show={tagModal} handleClose={() => setTagModal(false)} data={data} handleUpdate={handleUpdate} />
                             <div className='py-4'>
-                                <h3>Tag</h3>
+                                <h4>Tag</h4>
                                 <hr />
                             </div>
                             <ol>
@@ -133,7 +109,7 @@ function Edit() {
                     <div className='col-12 col-md-6'>
                         <Layout>
                             <div className='py-4'>
-                                <h3>หมวดหมู่งานประชุม</h3>
+                                <h4>หมวดหมู่งานประชุม</h4>
                                 <hr />
                             </div>
                             <div>
@@ -149,7 +125,7 @@ function Edit() {
                         <Layout>
                             <ConfrDateModal show={confrModal} handleClose={() => setConfrModal(false)} data={data} setData={setData} />
                             <div className='py-4'>
-                                <h3>ระยะเวลาการดำเนินงาน</h3>
+                                <h4>ระยะเวลาการดำเนินงาน</h4>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -163,7 +139,7 @@ function Edit() {
                         <Layout>
                             <UploadLogo show={logoModal} handleClose={() => setLogoModal(false)} setData={setData} id={confr_id} />
                             <div className='py-4'>
-                                <h3>Logo ประจำงานประชุม</h3>
+                                <h4>Logo ประจำงานประชุม</h4>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -177,7 +153,7 @@ function Edit() {
                     <div className='col-12'>
                         <Layout>
                             <div className='py-4'>
-                                <h3>รายละเอียดงานประชุม</h3>
+                                <h4>รายละเอียดงานประชุม</h4>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -199,89 +175,20 @@ function Edit() {
                         </Layout>
                     </div>
                     <div className='col-12'>
-                        <ConfirmDeleteDialog
-                            header='ยืนยันการลบกำหนดการ ?'
-                            message='ต้องการลบกำหนดการหรือไม่'
-                            onCancel={() => setShowDeleteDialog(false)}
-                            onConfirm={e => deleteSchedule(e, scheduleId)}
-                            show={showDeleteDialog}
-                        />
-                        <Layout>
-                            <div>
-                                <h3>กำหนดการ</h3>
-                                <hr />
-                            </div>
-                            <div className='position-absolute top-0 end-0 m-2'>
-                                <button type='button' onClick={() => setCreateDateModal(true)} className='btn'><i className="bi bi-plus-lg"></i></button>
-                            </div>
-                            <div>
-                                <table className='table'>
-                                    <thead>
-                                        <tr>
-                                            <th>เวลา</th>
-                                            <th>รายละเอียด</th>
-                                            <th>กรรมการ</th>
-                                            <th>เครื่องมือ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.schedule?.sort((a,b) => a.start.localeCompare(b.start)).map((list, index) => (
-                                            <tr key={index}>
-                                                <td>{list.start} - {list.end}</td>
-                                                <td>
-                                                    {list.items?.map((desc, idx) => (
-                                                        <p key={idx}>{desc}</p>
-                                                    ))}
-                                                </td>
-                                                <td>
-                                                    {list.session?.map((chair, idx) => (
-                                                        <p className='fw-bold' key={idx}>{chair}</p>
-                                                    ))}
-                                                </td>
-                                                <td>
-                                                    <div className="btn-group">
-                                                        <button onClick={() => handleShowEditDate(list)} className="btn btn-outline-dark" type='button'>
-                                                            <i className="bi bi-pencil-square"></i>
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleShowDeleteDialog(list._id)}
-                                                            className="btn btn-outline-dark"
-                                                            type='button'
-                                                        >
-                                                            <i className="bi bi-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Layout>
-                        <EditDateModal
-                            show={dateModal}
-                            handleClose={() => setDateModal(false)}
-                            data={data}
-                            editDate={editDateData}
-                            handleUpdate={handleUpdate}
-                        />
-                        <CreateDateModal
-                            show={createDateModal}
-                            handleClose={() => setCreateDateModal(false)}
-                            data={data}
-                            handleUpdate={handleUpdate}
-                        />
-                    </div>
-                    <div className='col-12'>
                         <Layout>
                             <div className='py-4'>
-                                <h3 className='fw-bold'>แผนและปฏิทินการจัดโครงการ</h3>
+                                <h4>แผนและปฏิทินการจัดโครงการ</h4>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
                                 <button type='button' onClick={() => setImportantDate(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
                             </div>
-                            <EditImportantDate show={importantDate} handleClose={() => setImportantDate(false)} data={data} handleUpdate={handleUpdate} />
+                            <EditImportantDate
+                                show={importantDate}
+                                handleClose={() => setImportantDate(false)}
+                                data={data}
+                                handleUpdate={handleUpdate}
+                            />
                             <div>
                                 {data.important_date?.map((items) => (
                                     <div key={items._id} className='show-btn-hover'>
@@ -289,10 +196,10 @@ function Edit() {
                                             {items.date_name}
                                         </div>
                                         <div>
-                                            {dayjs(items.start_date).format("DD MMM YYYY")} {items.end_date && 
-                                            <>
-                                            - {dayjs(items.end_date).format("DD MMM YYYY")}
-                                            </>
+                                            {dayjs(items.start_date).format("DD MMM YYYY")} {items.end_date &&
+                                                <>
+                                                    - {dayjs(items.end_date).format("DD MMM YYYY")}
+                                                </>
                                             }
                                         </div>
                                         <hr />
@@ -341,11 +248,21 @@ function EditTitleModal(props) {
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
                         <label className='form-label'>หัวข้อ</label>
-                        <input required name='title' className='form-control' type='text' defaultValue={props.data?.title} onChange={e => handleChange(e)} />
+                        <textarea 
+                        required 
+                        name='title' 
+                        className='form-control' 
+                        rows={3}
+                        defaultValue={props.data?.title} onChange={e => handleChange(e)} />
                     </div>
                     <div>
                         <label className='form-label'>หัวข้อรอง</label>
-                        <input name='sub_title' className='form-control' type='text' defaultValue={props.data?.sub_title} onChange={e => handleChange(e)} />
+                        <textarea 
+                        name='sub_title' 
+                        className='form-control' 
+                        rows={3} 
+                        defaultValue={props.data?.sub_title} 
+                        onChange={e => handleChange(e)} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
@@ -390,365 +307,26 @@ function EditDescModal(props) {
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
                 <Modal.Body className='row gy-3'>
-                    <div>
-                        <button type='button' className='btn btn-primary' onClick={() => setDesc([...desc, ""])}>+ Add</button>
-                    </div>
                     {desc?.map((items, index) => (
                         <div className='col-12' key={index}>
-                            <label className='form-label text-muted'>ย่อหน้าที่ {index + 1}</label>
-                            <textarea required className='form-control' defaultValue={items} onChange={e => handleChange(e, index)} />
-                            <div className='my-2 text-end'>
-                                <button className='btn text-danger' type='button' onClick={() => handleDel(index)}>Delete</button>
+                            <label className='form-label text-muted me-2'>ย่อหน้าที่ {index + 1}</label>
+                            <div className="input-group">
+                                <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
+                                    <i className="bi bi-trash"></i>
+                                </button>
+                                <textarea required className='form-control' defaultValue={items} onChange={e => handleChange(e, index)} />
                             </div>
-                            <hr />
                         </div>
                     ))}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="" onClick={props.handleClose}>
-                        ปิด
-                    </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
-                </Modal.Footer>
-            </form>
-        </Modal>
-    )
-}
-
-function CreateDateModal(props) {
-
-    const [desc, setDesc] = useState([""])
-    const [chair, setChair] = useState([])
-
-    // desc
-    const handleChangeDesc = (e, index) => {
-        const { value } = e.target
-        let temp = [...desc]
-        temp[index] = value
-        setDesc(temp)
-    }
-
-    const handleAddDesc = () => {
-        setDesc([...desc, ""])
-    }
-
-    const handleDeleteDesc = (index) => {
-        setDesc(desc.filter((items, idx) => idx !== index))
-    }
-
-    // chair
-    const handleChangeChair = (e, index) => {
-        const { value } = e.target
-        let temp = [...chair]
-        temp[index] = value
-        setChair(temp)
-    }
-
-    const handleAddChair = () => {
-        setChair([...chair, ""])
-    }
-
-    const handleDeleteChair = (index) => {
-        setChair(chair.filter((items, idx) => idx !== index))
-    }
-
-
-    // update data
-    const updateSchedule = (e) => {
-        e.preventDefault()
-        let temp = [...props.data.schedule]
-        let allData = { ...props.data }
-        temp.push({
-            start: e.target.start.value,
-            end: e.target.end.value,
-            items: desc,
-            session: chair
-        })
-        allData.schedule = temp
-        props.handleUpdate(e, allData, props.handleClose)
-    }
-
-    return (
-        <Modal show={props.show} onHide={props.handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>เพิ่มกำหนดการ</Modal.Title>
-            </Modal.Header>
-            <form onSubmit={updateSchedule}>
-                <Modal.Body className="row g-3">
-                    <div className="col-6">
-                        <label>เริ่มต้น</label>
-                        <input name='start' className="form-control" type='time' required />
-                    </div>
-                    <div className="col-6">
-                        <label>สิ้นสุด</label>
-                        <input name='end' className="form-control" type='time' required />
-                    </div>
                     <div>
-                        <div className="mb-3">
-                            <p className="fw-bold mb-0">รายละเอียด</p>
-                            <button onClick={handleAddDesc} type='button' className="btn btn-success">
-                                <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มรายละเอียด
-                            </button>
-                        </div>
-                        <div className="row g-3">
-                            {desc.map((descs, index) => (
-                                <div key={index}>
-                                    <label className="form-label">หัวข้อที่ {index + 1}</label>
-                                    <div className="input-group">
-                                        <textarea
-                                            rows={3}
-                                            onChange={e => handleChangeDesc(e, index)}
-                                            value={descs}
-                                            type='text'
-                                            className='form-control'
-                                            required
-                                        />
-                                        <button
-                                            type='button'
-                                            className="btn btn-danger"
-                                            onClick={() => handleDeleteDesc(index)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <div className="mb-3">
-                            <p className="fw-bold mb-0">กรรมการ</p>
-                            <button onClick={handleAddChair} type='button' className="btn btn-success">
-                                <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มกรรมการ
-                            </button>
-                        </div>
-                        <div className="row g-3">
-                            {chair.map((chairs, index) => (
-                                <div key={index}>
-                                    <label className="form-label">กรรมการท่านที่: {index + 1}</label>
-                                    <div className="input-group">
-                                        <input
-                                            key={index}
-                                            onChange={e => handleChangeChair(e, index)}
-                                            value={chairs}
-                                            type='text'
-                                            className='form-control'
-                                            required
-                                        />
-                                        <button
-                                            onClick={() => handleDeleteChair(index)}
-                                            type='button'
-                                            className="btn btn-danger"
-                                        >
-                                            <i className='bi bi-trash'></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <button type='button' className='btn btn-primary' onClick={() => setDesc([...desc, ""])}>
+                            <i className="bi bi-plus me-2"></i>
+                            เพิ่มรายละเอียด
+                        </button>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
-                        ปิด
-                    </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
-                </Modal.Footer>
-            </form>
-        </Modal>
-    )
-}
-
-function EditDateModal(props) {
-
-    const [data, setData] = useState({
-        start: '',
-        end: '',
-        items: [],
-        session: []
-    })
-
-    useEffect(() => {
-        setData(props.editDate)
-    }, [props.editDate])
-
-    // desc
-    const handleAddDesc = () => {
-        let temp = { ...data }
-        temp.items.push('')
-        setData(temp)
-    }
-
-    const handleChangeDesc = (e, index) => {
-        const { value } = e.target
-        let temp = { ...data }
-        temp.items[index] = value
-        setData(temp)
-    }
-
-    const handleDeleteDesc = (index) => {
-        let temp = { ...data }
-        temp.items = temp.items.filter((list, idx) => idx !== index)
-        setData(temp)
-    }
-
-    //chair
-    const handleAddChair = () => {
-        let temp = { ...data }
-        temp.session.push('')
-        setData(temp)
-    }
-
-    const handleChangeChair = (e, index) => {
-        const { value } = e.target
-        let temp = { ...data }
-        temp.session[index] = value
-        setData(temp)
-    }
-
-    const handleDeleteChair = (e, index) => {
-        let temp = { ...data }
-        temp.session = temp.session.filter((list, idx) => idx !== index)
-        setData(temp)
-    }
-
-    const handleCloseModal = () => {
-        setData({
-            start: '',
-            end: '',
-            items: [],
-            session: []
-        })
-        props.handleClose()
-    }
-
-    const updateSchedule = (e) => {
-        e.preventDefault()
-        let temp = { ...props.data }
-        temp.schedule = temp.schedule.map((items) => {
-            if (items._id === data._id) {
-                return data
-            } else {
-                return items
-            }
-        })
-        props.handleUpdate(e, temp, props.handleClose)
-    }
-
-    return (
-        <Modal show={props.show} onHide={handleCloseModal}>
-            <Modal.Header closeButton>
-                <Modal.Title>เพิ่มกำหนดการ</Modal.Title>
-            </Modal.Header>
-            <form
-                onSubmit={updateSchedule}
-            >
-                <Modal.Body className="row g-3">
-                    <div className="col-6">
-                        <label>เริ่มต้น</label>
-                        <input
-                            name='start'
-                            className="form-control"
-                            value={data?.start}
-                            type='time'
-                            required
-                            onChange={e => setData({ ...data, start: e.target.value })}
-                        />
-                    </div>
-                    <div className="col-6">
-                        <label>สิ้นสุด</label>
-                        <input
-                            name='end'
-                            className="form-control"
-                            type='time'
-                            value={data?.end}
-                            required
-                            onChange={e => setData({ ...data, end: e.target.value })}
-                        />
-                    </div>
-                    <div>
-                        <div className="mb-3">
-                            <p className="fw-bold mb-0">รายละเอียด</p>
-                            <button
-                                onClick={handleAddDesc}
-                                type='button'
-                                className="btn btn-success"
-                            >
-                                <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มรายละเอียด
-                            </button>
-                        </div>
-                        <div className="row g-3">
-                            {data.items?.map((descs, index) => (
-                                <div key={index}>
-                                    <label className="form-label">หัวข้อที่ {index + 1}</label>
-                                    <div className="input-group">
-                                        <textarea
-                                            rows={3}
-                                            onChange={e => handleChangeDesc(e, index)}
-                                            value={descs}
-                                            type='text'
-                                            className='form-control'
-                                            required
-                                        />
-                                        <button
-                                            type='button'
-                                            className="btn btn-danger"
-                                            onClick={() => handleDeleteDesc(index)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <div className="mb-3">
-                            <p className="fw-bold mb-0">กรรมการ</p>
-                            <button
-                                onClick={handleAddChair}
-                                type='button'
-                                className="btn btn-success"
-                            >
-                                <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มกรรมการ
-                            </button>
-                        </div>
-                        <div className="row g-3">
-                            {data.session?.map((chairs, index) => (
-                                <div key={index}>
-                                    <label className="form-label">กรรมการท่านที่: {index + 1}</label>
-                                    <div className="input-group">
-                                        <input
-                                            key={index}
-                                            onChange={e => handleChangeChair(e, index)}
-                                            value={chairs}
-                                            type='text'
-                                            className='form-control'
-                                            required
-                                        />
-                                        <button
-                                            onClick={() => handleDeleteChair(index)}
-                                            type='button'
-                                            className="btn btn-danger"
-                                        >
-                                            <i className='bi bi-trash'></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="" onClick={handleCloseModal}>
                         ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
@@ -791,12 +369,10 @@ function EditImportantDate(props) {
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
                 <Modal.Body className='row gy-5'>
-                    <div className='col-12'>
-                        <button className='btn btn-primary' type='button' onClick={handleAdd}>+ Add</button>
-                    </div>
                     {list.map((items, index) => (
                         <div className='col-12' key={index}>
-                            <p>รายการที่ {index + 1}</p>
+                            <div className="form-text">รายการที่ {index + 1}</div>
+                            <hr />
                             <div className='mb-3'>
                                 <label className='form-label'>
                                     ชื่อ
@@ -805,20 +381,41 @@ function EditImportantDate(props) {
                             </div>
                             <div className='row mb-3'>
                                 <div className='col-6'>
-                                    <label className='form-label'>เริ่ม</label>
-                                    <input required className='form-control' name='start_date' type='date' value={dayjs(items.start_date).format("YYYY-MM-DD")} onChange={e => handleChange(e, index)} />
+                                    <label className='form-label'>เริ่ม (MM/DD/YYYY)</label>
+                                    <input
+                                        required
+                                        className='form-control'
+                                        name='start_date'
+                                        type='date'
+                                        value={dayjs(items.start_date).format("YYYY-MM-DD")}
+                                        onChange={e => handleChange(e, index)}
+                                    />
+                                    <div className="form-text">
+                                        หากมีวันเดียวให้ใส่แค่วันเริ่มต้น
+                                    </div>
                                 </div>
                                 <div className='col-6'>
                                     <label className='form-label'>สิ้นสุด</label>
-                                    <input className='form-control' name='end_date' type='date' value={dayjs(items.end_date).format("YYYY-MM-DD")} onChange={e => handleChange(e, index)} />
+                                    <input
+                                        className='form-control'
+                                        name='end_date'
+                                        type='date'
+                                        value={dayjs(items.end_date).format("YYYY-MM-DD")}
+                                        onChange={e => handleChange(e, index)}
+                                    />
                                 </div>
                             </div>
                             <div className='text-end'>
-                                <button type='button' className='btn text-danger' onClick={() => handleDel(index)}>Delete</button>
+                                <button type='button' className='btn btn-outline-danger' onClick={() => handleDel(index)}>ลบกำหนดการ</button>
                             </div>
-                            <hr />
                         </div>
                     ))}
+                    <div className='col-12'>
+                        <button className='btn btn-primary' type='button' onClick={handleAdd}>
+                            <i className="bi bi-plus"></i>
+                            เพิ่มกำหนดการ
+                        </button>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
@@ -979,17 +576,17 @@ function EditTagModal(props) {
                         </button>
                     </div>
                     {data &&
-                        <div key={key}>
+                        <div key={key} className="row g-3">
                             {data.map((items, index) => (
                                 <div key={index}>
-                                    <label className='form-label'>Tag: {index + 1}</label>
-                                    <input
-                                        className='form-control'
-                                        type='text'
-                                        defaultValue={items}
-                                        onChange={e => handleChange(e, index)}
-                                        required />
-                                    <div className="text-end mt-2">
+                                    <label className='form-label text-muted'>Tag: {index + 1}</label>
+                                    <div className="input-group">
+                                        <input
+                                            className='form-control'
+                                            type='text'
+                                            defaultValue={items}
+                                            onChange={e => handleChange(e, index)}
+                                            required />
                                         <button type='button' onClick={() => deleteTag(index)} className='btn btn-danger btn-sm'>
                                             <i className='bi bi-trash'></i>
                                         </button>
@@ -1004,7 +601,7 @@ function EditTagModal(props) {
                         ปิด
                     </Button>
                     <Button variant="primary" type='submit'>
-                        แก้ไข
+                        ยืนยัน
                     </Button>
                 </Modal.Footer>
             </form>

@@ -10,11 +10,9 @@ import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatu
 import PaymentStatus from '../components/PaymentStatus';
 import useFetch from '../hook/useFetch';
 import dayjs from 'dayjs';
-import { UserDropdown } from '../components/UserDropdown';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { toast } from 'react-toastify';
-
-const api = process.env.REACT_APP_API_URL
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
 function HostAssign() {
 
@@ -22,6 +20,7 @@ function HostAssign() {
   const [paper, setPaper] = useState({})
   const [reviewer, setReviewer] = useState([])
   const [list, setList] = useState([])
+  const [newList, setNewList] = useState([])
   const [oldList, setOldList] = useState([])
   const paperFile = useFetch('/api/paperfile/read/' + id)
 
@@ -48,6 +47,40 @@ function HostAssign() {
       console.log(res)
     } catch (error) {
       console.log(error)
+    }
+  }
+
+
+  // handle delete
+  const [showConfirmDelete, setShowConfrimDelete] = useState(false)
+  const [deleteId, setDeleteId] = useState('')
+
+  const handleShowDelete = (id) => {
+    setDeleteId(id)
+    setShowConfrimDelete(true)
+  }
+
+  const handleCloseDelete = () => {
+    setDeleteId('')
+    setShowConfrimDelete(false)
+  }
+
+  const handleDelete = async (id) => {
+
+    if (!id) {
+      toast.warning('กรุณาเลือกรายการก่อนทำการลบ')
+      return
+    }
+
+    try {
+      await axios.delete('/api/assign/delete/' + id)
+      setOldList(oldList.filter(items => items._id !== id))
+      toast.success('ลบความเห็นกรรมการสำเร็จ')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      handleCloseDelete()
     }
   }
 
@@ -124,6 +157,11 @@ function HostAssign() {
         setReviewer(category.data.reviewer_list)
         const oldAssign = await axios.get('/api/assign/' + id)
         setOldList(oldAssign.data)
+        let temp = []
+        for (let i in oldAssign.data) {
+          temp.push(oldAssign.data[i].reviewer._id)
+        }
+        setList(temp)
       } catch (error) {
         console.log(error)
       }
@@ -139,17 +177,25 @@ function HostAssign() {
   const handleAssign = async (e) => {
     e.preventDefault()
     try {
-      for (let i in list) {
+      for (let i in newList) {
         await axios.post('/api/assign', {
-          reviewer: list[i],
+          reviewer: newList[i],
           paper_id: id
         })
       }
-      await axios.patch('/api/paper/status', {
+      const paper = await axios.patch('/api/paper/status', {
         id,
         status: 'REVIEW',
       })
+      await axios.post('/api/notification', {
+        user_id: paper.data.owner,
+        title: `มอบหมายบทความ ${paper.paper_code}`,
+        message: 'บทความของท่านได้ถูกมอบหมายให้กรรมการพิจารณาแล้ว กรุณาติดตามผลการตรวจบทความต่อไป'
+      })
       toast.success('มอบหมายบทความสำเร็จ')
+      setTimeout(
+        window.location.reload(), 1000
+      )
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -158,11 +204,11 @@ function HostAssign() {
     }
   }
 
-  const handleList = (e) => {
-    if (e.target.checked) {
-      setList([...list, e.target.value])
+  const handleList = (checked, value) => {
+    if (checked) {
+      setNewList([...newList, value])
     } else {
-      setList(list.filter(items => items !== e.target.value))
+      setNewList(newList.filter(items => items !== value))
     }
   }
 
@@ -189,12 +235,18 @@ function HostAssign() {
         text='ต้องการยืนยันการแก้ไขหรือไม่ ?'
         handleSubmit={handleEdit}
       />
+      <ConfirmDeleteDialog
+        header='ยืนยันการลบรายการตรวจบทความ'
+        message='ต้องการลบรายการตรวจบทความของกรรมการท่านนี้หรือไม่'
+        onCancel={handleCloseDelete}
+        onConfirm={() => handleDelete(deleteId)}
+        show={showConfirmDelete}
+      />
       <div className='container py-4'>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
-            <div className='d-flex justify-content-between align-items-center'>
-              <h5 className='mb-0 fw-bold'>ดูผลลัพธ์บทความ</h5>
-              <UserDropdown />
+            <div>
+              <h4 className='fw-bold'>ดูผลลัพธ์บทความ</h4>
             </div>
           </div>
         </div>
@@ -259,7 +311,7 @@ function HostAssign() {
                       <small className='fw-bold'>หลักฐานการชำระเงิน</small>
                     </div>
                     <small>
-                      <Link to={`${api}/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>
+                      <Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>
                     </small>
                   </div>
                 }
@@ -317,16 +369,16 @@ function HostAssign() {
                           {paperFile.data.map(items => (
                             <tr key={items._id}>
                               <td>
-                                {dayjs(items.createdAt).format('DD MM YYYY')}
+                                {dayjs(items.createdAt).format('DD MMM YYYY')}
                               </td>
                               <td>
-                                {dayjs(items.updatedAt).format('DD MM YYYY HH:mm')}
+                                {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
                               </td>
                               <td>
                                 {items.name}
                               </td>
                               <td>
-                                <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`} className='btn btn-link'>ดูไฟล์</Link>
+                                <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`} className='btn btn-link'>ดูไฟล์</Link>
                               </td>
                               <td>
                                 <div>
@@ -335,7 +387,7 @@ function HostAssign() {
                               </td>
                               <td>
                                 {items.close_name_file ? (
-                                  <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.close_name_file}`} className='btn btn-link'>ดูไฟล์</Link>
+                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.close_name_file}`} className='btn btn-link'>ดูไฟล์</Link>
                                 ) : (
                                   <button onClick={() => handleShowUpload(items._id, items.name)} type='button' className='btn btn-outline-primary'><i className="bi bi-upload"></i></button>
                                 )}
@@ -361,18 +413,18 @@ function HostAssign() {
                       </table>
                     </div>
                   }
-                  {paper.status === 'PENDING' &&
+                  {paper.status === 'PENDING' && paper.deadline?.length > 0 &&
                     <div>
                       <button onClick={() => setShowEditConfirm(true)} type='button' className='btn btn-primary'>ยืนยันการแก้ไข</button>
                     </div>
                   }
                 </div>
-                {paper.deadline &&
+                {paper.deadline?.length > 0 &&
                   <div className='col-12 col-md-6 col-lg-4'>
                     <small className='fw-bold'>Deadline</small>
                     <ol>
                       {paper.deadline.map((items) => (
-                        <li key={items._id}>{items.name}: {dayjs(items.date).format('DD MM YYYY')}</li>
+                        <li key={items._id}>{items.name}: {dayjs(items.date).format('DD MMM YYYY')}</li>
                       ))}
                     </ol>
                   </div>
@@ -385,7 +437,7 @@ function HostAssign() {
           <section>
             <div className='card  shadow-sm mb-3'>
               <div className='card-body'>
-                <h6 className="fw-bold mb-3">ข้อมูลกรรมการที่มอบหมายแล้ว</h6>
+                <h4 className="card-title">ข้อมูลกรรมการที่มอบหมายแล้ว</h4>
                 <div className='table-responsive'>
                   <table className='table table-hover'>
                     <thead>
@@ -395,6 +447,7 @@ function HostAssign() {
                         <th>ชื่อผู้ใช้งาน</th>
                         <th>สถานะ</th>
                         <th>ผลลัพธ์</th>
+                        <th>ลบ</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -415,6 +468,16 @@ function HostAssign() {
                           <td>
                             <PaperResult status={items.result} />
                           </td>
+                          <td>
+                            {items.status === 'PENDING' &&
+                              <button
+                                onClick={() => handleShowDelete(items._id)}
+                                type='button'
+                                className="btn btn-danger">
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            }
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -425,8 +488,8 @@ function HostAssign() {
             <form>
               <div className='card  shadow-sm'>
                 <div className='card-body'>
-                  <div className='d-flex justify-content-between align-items-center'>
-                    <p className="fw-bold mb-3">รายชื่อกรรมการ</p>
+                  <div className='d-flex justify-content-between align-items-center mb-3'>
+                    <h4 className="card-title">รายชื่อกรรมการ</h4>
                     <Link className='btn btn-primary' to={`/host/edit/category/${cate}`}>
                       <i className="bi bi-plus-lg me-2"></i>
                       เพิ่มกรรมการในหัวข้อนี้
@@ -447,7 +510,13 @@ function HostAssign() {
                           {reviewer.map((items) => (
                             <tr key={items._id}>
                               <td>
-                                <input type='checkbox' value={items._id} onChange={e => handleList(e)} disabled={oldList.some(list => list.reviewer._id === items._id)} />
+                                <input
+                                  type='checkbox'
+                                  value={items._id}
+                                  onChange={e => handleList(e.target.checked, items._id)}
+                                  defaultChecked={list.some(lists => lists === items._id)}
+                                  disabled={list.some(lists => lists === items._id)}
+                                />
                               </td>
                               <td>
                                 {items.name}
@@ -465,7 +534,11 @@ function HostAssign() {
                     </div>
                   }
                   <div className="text-end">
-                    <button type='button' onClick={() => setShowAssign(true)} className='btn btn-primary' disabled={list.length <= 0}>
+                    <button 
+                    type='button' 
+                    onClick={() => setShowAssign(true)} 
+                    className='btn btn-primary' 
+                    disabled={newList.length < 3 && oldList.length <= 0}>
                       <i className="me-2 bi bi-check"></i>
                       ยืนยัน
                     </button>
@@ -527,11 +600,11 @@ function UploadCloseNameFile(props) {
         }
       })
       props.list.setData(newData)
-      alert('Success')
+      toast.success('อัพโหลดสำเร็จ')
       props.handleClose()
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -596,12 +669,12 @@ function HistotyDetail(props) {
             <tbody>
               {data?.map((items) => (
                 <tr key={items._id}>
-                  <td>{dayjs(items.createdAt).format('DD MM YYYY HH:mm')}</td>
+                  <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
                   <td>
-                    <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>View</Link>
+                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>View</Link>
                   </td>
                   <td>
-                    <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.close_name_file}`}>View</Link>
+                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.close_name_file}`}>View</Link>
                   </td>
                 </tr>
               ))}

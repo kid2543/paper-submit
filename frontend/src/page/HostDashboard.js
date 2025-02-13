@@ -101,52 +101,56 @@ function HostDashboard() {
                 </Modal>
                 <div className='card'>
                     <div className='card-body'>
+                        <div className="btn-group mb-3">
+                            <button type='button' onClick={handleShow} className='btn btn-primary'><i className='bi bi-plus-lg me-2'></i>เพิ่มงานประชุม</button>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                    เปลี่ยนเครื่องมือค้นหา
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ชื่องานประชุม</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('tag')}>ค้นหาจาก Tag</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ประเภทงานประชุม</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
                         <div className='mb-3'>
                             <div>
                                 {searchInput === 'search' &&
-                                    <form className='input-group' onSubmit={e => searchConfr.handleSearchChange(e)}>
+                                    <form className='input-group col-6' onSubmit={e => searchConfr.handleSearchChange(e)}>
                                         <input name='search' type="search" className="form-control" placeholder="ค้นหาจากชื่องานประชุม" />
-                                        <button type='submit' className='btn btn-primary'>ค้นหา</button>
+                                        <button type='submit' className='btn btn-primary'>
+                                            <i className="bi bi-search"></i>
+                                        </button>
                                     </form>
                                 }
                                 {searchInput === 'tag' &&
                                     <form className='input-group' onSubmit={e => searchConfr.handleSearchTag(e)}>
                                         <input name='tag' type="search" className="form-control" placeholder="ค้นหาจาก tag" />
-                                        <button type='submit' className='btn btn-primary'>ค้นหา</button>
+                                        <button type='submit' className='btn btn-primary'>
+                                            <i className="bi bi-search"></i>
+                                        </button>
                                     </form>
                                 }
                                 {searchInput === 'cate' &&
                                     <select className="form-select" onChange={e => searchConfr.handleSearchCate(e)}>
                                         <option value=''>--เลือกประเภทงานประชุม</option>
-                                        <option value="การประชุมวิชาการประจำปี">การประชุมวิชาการประจำปี</option>
+                                        <option value="การประชุมวิชาการระดับชาติ">การประชุมวิชาการระดับชาติ</option>
                                         <option value="การประชุมวิชาการระดับนานาชาติ">การประชุมวิชาการระดับนานาชาติ</option>
                                         <option value="การประชุมวิชาการเฉพาะทาง">การประชุมวิชาการเฉพาะทาง</option>
-                                        <option value="การประชุมวิชาการระดับชาติ">การประชุมวิชาการระดับชาติ</option>
+                                        <option value="การประชุมวิชาการประจำปี">การประชุมวิชาการประจำปี</option>
                                     </select>
                                 }
                             </div>
                         </div>
-                            <div className="d-flex justify-content-end mb-3">
-                                <button type='button' onClick={handleShow} className='btn btn-outline-primary'><i className='bi bi-plus-lg me-2'></i>เพิ่มงานประชุม</button>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="" id="dropdown-basic">
-                                        <i className="bi bi-filter"></i>
-                                    </Dropdown.Toggle>
-
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ชื่องานประชุม</Dropdown.Item>
-                                        <Dropdown.Item type='button' onClick={() => setSearchInput('tag')}>ค้นหาจาก Tag</Dropdown.Item>
-                                        <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ประเภทงานประชุม</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
                         {searchConfr.status === 'loading' || searchConfr.status === 'idle' ? (
                             <LoadingPage />
                         ) : (
                             <div>
                                 {searchConfr.data &&
-                                    <div className='table-responsive'>
-                                        <table className='table' style={{ minHeight: '400px', minWidth: '800px' }}>
+                                    <div className='table-responsive' style={{ minHeight: 400 }}>
+                                        <table className='table' style={{ minWidth: '800px' }}>
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
@@ -161,9 +165,11 @@ function HostDashboard() {
                                                         <tr key={item._id}>
                                                             <td>{index + 1}</td>
                                                             <td>{item.confr_code}</td>
-                                                            <td>{item.title}</td>
                                                             <td>
-                                                                <button onClick={() => viewConference(item._id)} type='button' className='btn btn-primary' to='#'>
+                                                                {item.title}
+                                                            </td>
+                                                            <td>
+                                                                <button onClick={() => viewConference(item._id)} type='button' className='btn btn-light' to='#'>
                                                                     <i className="bi bi-pencil-square"></i>
                                                                 </button>
                                                             </td>
@@ -173,7 +179,9 @@ function HostDashboard() {
                                             ) : (
                                                 <tbody>
                                                     <tr>
-                                                        <td className='p-3' colSpan={3}>ไม่พบข้อมูล</td>
+                                                        <td className='p-3' colSpan={4}>
+                                                            <h3 className="fw-bold">ไม่พบข้อมูล</h3>
+                                                        </td>
                                                     </tr>
                                                 </tbody>
                                             )

@@ -36,7 +36,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h6 className='fw-bold card-title'>ผู้ส่งบทความ</h6>
+                <h4 className='card-title'>ผู้ส่งบทความ</h4>
                 <div>
                   <button className='btn' type='button' onClick={() => setShowPresenter(true)}>
                     <i className='bi bi-pencil-square'></i>
@@ -55,7 +55,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h6 className='fw-bold card-title'>กรรมการ</h6>
+                <h4 className='card-title'>กรรมการ</h4>
                 <button className='btn' type='button' onClick={() => setShowChair(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>
@@ -71,7 +71,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h6 className='fw-bold card-title'>ผู้เข้าชม</h6>
+                <h4 className='card-title'>ผู้เข้าชม</h4>
                 <button className='btn' type='button' onClick={() => setShowAudience(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>
@@ -107,6 +107,12 @@ function PresenterModal(props) {
     setList(temp)
   }
 
+  const handleDelete = (index) => {
+    let temp = [...list]
+    temp = temp.filter((lists, idx) => idx !== index)
+    setList(temp)
+  }
+
   const handleUpdate = async (e) => {
     e.preventDefault()
     const deleteEmpty = list.filter(items => items !== '')
@@ -130,16 +136,36 @@ function PresenterModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับผู้ส่งบทความ</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <div className="row g-3 mb-3">
+          {list.map((items, index) => (
+            <div key={index}>
+              <div className="form-text">
+                ข้อที่: {index + 1}
+              </div>
+              <hr />
+              <div className="text-end mb-3">
+                <button
+                  type='button'
+                  onClick={() => handleDelete(index)}
+                  className="btn btn-outline-danger"
+                >
+                  <i className="bi bi-trash me-2"></i>
+                  ลบรายละเอียด
+                </button>
+              </div>
+              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
+              <textarea
+                rows={5}
+                className='form-control'
+                value={items}
+                onChange={e => handleChange(e, index)} />
+            </div>
+          ))}
+        </div>
         <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
           <i className="me-2 bi bi-plus-lg"></i>
           เพิ่มหัวข้อ
         </button>
-        {list.map((items, index) => (
-          <div className='my-3' key={index}>
-            <label className='form-label'>ข้อที่: {index + 1}</label>
-            <textarea className='form-control' value={items} onChange={e => handleChange(e, index)} />
-          </div>
-        ))}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
@@ -166,6 +192,12 @@ function ChairModal(props) {
     setList(temp)
   }
 
+  const handleDelete = (index) => {
+    let temp = [...list]
+    temp = temp.filter((lists, idx) => idx !== index)
+    setList(temp)
+  }
+
   const handleUpdate = async (e) => {
     e.preventDefault()
     const filterList = list.filter(items => items !== '')
@@ -189,16 +221,33 @@ function ChairModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับกรรมการ</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <div className="row g-3 mb-3">
+          {list.map((items, index) => (
+            <div key={index}>
+              <div className="form-text">
+                ข้อที่: {index + 1}
+              </div>
+              <hr />
+              <div className="mb-3 text-end">
+                <button type='button' onClick={() => handleDelete(index)} className="btn btn-outline-danger">
+                  <i className="bi bi-trash me-2"></i>
+                  ลบรายละเอียด
+                </button>
+              </div>
+              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
+              <textarea
+                className='form-control'
+                value={items}
+                rows={5}
+                onChange={e => handleChange(e, index)}
+              />
+            </div>
+          ))}
+        </div>
         <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
           <i className="me-2 bi bi-plus-lg"></i>
           เพิ่มหัวข้อ
         </button>
-        {list.map((items, index) => (
-          <div className='my-3' key={index}>
-            <label className='form-label'>ข้อที่: {index + 1}</label>
-            <textarea className='form-control' value={items} onChange={e => handleChange(e, index)} />
-          </div>
-        ))}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>
@@ -225,6 +274,12 @@ function AudienceModal(props) {
     setList(temp)
   }
 
+  const handleDelete = (index) => {
+    let temp = [...list]
+    temp = temp.filter((lists, idx) => idx !== index)
+    setList(temp)
+  }
+
   const handleUpdate = async (e) => {
     e.preventDefault()
     const filterList = list.filter(items => items !== '')
@@ -248,16 +303,37 @@ function AudienceModal(props) {
         <Modal.Title>ข้อแนะนำสำหรับผู้เข้าชม</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <div className="row g-3 mb-3">
+          {list.map((items, index) => (
+            <div key={index}>
+              <div className="form-text">
+                ข้อที่: {index + 1}
+              </div>
+              <hr />
+              <div className='text-end mb-3'>
+                <button
+                  className="btn btn-outline-danger"
+                  type='button'
+                  onClick={() => handleDelete(index)}
+                >
+                  <i className="bi bi-trash me-2"></i>
+                  ลบรายละเอียด
+                </button>
+              </div>
+              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
+              <textarea
+                className='form-control'
+                value={items}
+                onChange={e => handleChange(e, index)}
+                rows={5}
+              />
+            </div>
+          ))}
+        </div>
         <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
           <i className="me-2 bi bi-plus-lg"></i>
           เพิ่มหัวข้อ
         </button>
-        {list.map((items, index) => (
-          <div className='my-3' key={index}>
-            <label className='form-label'>ข้อที่: {index + 1}</label>
-            <textarea className='form-control' value={items} onChange={e => handleChange(e, index)} />
-          </div>
-        ))}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="" onClick={props.handleClose}>

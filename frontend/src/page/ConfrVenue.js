@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import useFetch from '../hook/useFetch'
 
 
@@ -26,14 +26,14 @@ function ConfrVenue() {
 
     return (
         <div>
-            <section style={{ padding: "180px 0px" }}>
+            <section className="bg-light" style={{ padding: "180px 0px" }}>
                 <div className='text-center'>
                     <h1 className='display-1 fw-bold px-2'>สถานที่จัดงานประชุม</h1>
                     <p className='text-muted'>อ่านรายละเอียดสถานที่จัดงานได้ที่นี่</p>
                 </div>
             </section>
             {data &&
-                <section className='bg-white' style={{ padding: "64px 0px" }}>
+                <section style={{ padding: "64px 0px" }}>
                     <div className='container'>
                         <h1 className='fw-bold mb-4 text-center'>{data.venue.name}</h1>
                         {data.venue_image &&
@@ -48,7 +48,7 @@ function ConfrVenue() {
                         </div>
                         <div>
                             {data.venue.remark &&
-                                <p>{data.venue.remark}</p>
+                                <Link to={data.venue.remark} target='_blank' rel='noreferrer'>{data.venue.remark}</Link>
                             }
                         </div>
                     </div>

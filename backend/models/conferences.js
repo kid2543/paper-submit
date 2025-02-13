@@ -12,12 +12,7 @@ const conferencesSchema = mongoose.Schema({
   confr_code: { type: String, required: true, unique: true },
   confr_desc: [{ type: String }],
   important_date: [{ date_name: { type: String }, start_date: { type: Date }, end_date: { type: Date } }],
-  schedule: [{
-    start: String,
-    end: String,
-    items: [String],
-    session: [String]
-  }],
+  schedule: String,
   publication: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: Publication

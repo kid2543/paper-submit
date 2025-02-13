@@ -8,13 +8,15 @@ function Submit() {
 
     const id = sessionStorage.getItem('send_paper')
     const [paper, setPaper] = useState([{
-        name: "",
+        id: 1,
+        name: '',
         file: null
     }]);
     const [confr, setConfr] = useState({});
     const [cate, setCate] = useState([]);
     const [pub, setPub] = useState([]);
     const [err, setErr] = useState("")
+    const [isOpen, setIsOpen] = useState(false)
     const navigate = useNavigate()
 
     const handleDelFile = (index) => {
@@ -100,6 +102,9 @@ function Submit() {
                 const res = await axios.get('/api/conference/single/' + id)
                 setConfr(res.data)
                 setPub(res.data.publication)
+                if(res.data.status) {
+                    setIsOpen(true)
+                }
             } catch (error) {
                 console.log(error)
             }
@@ -118,6 +123,10 @@ function Submit() {
         getCateCode();
     }, [id])
 
+    if(!isOpen) {
+        return <div>งานประชุมนี้ไม่ได้เปิดให้ส่งบทความ</div>
+    }
+
     if (!id) {
         return (
             <div style={{ padding: '128px 0px' }}>
@@ -128,7 +137,7 @@ function Submit() {
 
     return (
         <div style={{ padding: '128px 0px' }}>
-            <div className='bg-dark position-fixed w-100 top-0' style={{ height: "480px", zIndex: -1 }}>
+            <div className='bg-dark bg-gradient position-fixed w-100 top-0' style={{ height: "480px", zIndex: -1 }}>
             </div>
             <form className='container my-5' onSubmit={handleForm}>
                 <div className='row'>
@@ -163,7 +172,7 @@ function Submit() {
                                         <select name='publication' className="form-select" required disabled={pub.length <= 0}>
                                             <option defaultChecked>-- เลือกวารสาร</option>
                                             {pub?.map(list => (
-                                                <option key={list._id} value={list._id}>{list.en_name}</option>
+                                                <option key={list._id} value={list._id}>{list.en_name} ({list.th_name})</option>
                                             ))}
                                         </select>
                                     </div>
@@ -202,30 +211,55 @@ function Submit() {
                                         <label className='form-label'>อีเมล</label>
                                         <input type='email' className='form-control' name='email' required />
                                     </div>
-                                    <div>
-                                        <div>
-                                            กรณีมีมากกว่า 1 ไฟล์
+                                    {paper.map((items, index) => (
+                                        <div key={index} className="mb-2">
+                                            <div className="form-text">ไฟล์ที่: {index + 1}</div>
+                                            <hr />
+                                            <div className="mb-3">
+                                                <label className='form-label'>ชื่อไฟล์</label>
+                                                <input
+                                                    onChange={e => handleChangeFileName(e, index)}
+                                                    value={items.name}
+                                                    className='form-control'
+                                                    type='text'
+                                                    id={index}
+                                                    required />
+                                            </div>
+                                            <div>
+                                                <label className='form-label'>แนบไฟล์เอกสาร</label>
+                                                <div className="input-group">
+                                                    <input
+                                                        onChange={e => handleChangeFile(e, index)}
+                                                        type='file'
+                                                        accept='.doc, .pdf'
+                                                        className='form-control'
+                                                        required />
+                                                    <button type='button' onClick={() => handleDelFile(index)} className="btn btn-outline-danger">
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button type='button' onClick={() => setPaper([...paper, {}])} className='btn btn-success'>
+                                    ))}
+                                    <div className="mb-3">
+                                        <p className="fw-bold">
+                                            กรณีมีมากกว่า 1 ไฟล์
+                                        </p>
+                                        <button
+                                            type='button'
+                                            onClick={() => setPaper([...paper, {
+                                                id: paper.length + 1,
+                                                name: '',
+                                                file: null
+                                            }])}
+                                            className='btn btn-success'>
                                             <i className="bi bi-plus-lg me-2"></i>
                                             เพิ่มไฟล์
                                         </button>
                                     </div>
-                                    {paper.map((items, index) => (
-                                        <div key={index} className="mb-3">
-                                            <div className="mb-3">
-                                                <label className='form-label'>ชื่อไฟล์</label>
-                                                <input onChange={e => handleChangeFileName(e, index)} value={items.name} className='form-control' type='text' required />
-                                            </div>
-                                            <div>
-                                                <label className='form-label'>แนบไฟล์เอกสาร</label>
-                                                <input onChange={e => handleChangeFile(e, index)} type='file' accept='.doc, .pdf' className='form-control' required />
-                                            </div>
-                                            <div className="text-end my-2">
-                                                <button type='button' onClick={() => handleDelFile(index)} className="btn btn-danger">ลบ</button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                </div>
+                                <div className="form-text">
+                                    กรุณาตรวจสอบรายละเอียดให้ครบถ้วนก่อนทำการกดส่งบทความด้านบน
                                 </div>
                             </div>
                         </div>

@@ -64,7 +64,7 @@ import ViewAward from './components/ViewAward';
 import AwardCateList from './components/HostEdit/AwardCateList';
 import AdminSignUp from './page/AdminSignUp';
 import AuthorLayout from './layout/AuthorLayout';
-import Archive from './page/Archive';
+import ConfrPaperAward from './page/ConfrPaperAward';
 
 
 function App() {
@@ -99,7 +99,10 @@ function App() {
           path='/profile'
           element={
             user ?
-              <UserProfile /> :
+              <HomeLayout>
+                <UserProfile />
+              </HomeLayout>
+              :
               <Login />
           }
         />
@@ -135,6 +138,14 @@ function App() {
             </ConfrLayout>
           }
         />
+        <Route
+          path='/confr/:id/award'
+          element={
+            <ConfrLayout>
+              <ConfrPaperAward />
+            </ConfrLayout>
+          }
+        />
         <Route path='/submit'
           element={
             <PrivateRoute api={authorApi}>
@@ -147,7 +158,7 @@ function App() {
         <Route path='/author'
           element={
             <PrivateRoute api={authorApi} >
-              <AuthorLayout>
+              <AuthorLayout >
                 <Author />
               </AuthorLayout>
             </PrivateRoute>
@@ -159,16 +170,6 @@ function App() {
             <PrivateRoute api={authorApi}>
               <AuthorLayout>
                 <AuthorPaper />
-              </AuthorLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path='/author/archive'
-          element={
-            <PrivateRoute api={authorApi}>
-              <AuthorLayout>
-                <Archive />
               </AuthorLayout>
             </PrivateRoute>
           }
@@ -190,7 +191,9 @@ function App() {
           path='/host/confr'
           element={
             <PrivateRoute api={hostApi}>
-              <Host />
+              <HostEditLayout>
+                <Host />
+              </HostEditLayout>
             </PrivateRoute>
           }
         />
@@ -338,7 +341,9 @@ function App() {
           path='/host/paper/:id'
           element={
             <PrivateRoute api={hostApi}>
-              <HostReview />
+              <HostEditLayout>
+                <HostReview />
+              </HostEditLayout>
             </PrivateRoute>
           }
         />
@@ -346,7 +351,9 @@ function App() {
           path='/host/assign/:id/:cate'
           element={
             <PrivateRoute api={hostApi}>
-              <HostAssign />
+              <HostEditLayout>
+                <HostAssign />
+              </HostEditLayout>
             </PrivateRoute>
           }
         />

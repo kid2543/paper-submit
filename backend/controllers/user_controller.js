@@ -115,23 +115,6 @@ const getHost = async (req, res) => {
     }
 }
 
-
-// get notification
-const getUserNotification = async (req, res) => {
-    const { _id } = req.user
-
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-        return res.status(400).json({ error: 'รหัสผู้ใช้งานไม่ถูกต้อง' })
-    }
-
-    try {
-        const data = await Notification.find({ userId: _id })
-        res.status(200).json(data)
-    } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-}
-
 // admin get all user
 const getAll = async (req, res) => {
     try {
@@ -383,7 +366,6 @@ module.exports = {
     createHost,
     createCommittee,
     getHost,
-    getUserNotification,
     getCommittee,
     searchHost,
     searchComit,

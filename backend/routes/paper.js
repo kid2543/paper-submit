@@ -32,7 +32,8 @@ const {
     sendEmailPdf,
     sendCertificate,
     getPaperArchive,
-    getPaperOwnerAdmin
+    getPaperOwnerAdmin,
+    getConfrPaperAward
 } = require('../controllers/paper_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
@@ -65,6 +66,9 @@ router.get('/category/:id', verifyToken, getPaperByCategory)
 
 //get only have awarad
 router.get('/category/award/:id', verifyToken, getPaperAward)
+
+// get paper award
+router.get('/confr/award/:id', getConfrPaperAward)
 
 // cancel paper
 router.patch('/cancel', verifyToken, cancelPaper)

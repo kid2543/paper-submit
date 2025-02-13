@@ -12,8 +12,6 @@ import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { UserDropdown } from '../components/UserDropdown';
 
-const api = process.env.REACT_APP_API_URL
-
 function HostReview() {
 
   const { id } = useParams()
@@ -75,18 +73,18 @@ function HostReview() {
     if (result === 'REVISE') {
       try {
         await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
-        toast.success('Updated')
+        toast.success('เปลี่ยนสถานะสำเร็จ')
       } catch (error) {
         console.log(error)
-        toast.error('Error')
+        toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
       }
     } else {
       try {
         await axios.patch('/api/paper/result', { _id: id, result: result })
-        toast.success('Updated')
+        toast.success('เปลี่ยนสถานะสำเร็จ')
       } catch (error) {
         console.log(error)
-        toast.error('Error')
+        toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
       }
     }
   }
@@ -139,12 +137,12 @@ function HostReview() {
                   <PaperDetailField title='ชื่อบทความ' data={paper.title} />
                   <PaperDetailField title='รหัสบทความ' data={paper.paper_code} />
                   <PaperDetailField title='ผู้แต่ง' data={paper.author} />
-                  <PaperDetailField title='ผู้ส่งบทความ' data={`${paper.owner?.name} (${paper.owner?.username})`} />
+                  <PaperDetailField title='ผู้ส่งบทความ' data={`${paper.owner?.name ? paper.owner.name : "-"} (${paper.owner?.username})`} />
                   <PaperDetailField title='สถานะบทความ' data={<PaperStatus status={paper.status} />} />
                   <PaperDetailField title='ผลลัพธ์บทความ' data={<PaperResult status={paper.result} />} />
                   <PaperDetailField title='สถานะชำระเงิน' data={<PaymentStatus status={paper.payment_status} />} />
                   {paper.payment_image &&
-                    <PaperDetailField title='หลักฐานการชำระเงิน' data={<Link to={`${api}/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>} />
+                    <PaperDetailField title='หลักฐานการชำระเงิน' data={<Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>} />
                   }
                   <PaperDetailField title='ที่อยู่ในการติดต่อ' data={paper.address} />
                   <PaperDetailField title='อีเมล' data={paper.email} />
@@ -169,30 +167,30 @@ function HostReview() {
                   </div>
                 ) : (
                   <div className='card-body'>
-                    <h6 className='fw-bold mb-4'>
+                    <h4 className='card-title'>
                       ส่งจดหมายเข้าร่วมงานประชุม
-                    </h6>
-                    <form onSubmit={e => sendMail(e, '/api/paper/send/email', sendMailFile)} className='row g-3 mb-3'>
-                      <div className='col-auto'>
-                        <label className='form-label'>อีเมล</label>
-                        <input name='recipient' className='form-control-plaintext fw-bold' readOnly value={paper.email} />
+                    </h4>
+                    <form onSubmit={e => sendMail(e, '/api/paper/send/email', sendMailFile)} className='row row-cols-1 g-3 mb-3'>
+                      <div>
+                        <label className='form-label fw-bold'>อีเมล</label>
+                        <input name='recipient' className='form-control-plaintext' readOnly value={paper.email} />
                       </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ชื่องานประชุม</label>
-                        <input name='confr_title' className='form-control-plaintext fw-bold' readOnly value={paper.confr_code?.title} />
+                      <div>
+                        <label className='form-label fw-bold'>ชื่องานประชุม</label>
+                        <input name='confr_title' className='form-control-plaintext' readOnly value={paper.confr_code?.title} />
                       </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ชื่อบทความ</label>
+                      <div>
+                        <label className='form-label fw-bold'>ชื่อบทความ</label>
                         <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
-                        <input className='form-control-plaintext fw-bold' readOnly value={paper.title} />
+                        <input className='form-control-plaintext' readOnly value={paper.title} />
                       </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ผู้ส่งบทความ</label>
+                      <div>
+                        <label className='form-label fw-bold'>ผู้ส่งบทความ</label>
                         <input name='owner' className='form-control-plaintext d-none' readOnly value={paper.owner?._id} />
-                        <input className='form-control-plaintext fw-bold' readOnly value={paper.owner?.username} />
+                        <input className='form-control-plaintext' readOnly value={paper.owner?.username} />
                       </div>
                       <div className='col-12'>
-                        <label className='form-label'>เลือกไฟล์จดหมาย</label>
+                        <label className='form-label fw-bold'>เลือกไฟล์จดหมาย</label>
                         <input
                           onChange={e => setSendMailFile(e.target.files[0])}
                           required
@@ -268,7 +266,7 @@ function HostReview() {
           </div>
           {review.length > 0 ? (
             <div>
-              <div className='row g-3 mb-5'>
+              <div className='row g-3 mb-3'>
                 {review?.map((item, index) => (
                   <div key={item._id} className='col-12 col-md-6 col-lg-4'>
                     <div className='card shadow-sm h-100'>
@@ -290,7 +288,7 @@ function HostReview() {
                             <div>
                               <small>{item.reviewer?.name} ({item.reviewer?.username})</small> <br />
                               {item.updatedAt &&
-                                <small className='text-muted'>{dayjs(item.updatedAt).format('DD MM YYYY HH:mm')}</small>
+                                <small className='text-muted'>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</small>
                               }
                             </div>
                           </div>
@@ -302,9 +300,9 @@ function HostReview() {
                 <ReviewHistory show={show} handleClose={handleClose} data={history} />
               </div>
               {handleStatus(review) && paper.status === 'REVIEW' &&
-                <div className='card   shadow-sm'>
+                <div className='card shadow-sm'>
                   <div className='card-body'>
-                    <p>เปลี่ยนผลลัพธ์บทความ</p>
+                    <h4 className="card-title">เปลี่ยนผลลัพธ์บทความ</h4>
                     <form onSubmit={handleResult}>
                       <div>
                         <label className='form-label'>ผลลัพธ์บทความ</label>
@@ -328,7 +326,7 @@ function HostReview() {
                         </div>
                       }
                       <div className='text-end mt-3'>
-                        <button type='submit' className='btn btn-primary'>Submit</button>
+                        <button type='submit' className='btn btn-primary' disabled={!result}>ยืนยันสถานะ</button>
                       </div>
                     </form>
                   </div>
@@ -392,7 +390,7 @@ function ReviewHistory(props) {
                     <p>{items.suggestion}</p>
                     {items.suggestion_file &&
                       <div>
-                        <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`${api}/uploads/${items.suggestion_file}`}>ดูไฟล์</Link>
+                        <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`/uploads/${items.suggestion_file}`}>ดูไฟล์</Link>
                       </div>
                     }
                   </div>

@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
 import useFetch from '../hook/useFetch'
 
-
 function ConfrRegistration() {
 
     const { id } = useParams()
@@ -80,43 +79,52 @@ function ConfrRegistration() {
                             <h4 className='fw-bold mb-4'>ข้อมูลการลงทะเบียน</h4>
                             <div className='card  shadow'>
                                 <div className='card-body'>
-                                    {data.regis_eb_start_date &&
-                                        <div>
-                                            <p>Early Bird:
-                                                <span className='mx-2 badge text-bg-light'>
-                                                    {data.regis_eb_start_date && dayjs(data.regis_eb_start_date).format('DD MMM YYYY')}
-                                                </span>
-                                                -
-                                                <span className='mx-2 badge text-bg-light'>
-                                                    {data.regis_eb_end_date && dayjs(data.regis_eb_end_date).format('DD MMM YYYY')}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    }
-                                    {data.regis_rl_start_date &&
-                                        <div>
-                                            <p>Regular:
-                                                <span className='badge text-bg-light mx-2'>
-                                                    {data.regis_rl_start_date &&
-                                                        dayjs(data.regis_rl_start_date).format('DD MMM YYYY')
-                                                    }
-                                                </span>
-                                                -
-                                                <span className='badge text-bg-light mx-2'>
-                                                    {data.regis_rl_end_date &&
-                                                        dayjs(data.regis_rl_end_date).format('DD MMM YYYY')
-                                                    }
-                                                </span>
-                                            </p>
-                                        </div>
-                                    }
                                     <div className='table-responsive'>
-                                        <table className='table table-hover' style={{width: "800px"}}>
+                                        <table className='table' style={{ minWidth: "1000px" }}>
                                             <thead>
                                                 <tr>
-                                                    <th>-</th>
-                                                    <th>Early</th>
-                                                    <th>Regular</th>
+                                                    <th>ประเภทการลงทะเบียน</th>
+                                                    <th>
+                                                        <div>
+                                                            Early
+                                                        </div>
+                                                        <div>
+                                                            {data.regis_eb_start_date &&
+                                                                <span className="badge text-bg-primary">
+                                                                    {dayjs(data.regis_eb_start_date).format('DD MMM YYYY')}
+                                                                </span>
+                                                            }
+                                                            {data.regis_eb_end_date &&
+                                                                <>
+                                                                    <span className="mx-2">-</span>
+                                                                    <span className='badge text-bg-primary'>
+                                                                        {dayjs(data.regis_eb_end_date).format('DD MMM YYYY')}
+                                                                    </span>
+                                                                </>
+                                                            }
+                                                        </div>
+
+                                                    </th>
+                                                    <th>
+                                                        <div>
+                                                            Regular
+                                                        </div>
+                                                        <div>
+                                                            {data.regis_rl_start_date && 
+                                                                <span className="badge text-bg-primary">
+                                                                    {dayjs(data.regis_rl_start_date).format('DD MMM YYYY')}
+                                                                </span>
+                                                            }
+                                                            {data.regis_rl_end_date && 
+                                                            <>
+                                                            <span className="mx-2">-</span>
+                                                                <span className="badge text-bg-primary">
+                                                                    {dayjs(data.regis_rl_end_date).format('DD MMM YYYY')}
+                                                                </span>
+                                                            </>
+                                                            }
+                                                        </div>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -126,10 +134,10 @@ function ConfrRegistration() {
                                                             {items.name}
                                                         </td>
                                                         <td>
-                                                            {items.price_1}
+                                                            {new Intl.NumberFormat('en-US').format(items.price_1)} บาท
                                                         </td>
                                                         <td>
-                                                            {items.price_2}
+                                                            {new Intl.NumberFormat('en-US').format(items.price_2)} บาท
                                                         </td>
                                                     </tr>
                                                 ))}

@@ -31,7 +31,7 @@ function SidebarV2({ children }) {
                 </div>
                 </Col>
                 <Col xs={12} lg={10} className="content">
-                    <Navbar bg="dark" variant="dark" expand="lg" className="d-lg-none p-3 rounded">
+                    <Navbar bg="dark" variant="dark" expand="lg" className="d-lg-none p-3 mb-3 rounded">
                         <Button variant="outline-light" onClick={handleShow}>
                             <i className='bi bi-list'></i>
                         </Button>

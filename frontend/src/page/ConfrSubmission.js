@@ -4,8 +4,6 @@ import { Link, useParams } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
 import Accordion from 'react-bootstrap/Accordion';
 
-const api = process.env.REACT_APP_API_URL
-
 function ConfrSubmission() {
 
   const { id } = useParams()
@@ -34,9 +32,9 @@ function ConfrSubmission() {
                 <h4 className='fw-bold mb-4'>Template</h4>
                 <div className='row g-3'>
                   {template.data.map(items => (
-                    <div key={items._id} className='col-12 col-md-4'>
+                    <div key={items._id} className='col-auto'>
                       <div>
-                        <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.file}`} className='btn btn-outline-dark'>
+                        <Link target='_blank' rel='noreferrer' to={`/uploads/${items.file}`} className='btn btn-outline-dark p-3'>
                           <span className='me-2'>
                             <i className="bi bi-download"></i>
                           </span>

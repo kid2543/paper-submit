@@ -91,7 +91,7 @@ function HostEditPub() {
             <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
                     <div className='mb-3'>
-                        <h6 className='fw-bold card-title'>รายชื่อวารสารในงานประชุม</h6>
+                        <h4 className='card-title'>รายชื่อวารสารในงานประชุม</h4>
                         <small className='text-muted card-text'>เลือกวารสารที่ต้องการทั้งหมดแล้วกดบันทึกเพื่อ หากต้องการเปลี่ยนให้เลือกวารสารทั้งหมดใหม่อีกครั้ง</small>
                     </div>
                     <ol>
@@ -107,7 +107,7 @@ function HostEditPub() {
             <div className='card  shadow-sm'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <h6 className='fw-bold card-title'>รายชื่อวารสารทั้งหมด</h6>
+                        <h4 className='card-title'>รายชื่อวารสารทั้งหมด</h4>
                         <div>
                             <input className='form-control' placeholder='ค้นหาวารสาร' onChange={e => setQuery(e.target.value)} />
                         </div>

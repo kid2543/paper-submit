@@ -27,22 +27,51 @@ const uploadVenue = async (req, res) => {
 
     try {
         const oldFile = await Conferences.findById(id)
-        const confr = await Conferences.findByIdAndUpdate(id, {
-            venue_image: filename
-        }, { new: true })
-        if (oldFile.venue_image !== '') {
+        if (oldFile.venue_image) {
             fs.unlink('public/uploads/' + oldFile.venue_image, (err) => {
                 if (err) {
-                    console.error('Error deleteing the file: ', err)
+                    console.error('ลบรูปสถานที่จัดงานไม่สำเร็จ', err)
                 } else {
-                    console.log('old file is deleted')
+                    console.log('ลบรูปสถานที่จัดงานแล้ว')
                 }
             })
         }
+        const confr = await Conferences.findByIdAndUpdate(id, {
+            venue_image: filename
+        }, { new: true })
         res.status(200).json(confr)
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
+}
+
+const uploadSchedule = async (req, res) => {
+    const { id } = req.params
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'ไม่พบข้อมูลไฟล์' })
+    }
+
+    const { filename } = req.file
+
+    try {
+        const paper = await Conferences.findByIdAndUpdate(id, {
+            schedule: filename
+        }, { new: true })
+        res.status(200).json(paper)
+    } catch (error) {
+        if (req.file) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log('ลบไฟล์กำหนดการแล้ว')
+                }
+            })
+        }
+        res.status(400).json({ error: error.message })
+    }
+
 }
 
 const uploadLogo = async (req, res) => {
@@ -65,17 +94,20 @@ const uploadLogo = async (req, res) => {
 
     try {
         const oldFile = await Conferences.findById(id)
+        if (oldFile.logo) {
+            fs.unlink('public/uploads/' + oldFile.logo, (err) => {
+                if (err) {
+                    console.log('เกิดข้อผิดพลาดเกี่ยวกับการลบไฟล์ logo เดิม:', err)
+                } else {
+                    console.log('ลบไฟล์ logo สำเร็จแล้ว')
+                }
+            })
+        }
+
         const confr = await Conferences.findByIdAndUpdate(id, {
             logo: filename
         }, { new: true })
-        if (oldFile.logo !== '') {
-            fs.unlink('public/uploads/' + oldFile.logo, (err) => {
-                if (err) {
-                    console.log('Error deleteing the file oldfile:', err)
-                }
-                console.log('old file is deleted')
-            })
-        }
+
         res.status(200).json(confr)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -290,6 +322,36 @@ const searchConference = async (req, res) => {
     }
 }
 
+const searchOpenConference = async (req, res) => {
+    const { page = 1, limit = 10, search = '', tag = '', cate = '' } = req.query
+
+    let query = { status: true }
+
+    if (search) {
+        query = { title: { $regex: search, $options: 'i' }, status: true }
+    } else if (tag) {
+        query = { tag: { $regex: tag, $options: 'i' }, status: true }
+    } else if (cate) {
+        query = { cate: { $regex: cate, $options: 'i' }, status: true }
+
+    }
+
+    try {
+        const items = await Conferences.find(query)
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec()
+        const count = await Conferences.countDocuments(query)
+        res.status(200).json({
+            items,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 // host search confrence
 const hostSeachConference = async (req, res) => {
     const { page = 1, limit = 10, search = '', tag = '', cate = '' } = req.query
@@ -337,8 +399,8 @@ const deleteConference = async (req, res) => {
         if (paper.length > 0)
             return res.status(400).json({ error: 'งานประชุมมีบทความที่กำลังดำเนินการไม่สามารถลบได้' })
         let confr = {}
-        if(role !== 'ADMIN') {
-            confr = await Conferences.findOne({_id: id, owner: req.user._id})
+        if (role !== 'ADMIN') {
+            confr = await Conferences.findOne({ _id: id, owner: req.user._id })
             console.log('ไม่ใช่ Admin')
         } else {
             confr = await Conferences.findById(id)
@@ -348,7 +410,7 @@ const deleteConference = async (req, res) => {
             if (confr.venue_image)
                 fs.unlink(`public/uploads/${confr.venue_image}`, (err) => {
                     if (err) {
-                        console.log('ลบไฟล์สถานที่จัดงานไม่สำเร็จ',err)
+                        console.log('ลบไฟล์สถานที่จัดงานไม่สำเร็จ', err)
                     } else {
                         console.log("ลบไฟล์รูปสถานที่จัดงานแล้ว")
                     }
@@ -377,5 +439,7 @@ module.exports = {
     deleteConference,
     hostSeachConference,
     getHomeConfr,
-    getConferenceOwner
+    getConferenceOwner,
+    searchOpenConference,
+    uploadSchedule
 }

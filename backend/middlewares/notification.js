@@ -1,7 +1,7 @@
 const Notification = require('../models/notification')
 
-function createNotification(userId, title, message) {
-    const notification = new Notification({userId, title, message})
+function createNotification(user_id, title, message) {
+    const notification = new Notification({user_id, title, message})
     return notification.save()
 }
 

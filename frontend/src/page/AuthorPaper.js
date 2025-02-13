@@ -16,14 +16,15 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import ConfirmDialog from '../components/ConfirmDialog'
 
-const api = process.env.REACT_APP_API_URL
-
 function AuthorPaper() {
 
   const { id } = useParams()
   const { data, error, loading } = useFetch('/api/paper/owner/' + id)
   const paperFile = useFetch('/api/paperfile/read/' + id)
   const comment = useFetch(`/api/assign/${id}`)
+
+  const [uploaded, setUploaded] = useState([''])
+
 
   const handleUpdate = async (e) => {
     e.preventDefault()
@@ -73,17 +74,20 @@ function AuthorPaper() {
 
   const hanleEditPaper = async (e, file_id) => {
     e.preventDefault()
-    console.log(file_id)
-    console.log(e.target.edit.files[0])
+    if (!e.target.edit_file.files[0]) {
+      toast.warning('กรุณาเลือกไฟล์ก่อนทำการอัพโหลด')
+      return
+    }
+
     try {
       const formData = new FormData()
-      formData.append('file', e.target.edit.files[0])
+      formData.append('file', e.target.edit_file.files[0])
       const res = await axios.post('/api/paperfile/edit/' + file_id, formData)
-      console.log(res.data)
-      alert('Updated')
+      setUploaded([...uploaded, res.data._id])
+      toast.success('อัพโหลดฉบับแก้ไขสำเร็จ กรุณาตรวจสอบให้แน่ใจว่าได้ทำการอัพโหลดครบแล้วก่อนทำการกดยืนยัน')
     } catch (error) {
       console.log(error)
-      alert('Error')
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     }
   }
 
@@ -98,6 +102,8 @@ function AuthorPaper() {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setShowConfirmEdit(false)
     }
   }
 
@@ -112,8 +118,8 @@ function AuthorPaper() {
   }
 
   return (
-    <div className="py-3">
-      <ConfirmDialog 
+    <div className="py-2">
+      <ConfirmDialog
         show={showConfirmEdit}
         handleClose={() => setShowConfirmEdit(false)}
         handleSubmit={handleEditStatus}
@@ -135,8 +141,9 @@ function AuthorPaper() {
           </section>
           <section className='card  shadow-sm my-3'>
             <div className='card-body'>
-              <h6 className="fw-bold mb-3">รายละเอียดบทความ</h6>
-              <div className='row gy-3'>
+              <h4>รายละเอียดบทความ</h4>
+              <hr />
+              <div className='row g-3'>
                 <div className='col-12'>
                   <label className='form-label'>อาจารย์ประจำวิชา</label>
                   <input className='form-control' value={data.advise} disabled />
@@ -199,11 +206,9 @@ function AuthorPaper() {
                     </span>
                   </p>
                 </div>
-                <div>
-                  <hr />
-                </div>
                 <form onSubmit={handleUpdate}>
-                  <h6 className='fw-bold mb-3'>แก้ไขรายละเอียดบทความ</h6>
+                  <h4>แก้ไขรายละเอียดบทความ</h4>
+                  <hr />
                   <div className='mb-3'>
                     <label className='form-label'>คำสำคัญ</label>
                     <textarea rows={3} name='keyword' className='form-control' defaultValue={data.keyword} />
@@ -232,10 +237,11 @@ function AuthorPaper() {
                   </div>
                   {paperFile.data &&
                     <div>
-                      <h6 className='fw-bold mb-3'>ไฟล์เอกสาร</h6>
+                      <h4>ไฟล์เอกสาร</h4>
+                      <hr />
                       <div className='table-responsive'>
                         <table className='table'>
-                          <thead className='table-info'>
+                          <thead>
                             <tr>
                               <th>แก้ไขล่าสุด</th>
                               <th>ชื่อ</th>
@@ -253,7 +259,7 @@ function AuthorPaper() {
                                   {items.name}
                                 </td>
                                 <td>
-                                  <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>เพิ่มเติม</Link>
+                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
                                 </td>
                                 <td>
                                   <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
@@ -278,48 +284,72 @@ function AuthorPaper() {
               </div>
             </div>
           </section>
-          <section className='card  shadow-sm'>
-            {data.result === 'REVISE' && data.status === 'SUCCESS' &&
+          {data.result === 'REVISE' && data.status === 'SUCCESS' &&
+            <section className='card  shadow-sm'>
               <div className='card-body'>
                 <div>
-                  <h6 className='fw-bold card-title'>Upload บทความฉบับแก้ไข</h6>
+                  <h4>อัพโหลดบทความฉบับแก้ไข</h4>
+                  <hr />
                   <p>
                     แก้ไขให้แล้วเสร็จภายใน:
                   </p>
-                  <ol>
+                  <ul>
                     {data.deadline?.map((date, index) => (
-                      <li key={date._id}>{data.deadline.length > index + 1 ? <del>{dayjs(date.date).format('DD MM YYYY')}</del> : <p>{dayjs(date.date).format('DD MM YYYY')}</p>}</li>
+                      <li key={date._id}>{data.deadline.length > index + 1 ? <del>{dayjs(date.date).format('DD MMM YYYY')}</del> : <p>{dayjs(date.date).format('DD MMM YYYY')}</p>}</li>
                     ))}
-                  </ol>
+                  </ul>
                   {paperFile.data &&
                     <div>
                       {paperFile.data.map((items) => (
                         <form onSubmit={e => hanleEditPaper(e, items._id)} key={items._id} className='mb-3'>
-                          <label className='form-label'>Upload {items.name}</label>
-                          <div>
-                            <input name='edit' className='form-control' type='file' accept='.pdf, .doc' />
-                            <div className='mt-3'>
-                              <button type='submit' className='btn btn-outline-primary'>Upload</button>
-                            </div>
+                          <label className='form-label'>ไฟล์ <span className="fw-bold">{items.name}</span> (ฉบับแก้ไข)</label>
+                          <div className="input-group">
+                            <input
+                              name='edit_file'
+                              className='form-control'
+                              type='file'
+                              accept='.pdf, .doc'
+                              required
+                            />
+                            {uploaded.includes(items._id) &&
+                              <button className="btn btn-success">
+                                <i className="bi bi-check-lg"></i>
+                              </button>
+                            }
+                          </div>
+                          <div className='mt-3'>
+                            <button type='submit' className='btn btn-outline-primary'>
+                              <i className="bi bi-upload me-2"></i>
+                              อัพโหลด
+                            </button>
                           </div>
                         </form>
                       ))}
                     </div>
                   }
+                  <div className="text-muted">
+                    กรุณาอัพโหลดฉบับแก้ไขให้ครบ หรืออัพโหลดเฉพาะที่แก้ไขก่อนทำการกดยืนยัน
+                  </div>
                   <div className='text-end mt-3'>
-                    <button type='button' onClick={() => setShowConfirmEdit(true)} className='btn btn-primary'>ยืนยันการแก้ไข</button>
+                    <button
+                      type='button'
+                      onClick={() => setShowConfirmEdit(true)}
+                      className='btn btn-primary'
+                    >
+                      ยืนยันการแก้ไข
+                    </button>
                   </div>
                 </div>
               </div>
-            }
-          </section>
+            </section>
+          }
         </div>
       }
 
       <section className='card shadow-sm my-3'>
         <div className='card-body'>
-          <h6 className="fw-bold mb-3 card-title">ความคิดเห็นกรรมการ</h6>
-          {data?.status !== 'SUCCESS' && 
+          <h4 className="card-title">ความคิดเห็นกรรมการ</h4>
+          {data?.status !== 'SUCCESS' &&
             <p>รอการดำเนินการบทความ</p>
           }
           {comment.data && data?.status === 'SUCCESS' &&
@@ -329,26 +359,26 @@ function AuthorPaper() {
               }
               {comment.data.map((items, index) => (
                 <div key={items._id}>
-                  <div className='d-flex justify-content-between align-items-center'>
-                    <p className='mb-0'>กรรมการท่านที่ {index + 1}</p>
-                    <div>
-                      <div>
+                  <div>
+                    <div className="text-muted">กรรมการท่านที่ {index + 1}</div>
+                    <div className="mb-3">
+                      <span className="me-2">
                         <ReviewStatus status={items.status} />
-                      </div>
+                      </span>
                       <PaperResult status={items.result} />
                     </div>
                   </div>
                   <div>
                     {items.suggestion &&
-                      <div>
-                        ข้อแนะนำ: {items.suggestion}
-                      </div>
+                      <p>
+                        <b>ข้อแนะนำ:</b> <br /> {items.suggestion}
+                      </p>
                     }
                     {items.suggestion_file &&
-                      <div>
-                        ไฟล์ข้อแนะนำ
-                        <Link to={`${api}/uploads/${items.suggestion_file}`} target='_blank' rel='noreferrer'>{items.suggestion_file}</Link>
-                      </div>
+                      <p>
+                        <b>ไฟล์ข้อแนะนำ</b> <br />
+                        คลิกที่นี่เพื่อดูข้อแนะนำ: <Link to={`/uploads/${items.suggestion_file}`} target='_blank' rel='noreferrer'>{items.suggestion_file}</Link>
+                      </p>
                     }
                   </div>
                   <hr />
@@ -360,14 +390,14 @@ function AuthorPaper() {
       </section>
       <section className='card  shadow-sm my-3'>
         <div className='card-body'>
-          <h6 className="fw-bold mb-3 card-title">ระวัติความคิดเห็นกรรมการ</h6>
+          <h4 className="fw-bold mb-3 card-title">ประวัติความคิดเห็นกรรมการ</h4>
           {comment.data &&
             <div>
               {comment.data.length <= 0 ?
                 <p>ไม่พบประวัติการแก้ไข</p> : (
                   <div className='table-responsive'>
                     <table className='table'>
-                      <thead className='table-dark'>
+                      <thead>
                         <tr>
                           <th>#</th>
                           <th>ประวัติ</th>
@@ -376,9 +406,14 @@ function AuthorPaper() {
                       <tbody>
                         {comment.data.map((items, index) => (
                           <tr key={items._id}>
-                            <td>{index + 1}</td>
+                            <td>กรรมการท่านที่: {index + 1}</td>
                             <td>
-                              <Link onClick={() => handleShowHistoryComment(items._id)}>View</Link>
+                              <Link
+                                className="btn btn-sm btn-link"
+                                onClick={() => handleShowHistoryComment(items._id)}
+                              >
+                                ดูประวัติ
+                              </Link>
                             </td>
                           </tr>
                         ))}
@@ -435,10 +470,10 @@ function HistoryPaper(props) {
                 {data.map((items) => (
                   <tr key={items._id}>
                     <td>
-                      {dayjs(items.createdAt).format('DD MM YYYY HH:mm')}
+                      {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
                     </td>
                     <td>
-                      <Link target='_blank' rel='noreferrer' to={`${api}/uploads/${items.original_file}`}>View</Link>
+                      <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>View</Link>
                     </td>
                   </tr>
                 ))}
@@ -481,30 +516,33 @@ function HistoryComment(props) {
         <Modal.Title>ประวัติความเห็น</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {data &&
-          <div>
-            {data.map((items) => (
-              <div key={items._id} className='card mb-3'>
-                <div className='card-body row'>
-                  <div className='col-12 col-md-4'>
-                    <PaperResult status={items.result} />
-                    <div>
-                      <small>
-                        {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
-                      </small>
-                    </div>
-                  </div>
-                  <div className='col-12 col-md-8'>
-                    <p>{items.suggestion}</p>
-                    {items.suggestion_file &&
-                      <div>
-                        <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`${api}/uploads/${items.suggestion_file}`}>File ข้อแนะนำ</Link>
-                      </div>
-                    }
+        <div>
+          {data?.map((items) => (
+            <div key={items._id} className='card mb-3'>
+              <div className='card-body row'>
+                <div className='col-12 col-md-4'>
+                  <PaperResult status={items.result} />
+                  <div>
+                    <small>
+                      {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
+                    </small>
                   </div>
                 </div>
+                <div className='col-12 col-md-8'>
+                  <p>{items.suggestion}</p>
+                  {items.suggestion_file &&
+                    <div>
+                      <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`/uploads/${items.suggestion_file}`}>File ข้อแนะนำ</Link>
+                    </div>
+                  }
+                </div>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+        {data.length <= 0 &&
+          <div className="text-center">
+            ไม่พบข้อมูล
           </div>
         }
       </Modal.Body>

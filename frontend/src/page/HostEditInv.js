@@ -11,8 +11,6 @@ import mockImage from '../asset/logo.png'
 import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
-const api = process.env.REACT_APP_API_URL
-
 function HostEditInv() {
 
     const id = sessionStorage.getItem('host_confr')
@@ -117,7 +115,7 @@ function HostEditInv() {
             <div className='card shadow-sm  mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
-                        <h6 className='fw-bold card-title'>รายการพิธีกร</h6>
+                        <h4 className='card-title'>รายการพิธีกร</h4>
                         <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
                             <i className='me-2 bi bi-plus-lg'></i>
                             เพิ่มพิธีกร
@@ -195,7 +193,7 @@ function HostEditInv() {
                                             <div>
                                                 <p>CV:
                                                     {items.cv &&
-                                                        <a className="ms-2" href={`${api}/uploads/${items.cv}`} target='_blank' rel='noreferrer'>{items.name}</a>
+                                                        <a className="ms-2" href={`/uploads/${items.cv}`} target='_blank' rel='noreferrer'>{items.name}</a>
                                                     }
                                                 </p>
                                             </div>

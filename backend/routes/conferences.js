@@ -4,6 +4,8 @@ const express = require('express')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
 const uploadImage = require('../middlewares/uploadImage')
+const uploadPdf = require('../middlewares/uploadFile')
+
 
 // controller
 const { 
@@ -21,7 +23,9 @@ const {
     deleteConference, 
     hostSeachConference, 
     getHomeConfr, 
-    getConferenceOwner
+    getConferenceOwner,
+    searchOpenConference,
+    uploadSchedule
  } = require('../controllers/confr_controller')
 
 const router = express.Router()
@@ -37,6 +41,9 @@ router.patch('/venue/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadImag
 
 // upload logo
 router.patch('/logo/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadImage.single('image'),  uploadLogo)
+
+// upload schedule
+router.patch('/schedule/:id', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), uploadSchedule)
 
 //get all
 router.get('/all', verifyToken, checkRole(['HOST', 'ADMIN']), allConference)
@@ -65,6 +72,9 @@ router.get('/question/:id', verifyToken, checkRole(['HOST', 'ADMIN', 'COMMITTEE'
 
 // search conference
 router.get('/search', verifyToken, checkRole(['ADMIN']), searchConference)
+
+// search open conference
+router.get('/open/search', searchOpenConference)
 
 // delete conference
 router.delete('/delete/:id', verifyToken, checkRole(['ADMIN', 'HOST']), deleteConference)

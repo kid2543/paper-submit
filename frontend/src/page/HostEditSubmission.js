@@ -6,8 +6,6 @@ import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 
-const api = process.env.REACT_APP_API_URL
-
 function HostEditSubmission() {
 
   const id = sessionStorage.getItem('host_confr')
@@ -113,7 +111,7 @@ function HostEditSubmission() {
       <div className='card  shadow-sm mb-3'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
-            <h6 className='fw-bold card-title'>รายการเทมเพลต</h6>
+            <h4 className='card-title'>รายการเทมเพลต</h4>
             <button className='btn btn-primary' onClick={() => setTemplateModal(true)}>
               <i className='bi bi-plus-lg me-2'></i>
               เพิ่มเทมเพลต
@@ -125,13 +123,17 @@ function HostEditSubmission() {
               onConfirm={handleDeleteTemplate}
               onCancel={handleCancel}
             />
-            <TemplateModal show={templateModal} handleClose={() => setTemplateModal(false)} data={templateList} setData={setTemplateList} />
+            <TemplateModal
+              show={templateModal}
+              handleClose={() => setTemplateModal(false)}
+              data={templateList}
+              setData={setTemplateList} />
           </div>
           <div>
             {templateList &&
-              <div className='table-responsive'>
+              <div className='table-responsive' style={{ minHeight: 400 }}>
                 <table className='table' style={{ minWidth: '1000px' }}>
-                  <thead className='table-dark'>
+                  <thead>
                     <tr>
                       <th>#</th>
                       <th>ไฟล์</th>
@@ -143,7 +145,7 @@ function HostEditSubmission() {
                       <tr key={items._id}>
                         <td>{index + 1}</td>
                         <td>
-                          <Link to={`${api}/uploads/${items.file}`} target='_blank' rel='noopener noreferrer'>{items.name}</Link>
+                          <Link to={`/uploads/${items.file}`} target='_blank' rel='noopener noreferrer'>{items.name}</Link>
                         </td>
                         <td>
                           <button type='button' onClick={() => handleConfirm(items._id)} className='btn btn-danger text-white btn-sm'>
@@ -163,7 +165,7 @@ function HostEditSubmission() {
       <div className='card  shadow-sm'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
-            <h6 className='fw-bold card-title'>ข้อแนะนำการส่งบทความ</h6>
+            <h4 className='card-title'>ข้อแนะนำการส่งบทความ</h4>
             <button className='btn btn-outline-dark' onClick={handleShow}>
               <i className='bi bi-pencil-square me-2'></i>
               แก้ไข
@@ -240,7 +242,7 @@ function TemplateModal(props) {
           </div>
           <div className='col-12'>
             <label className='form-label'>เลือกไฟล์</label>
-            <input className='form-control' type='file' accept='.pdf, .doc' onChange={e => setTemplateFile(e.target.files[0])} required />
+            <input className='form-control' type='file' accept='.pdf, .docx' onChange={e => setTemplateFile(e.target.files[0])} required />
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -316,30 +318,40 @@ function SubmissionModal(props) {
       <form onSubmit={handleUpdate}>
         {data &&
           <Modal.Body>
-            <div className='mb-3'>
-              <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>
-                <i className='bi bi-plus-lg me-2'></i>
-                เพิ่มหัวข้อ
-              </button>
-            </div>
-            {data.map((items, index) => (
-              <div key={index} className="mb-3">
-                <div className="input-group">
-                <label className='form-label text-muted me-2'>ข้อที่ {index + 1}</label>
+            <div className="row g-3 mb-3">
+              {data.map((items, index) => (
+                <div key={index}>
+                  <div className="form-text">
+                    ข้อที่ {index + 1}
+                  </div>
+                  <hr/>
+                  <div className="text-end">
+                    <button 
+                    type='button' 
+                    onClick={() => handleDelete(index)} 
+                    className='btn btn-outline-danger'>
+                      <i className='bi bi-trash me-2'></i>
+                      ลบรายละเอียด
+                    </button>
+                  </div>
+                  <label className='form-label'>รายละเอียดข้อแนะนำ</label>
                   <textarea
                     key={key}
                     className='form-control'
                     onChange={e => handleChange(e, index)}
                     defaultValue={items}
                     required
-                    rows={3}
+                    rows={5}
                   />
-                  <button type='button' onClick={() => handleDelete(index)} className='btn btn-danger btn-sm text-white'>
-                    <i className='bi bi-trash'></i>
-                  </button>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div>
+              <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>
+                <i className='bi bi-plus-lg me-2'></i>
+                เพิ่มหัวข้อ
+              </button>
+            </div>
           </Modal.Body>
         }
         <Modal.Footer>

@@ -8,10 +8,15 @@ const {
     getAllNotification,
     readNotification,
     clearNotification,
-    getConfrNotification
+    getConfrNotification,
+    createNewNotification
 } = require('../controllers/notification_controller')
+const checkRole = require('../middlewares/checkRole')
 
 const router = express.Router()
+
+// create notification
+router.post('/', verifyToken, checkRole(['ADMIN','HOST']), createNewNotification)
 
 // get all notification
 router.get('/', verifyToken, getAllNotification)

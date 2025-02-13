@@ -113,7 +113,7 @@ function HostCateList() {
             <div className='card  shadow-sm'>
                 <div className='card-body'>
                     <div className='d-md-flex justify-content-between mb-3 align-items-center'>
-                        <h6 className='fw-bold mb-0'>รายการหัวข้องานประชุม</h6>
+                        <h4 className='card-title'>รายการหัวข้องานประชุม</h4>
                         <button type='button' onClick={handleShow} className='btn btn-primary'><i className="bi bi-plus-lg me-2"></i>เพิ่มหัวข้องานประชุม</button>
                         <Modal show={show} onHide={handleClose}>
                             <Modal.Header closeButton>
@@ -123,8 +123,8 @@ function HostCateList() {
                                 <Modal.Body className='row g-3 align-items-center'>
                                     <div className='col-12'>
                                         <label className='col-form-label'>รหัสหัวข้อ</label>
-                                        <input className='form-control' name='category_code' pattern='([?=.*A-Za-z])(?=.*\d).{7,}' />
-                                        <small>รหัสหัวข้อประกอบด้วย ตัวอักษรและตัวเลข อย่างน้อย 8 ตัวอักษร</small>
+                                        <input className='form-control' name='category_code' pattern='([?=.*A-Za-z])(?=.*\d).{4,}' />
+                                        <div className="form-text">รหัสหัวข้อประกอบด้วย ตัวอักษรภาษาอังกฤษและตัวเลข อย่างน้อย 4 ตัวอักษร</div>
                                     </div>
                                     <div className='col-12'>
                                         <label className='col-form-label'>ชื่อหัวข้อ</label>
@@ -132,7 +132,7 @@ function HostCateList() {
                                     </div>
                                     <div className='col-12'>
                                         <label className='col-form-label'>รายละเอียด</label>
-                                        <textarea className='form-control' name='desc' />
+                                        <textarea rows={5} className='form-control' name='desc' />
                                     </div>
                                     {createError && <div className='text-danger'>{createError}</div>}
                                 </Modal.Body>
@@ -166,31 +166,17 @@ function HostCateList() {
                                             <td>{cate.reviewer_list.length}</td>
                                             <td>
                                                 <div className="btn-group">
-                                                    <Link to={`/host/edit/category/${cate._id}`} type='button' className='btn btn-primary'>
+                                                    <Link to={`/host/edit/category/${cate._id}`} type='button' className='btn btn-light'>
                                                         <i className='bi bi-pen'></i>
                                                     </Link>
-                                                    <button onClick={() => handleShowDelete(cate._id)} type='button' className='btn btn-danger'>
+                                                    <button
+                                                        onClick={() => handleShowDelete(cate._id)}
+                                                        type='button'
+                                                        className='btn btn-light'
+                                                    >
                                                         <i className='bi bi-trash'></i>
                                                     </button>
                                                 </div>
-                                                {/* <div className='d-flex'>
-                                                    <Dropdown drop='down-centered'>
-                                                        <Dropdown.Toggle variant="btn">
-                                                            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-                                                        </Dropdown.Toggle>
-
-                                                        <Dropdown.Menu>
-                                                            <Dropdown.Item href={'/host/edit/category/' + cate._id}>
-                                                                <span className='me-2'><ion-icon name="pencil-outline"></ion-icon></span>
-                                                                Edit
-                                                            </Dropdown.Item>
-                                                            <Dropdown.Item onClick={() => deleteCate(cate._id, cate.icon)}>
-                                                                <span className='me-2'><ion-icon name="trash-outline"></ion-icon></span>
-                                                                Delete
-                                                            </Dropdown.Item>
-                                                        </Dropdown.Menu>
-                                                    </Dropdown>
-                                                </div> */}
                                             </td>
                                         </tr>
                                     ))}

@@ -7,8 +7,6 @@ import { toast } from 'react-toastify'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { UserDropdown } from '../components/UserDropdown'
 
-const api = process.env.REACT_APP_API_URL
-
 function Review() {
 
     const { id } = useParams()
@@ -60,6 +58,8 @@ function Review() {
                 }
                 formData.append('total', totalNumber)
                 formData.append('result', result)
+                formData.append('confr_id', confr_id)
+                formData.append('paper_code', paper.data.paper_id?.paper_code)
                 await axios.patch('/api/assign', formData)
                 toast.success('ให้คะแนน และอัพโหลดไฟล์สำเร็จ')
                 setTimeout(
@@ -72,7 +72,9 @@ function Review() {
                     suggestion: suggestion,
                     rate: totalArr,
                     total: totalNumber,
-                    result: result
+                    result: result,
+                    confr_id,
+                    paper_code: paper.data.paper_id?.paper_code
                 })
                 toast.success('ให้คะแนนสำเร็จ')
                 setTimeout(
@@ -115,7 +117,7 @@ function Review() {
 
 
     return (
-        <div className='container my-5'>
+        <div className='container my-3'>
             <ConfirmDialog
                 show={showConfirm}
                 handleClose={() => setShowConfirm(false)}
@@ -123,7 +125,7 @@ function Review() {
                 header='ยืนยันการให้คะแนน'
                 text='ต้องการยืนยันการให้คะแนนหรือไม่เนื่องจากจะไม่สามารถกลับมาแก้ไขได้'
             />
-            <div className='card  shadow-sm mb-5'>
+            <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
                         <h5 className='fw-bold mb-0'>ตรวจบทความ</h5>
@@ -132,7 +134,7 @@ function Review() {
                 </div>
             </div>
             {paper.data &&
-                <div className='card  shadow-sm mb-5'>
+                <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
                         <p>รายละเอียดบทความ</p>
                         <div className='row g-3'>
@@ -157,11 +159,12 @@ function Review() {
                                         {PaperFile.map((items) => (
                                             <li key={items._id}>
                                                 <Link
-                                                    className='link-success'
-                                                    to={items.read_original ? `${api}/uploads/${items.original_file}` : `${api}/uploads/${items.close_name_file}`}
+                                                    className='btn btn-success'
+                                                    to={items.read_original ? `/uploads/${items.original_file}` : `/uploads/${items.close_name_file}`}
                                                     target='_blank'
                                                     rel='noreferrer'
                                                 >
+                                                    <i className='bi bi-file-earmark me-2'></i>
                                                     {items.name}
                                                 </Link>
                                             </li>

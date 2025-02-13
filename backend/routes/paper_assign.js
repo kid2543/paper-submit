@@ -4,7 +4,17 @@ const express = require('express')
 const uploadPdf = require('../middlewares/uploadFile')
 
 // controller
-const { assignPaper, reviewPaper, readReview, reviewerNumber, getReview, getOneReview, uploadSuggestionFile, editReview } = require('../controllers/assign_controller')
+const {
+    assignPaper,
+    reviewPaper,
+    readReview,
+    reviewerNumber,
+    getReview,
+    getOneReview,
+    uploadSuggestionFile,
+    editReview,
+    removeAssign
+} = require('../controllers/assign_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
 
@@ -33,6 +43,9 @@ router.get('/number/:id', verifyToken, checkRole(['HOST', 'ADMIN']), reviewerNum
 
 // edit review
 router.post('/edit/paper/:id', verifyToken, checkRole('HOST', 'ADMIN'), editReview)
+
+// remove assign
+router.delete('/delete/:id', verifyToken, checkRole(['HOST', 'ADMIN']), removeAssign)
 
 
 module.exports = router

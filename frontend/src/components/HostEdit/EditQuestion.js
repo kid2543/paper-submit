@@ -78,16 +78,8 @@ function EditQuestion() {
             </div>
             <div className='card shadow-sm'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center mb-4'>
-                        <h6 className='fw-bold mb-0'>รายการคำถาม</h6>
-                        <div>
-                            <button onClick={handleAdd} type='button' className='btn btn-primary'>
-                                <span className='me-2'>
-                                    <i className='bi bi-plus-lg'></i>
-                                </span>
-                                เพิ่มแบบประเมิน
-                            </button>
-                        </div>
+                    <div>
+                        <h4>รายการคำถาม</h4>
                     </div>
                     {question && (
                         <form onSubmit={handleUpdate}>
@@ -136,6 +128,14 @@ function EditQuestion() {
                         </form>
                     )
                     }
+                    <div className="text-end">
+                        <button onClick={handleAdd} type='button' className='btn btn-primary'>
+                            <span className='me-2'>
+                                <i className='bi bi-plus-lg'></i>
+                            </span>
+                            เพิ่มแบบประเมิน
+                        </button>
+                    </div>
                 </div>
             </div>
         </div >

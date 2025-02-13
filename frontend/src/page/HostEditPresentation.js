@@ -36,7 +36,7 @@ function HostEditPresentation() {
             <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <h6 className='fw-bold mb-0'>ข้อแนะการนำเสนอบทความ</h6>
+                        <h4>ข้อแนะการนำเสนอบทความ</h4>
                         <div>
                             <button className='btn' type='button' onClick={() => setShowA((true))}>
                                 <i className='bi bi-pencil-square'></i>
@@ -56,7 +56,7 @@ function HostEditPresentation() {
             <div className='card shadow-sm'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <h6 className='fw-bold mb-0'>รายละเอียดเพิ่มเติม</h6>
+                        <h4>รายละเอียดเพิ่มเติม</h4>
                         <div>
                             <button className='btn' type='button' onClick={() => setShowB(true)}>
                                 <i className='bi bi-pencil-square'></i>
@@ -116,19 +116,32 @@ function GuidelineModal(props) {
                 <Modal.Title>ข้อแนะนำการนำเสนอ</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
-                <Modal.Body className='row gy-3'>
+                <Modal.Body className='row g-3'>
+                    {guideline.map((items, index) => (
+                        <div className='col-12' key={index}>
+                            <div className='form-text'>ข้อแนะนำ: {index + 1}</div>
+                            <hr />
+                            <div className="text-end mb-3">
+                            <button className="btn btn-outline-danger" type='button'>
+                                <i className="bi bi-trash me-2"></i>
+                                ลบข้อแนะนำนี้
+                            </button>
+                            </div>
+                            <label className="form-label">ข้อแนะนำ</label>
+                            <textarea
+                                className='form-control'
+                                value={items}
+                                onChange={e => handleChange(e, index)}
+                                rows={5}
+                            />
+                        </div>
+                    ))}
                     <div>
                         <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
                             <i className="me-2 bi bi-plus-lg"></i>
                             เพิ่มหัวข้อ
                         </button>
                     </div>
-                    {guideline.map((items, index) => (
-                        <div className='col-12' key={index}>
-                            <label className='form-label'>ข้อที่: {index + 1}</label>
-                            <textarea className='form-control' value={items} onChange={e => handleChange(e, index)} />
-                        </div>
-                    ))}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>

@@ -14,19 +14,15 @@ function AuthorSidebar({ children }) {
   return (
     <Container fluid>
       <Row>
-        <Col xs={12} lg={2} className="d-none bg-dark d-lg-block sidebar">
+        <Col xs={12} lg={2} className="d-none text-bg-white d-lg-block sidebar border-end">
           <div className="d-flex flex-column h-100 justify-content-between">
             <Nav variant='pills' className="flex-column p-3" activeKey={window.location.pathname}>
               <Nav.Link href='/' className='p-3'>
-                <h4 className='fw-bold text-white'>PAPERSS</h4>
+                <h4 className='fw-bold'>PAPERSS</h4>
               </Nav.Link>
-              <Nav.Link href="/author" className='text-white'>
+              <Nav.Link href="/author">
                 <i className="bi bi-arrow-left-right me-2"></i>
-                รายการบทความ
-              </Nav.Link>
-              <Nav.Link href="/author/archive" className='text-white'>
-                <i className="bi bi-archive me-2"></i>
-                เก็บบทความ
+                สถานะบทความ
               </Nav.Link>
             </Nav>
             <div className="p-3">
@@ -48,11 +44,7 @@ function AuthorSidebar({ children }) {
               <Nav className="flex-column">
                 <Nav.Link href="/author">
                   <i className="bi bi-arrow-left-right me-2"></i>
-                  ส่ง
-                </Nav.Link>
-                <Nav.Link href="/author/archive">
-                  <i className="bi bi-archive me-2"></i>
-                  เก็บ
+                  สถานะบทความ
                 </Nav.Link>
               </Nav>
             </Offcanvas.Body>

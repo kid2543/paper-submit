@@ -69,7 +69,13 @@ function HostPartner() {
           <p className='text-muted card-text'>เพิ่มและแก้ไขรูปภาพผู้สนับสนุนได้ที่นี่</p>
         </div>
       </div>
-      <CreatePartnerModal show={showCreate} handleClose={handleCloseCreate} handleSubmit={handleSubmit} setPartnerUpload={setPartnerUpload} partnerUpload={partnerUpload} />
+      <CreatePartnerModal
+        show={showCreate}
+        handleClose={handleCloseCreate}
+        handleSubmit={handleSubmit}
+        setPartnerUpload={setPartnerUpload}
+        partnerUpload={partnerUpload}
+      />
       <ConfirmDel
         show={show}
         handleClose={handleClose}
@@ -79,7 +85,7 @@ function HostPartner() {
       <div className='card shadow-sm'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center'>
-            <h6 className='fw-bold card-title'>รายการผู้สนับสนุน</h6>
+            <h4 className='card-title'>รายการผู้สนับสนุน</h4>
             <button className='btn btn-primary' type='button' onClick={handleShowCreate}>
               <i className='bi bi-plus-lg me-2'></i>เพิ่มรูปผู้สนับสนุน
             </button>
@@ -144,7 +150,7 @@ function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>New Partner</Modal.Title>
+        <Modal.Title>เพิ่มรูปผู้สนับสนุน</Modal.Title>
       </Modal.Header>
       <form onSubmit={handleSubmit}>
         <Modal.Body>
@@ -162,6 +168,7 @@ function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload
             ปิด
           </Button>
           <Button variant="primary" type="submit" disabled={!partnerUpload}>
+            <i className="bi bi-upload me-2"></i>
             อัพโหลด
           </Button>
         </Modal.Footer>

@@ -128,7 +128,7 @@ function HostEditCate() {
                 </div>
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h6 className='fw-bold mb-4'>รายชื่อกรรมการประจำหัวข้อ</h6>
+                        <h4 className='card-title'>รายชื่อกรรมการประจำหัวข้อ</h4>
                         {commitDetail.length > 0 ? (
                             <div className='table-responsive'>
                                 <table className='table table-hover'>
@@ -159,9 +159,9 @@ function HostEditCate() {
                 </div>
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h6 className='fw-bold mb-4'>
+                        <h4 className='card-title'>
                             รายชื่อกรรมการทั้งหมด
-                        </h6>
+                        </h4>
                         <div className='d-flex justify-content-between align-items-center mb-3'>
                             <div>
                                 <form onSubmit={handleSearchChange} className="input-group">

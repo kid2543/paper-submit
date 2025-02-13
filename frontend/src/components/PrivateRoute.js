@@ -35,7 +35,7 @@ const PrivateRoute = ({children, api}) => {
     }
 
     if(Forbiden) {
-        return <UnAuthorized />
+        return <UnAuthorized replace />
     }
 
     return children

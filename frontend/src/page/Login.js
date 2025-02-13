@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useLogin } from '../hook/useLogin'
+import { Link } from 'react-router-dom'
 
 
 const Login = () => {
@@ -16,11 +17,11 @@ const Login = () => {
     return (
         <section className='vh-100 bg-primary bg-gradient'>
             <div className="d-flex h-100 align-items-center">
-                <div className="card col-12 col-md-6 col-lg-4 mx-auto my-3 p-3">
+                <div className="card col-11 col-md-6 col-lg-4 mx-auto my-3 p-3">
                     <div className="card-body">
                         <div className="text-center mb-5">
                             <h1 className="card-title fw-bold">เข้าสู่ระบบ</h1>
-                            <div className="text-muted">
+                            <div className="text-muted px-2">
                                 กรอกข้อมูลผู้ใช้งาน และรหัสผ่านเพื่อเริ่มการใช้งาน
                             </div>
                         </div>
@@ -57,7 +58,7 @@ const Login = () => {
                             <button type='submit' disabled={isLoading} className="btn btn-primary w-100">เข้าสู่ระบบ</button>
                         </form>
                         <div className="text-center text-muted">
-                            <small>ไม่มีบัญชี ? <a href='/signup'>ลงทะเบียน</a></small>
+                            <small>ไม่มีบัญชี ? <Link to='/signup'>ลงทะเบียน</Link> หรือ <Link to='/'>ไปหน้าแรก</Link></small>
                         </div>
                     </div>
                 </div>

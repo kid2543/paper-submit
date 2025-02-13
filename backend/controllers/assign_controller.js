@@ -14,11 +14,11 @@ const assignPaper = async (req, res) => {
     let check = []
 
     if (!mongoose.Types.ObjectId.isValid(reviewer)) {
-        return res.status(400).json({ error: 'This is not reviewer id' })
+        return res.status(400).json({ error: 'รหัสกรรมการไม่ถูกต้อง' })
     }
 
     if (!mongoose.Types.ObjectId.isValid(paper_id)) {
-        return res.status(400).json({ error: 'This is not paper id' })
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
     }
 
     check = await paperAssign.find({ reviewer, paper_id, status: { $ne: 'CANCEL' } })
@@ -288,6 +288,21 @@ const editReview = async (req, res) => {
     }
 }
 
+// remove assign
+const removeAssign = async (req, res) => {
+    const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id))
+        return res.status(400).json({error : 'รหัสรายการตรวจไม่ถูกต้อง'})
+
+    try {
+        await paperAssign.deleteOne({_id: id})
+        res.status(204).send('ลบรายการตรวจสำเร็จ')
+    } catch (error) {
+        res.status(400).json({error : error.message})        
+    }
+}
+
 module.exports = {
     assignPaper,
     reviewPaper,
@@ -296,5 +311,6 @@ module.exports = {
     getReview,
     getOneReview,
     uploadSuggestionFile,
-    editReview
+    editReview,
+    removeAssign
 }

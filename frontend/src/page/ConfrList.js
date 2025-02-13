@@ -1,89 +1,158 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { useState } from 'react'
 import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import LoadingPage from '../components/LoadingPage';
+import useSearch from '../hook/useSearch';
+import ConferenceCategory from '../hook/ConferenceCategory';
+import { Dropdown } from 'react-bootstrap';
+import PaginationComponent from '../components/Pagination';
 
 
 function ConfrList() {
 
-  const [confr, setConfr] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data,
+    error,
+    handleNextPage,
+    handlePreviousPage,
+    handleSearchCate,
+    handleSearchChange,
+    handleSearchTag,
+    page,
+    totalPages,
+    status
+  } = useSearch('/api/conference/open/search')
 
+  const { confrCateArray } = ConferenceCategory()
 
-  useEffect(() => {
-
-    const fethConfr = async () => {
-      try {
-        const res = await axios.get('/api/conference')
-        setConfr(res.data)
-      } catch (error) {
-        console.log(error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fethConfr();
-  }, [])
-
-  if (loading) {
-    return (
-      <LoadingPage />
-    )
-  }
+  const [selectV, setSelectV] = useState('TITLE')
 
   return (
-    <div style={{ paddingTop: "128px" }}>
+    <div style={{ padding: "128px 0px" }}>
       <section className='container'>
-
-        <div className='card text-bg-secondary'>
-          <div className="card-body">
+        <div className="card">
+          <div className='card-body'>
             <div className='mb-3'>
-              <h4 className='card-title fw-bold mb-3'>งานประชุมวิชาการที่เปิดรับ</h4>
+              <h4 className='card-title fw-bold'>งานประชุมวิชาการที่เปิดรับ</h4>
+              <p className="text-muted">เลือกงานประชุมและส่งบทความได้ที่นี่</p>
             </div>
-            {confr.length > 0 ? (
-              <div className='row g-3'>
-                {confr.map((item) => (
-                  <div key={item._id} className='col-12 col-md-6 col-lg-4'>
-                    <div className='card shadow-sm h-100'>
-                      <div className='card-body'>
-                        <div className='d-flex flex-column justify-content-between h-100'>
-                          <div>
-                            <h4 className="fw-bold">{item.confr_code}</h4>
-                            <p><i className="bi bi-calendar-event-fill me-2 text-primary">{dayjs(item.confr_end_date).format(" DD MMM YYYY")}</i></p>
-                            <p>{item.title}</p>
-                            {item.cate &&
-                              <div className='mb-3'>
-                                <span className='badge text-bg-dark'>{item.cate}</span>
-                              </div>
-                            }
-                          </div>
-                          <div className='mb-3'>
-                            {item.tag?.map((items, index) => (
-                              <span key={index} className='badge text-bg-secondary me-1'>{items}</span>
-                            ))}
-                          </div>
+            <Dropdown className="mb-3">
+              <Dropdown.Toggle variant="success">
+                เลือกฟอร์มการค้นหา
+              </Dropdown.Toggle>
 
-                          <div className='mt-3 text-end popup'>
-                            <Link
-                              to={`/confr/${item._id}`}
-                              className='btn btn-primary btn-sm'
-                              type='button'
-                            >
-                              รายละเอียดเพิ่มเติม
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  active={selectV === 'TITLE'}
+                  type='button'
+                  onClick={() => setSelectV('TITLE')}
+                >
+                  ค้นหาจากชื่องานประชุม
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={selectV === 'CATE'}
+                  type='button'
+                  onClick={() => setSelectV('CATE')}
+                >
+                  ค้นหาจากหมวดหมู่
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={selectV === 'TAG'}
+                  type='button'
+                  onClick={() => setSelectV('TAG')}
+                >
+                  ค้นหาจาก Tag
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <div className="mb-3">
+              {selectV === 'TITLE' &&
+                <form onSubmit={handleSearchChange}>
+                  <div className="input-group">
+                    <input
+                      name='search'
+                      className="form-control"
+                      placeholder='ค้นหางานประชุมวิชาการด้วยชื่องานประชุม'
+                    />
+                    <button className="btn btn-primary">
+                      <i className="bi bi-search"></i>
+                    </button>
                   </div>
-                ))}
+                </form>
+              }
+              {selectV === 'TAG' &&
+                <form onSubmit={handleSearchTag}>
+                  <div className="input-group">
+                    <input
+                      name='tag'
+                      className="form-control"
+                      placeholder='ค้นหางานประชุมด้วย tag'
+                    />
+                  </div>
+                </form>
+              }
+              {selectV === 'CATE' &&
+                <form>
+                  <select onChange={handleSearchCate} className="form-select" name='cate'>
+                    <option value=''>-- เลือกหมวดหมู่</option>
+                    {confrCateArray.map(list => (
+                      <option key={list} value={list}>{list}</option>
+                    ))}
+                  </select>
+                </form>
+              }
+            </div>
+            {error && 
+              <div className="alert alert-warning">
+                {error}
+              </div>
+            }
+            {data?.length > 0 ? (
+              <div>
+                {status === 'idle' || status === 'loading' ? (
+                  <LoadingPage />
+                ) : (
+                  <div className='table-responsive' style={{ minHeight: 400 }}>
+                    <table className="table table-hover" style={{ minWidth: 1000 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: 128 }}>กำหนดการ</th>
+                          <th>ชื่องานประชุม</th>
+                          <th>หมวดหมู่</th>
+                          <th>tag</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data?.map((items) => (
+                          <tr key={items._id}>
+                            <td>{dayjs(items.confr_end_date).format('DD MMM YYYY')}</td>
+                            <td>
+                              <Link target='_blank' rel='noreferrer' to={`/confr/${items._id}`}>
+                                {items.title}
+                              </Link>
+                            </td>
+                            <td>{items.cate}</td>
+                            <td>{items.tag?.map((tags, tags_index) =>
+                              <span key={tags_index} className="badge text-bg-dark me-2">{tags}</span>
+                            )}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             ) : (
-              <div>
-                ไม่พบข้อมูลงานประชุม
+              <div className="text-center">
+                <h3 className="fw-bold">ไม่พบข้อมูล</h3>
               </div>
             )}
+            <PaginationComponent
+              currentPage={page}
+              onPageNext={handleNextPage}
+              onPagePrev={handlePreviousPage}
+              totalPages={totalPages}
+            />
           </div>
         </div>
       </section>

@@ -54,13 +54,13 @@ export function HomeNavbar() {
     )
 }
 
-export function ConfrNavbar({code}) {
+export function ConfrNavbar() {
 
     const { id } = useParams()
 
     return (
         <header>
-            <Navbar expand="lg" className="bg-white shadow-sm">
+            <Navbar expand="lg" className="bg-white position-fixed top-0 w-100 shadow-sm">
                 <Container>
                     <Navbar.Brand href='/'>
                         <div className='bg-light p-2 rounded fw-bold text-primary'>
@@ -75,6 +75,7 @@ export function ConfrNavbar({code}) {
                             <Nav.Link href={`/confr/${id}/guideline`}>แนะนำการเข้าร่วมงาน</Nav.Link>
                             <Nav.Link href={`/confr/${id}/registration`}>การลงทะเบียน</Nav.Link>
                             <Nav.Link href={`/confr/${id}/venue`}>สถานที่จัดงาน</Nav.Link>
+                            <Nav.Link href={`/confr/${id}/award`}>บทความที่ได้รับรางวัล</Nav.Link>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>

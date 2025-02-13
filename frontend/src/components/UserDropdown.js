@@ -11,6 +11,7 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 // notify
 import { toast } from 'react-toastify'
 import 'react-toastify/ReactToastify.css'
+import dayjs from 'dayjs'
 
 export function UserDropdown() {
     const { logout } = useLogout()
@@ -58,11 +59,7 @@ export function UserDropdown() {
                 setNotiMessage(res.data)
                 const unread = res.data.filter(items => items.status !== true)
                 setUnreadState(unread.length)
-                
-                // alert notification
-                if(unread.length > 0) {
-                    toast('มีการแจ้งเตือนใหม่')
-                }
+
             } catch (error) {
                 console.log(error)
             }
@@ -88,15 +85,11 @@ export function UserDropdown() {
                 <span className="me-2">{user}</span>                    
             </Dropdown.Toggle>
             <Dropdown.Menu>
-                <Dropdown.ItemText>
-                    {user}
-                </Dropdown.ItemText>
                 <Dropdown.Header>
-                    test@mail.com
+                    {user}
                 </Dropdown.Header>
-                <Dropdown.Divider />
                 <Dropdown.Item href="/setting">
-                    เครื่องมือ
+                    ระบบรับส่งบทความ
                 </Dropdown.Item>
                 <Dropdown.Item href="/profile">
                     การตั้งค่า
@@ -104,7 +97,7 @@ export function UserDropdown() {
                 <Dropdown.Item onClick={handleShow}>
                     <span className='position-relative'>
                         การแจ้งเตือน
-                        {unreadState.length > 0 &&
+                        {unreadState > 0 &&
                             <span className='position-absolute top-0 start-100 translate-middle badge border-light rounded-circle bg-danger p-1'>
                                 <span className='visually-hidden'>unread messages</span>
                             </span>
@@ -125,10 +118,18 @@ export function UserDropdown() {
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     {notiMessage.length > 0 ? (
-                        <section>
+                        <section className="row g-3 row-cols-1">
                             {notiMessage.map(items => (
-                                <div key={items._id}>
-                                    {items._id}
+                                <div className="card" key={items._id}>
+                                    <div className="card-body">
+                                        <h4 className="card-title">{items.title}</h4>
+                                        <div className="card-text">
+                                            {items.message}
+                                        </div>
+                                        <small className='card-text text-muted'>
+                                            {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
+                                        </small>
+                                    </div>
                                 </div>
                             ))}
                         </section>

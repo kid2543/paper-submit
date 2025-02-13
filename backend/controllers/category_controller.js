@@ -133,7 +133,7 @@ const getOneCategory = async (req, res) => {
     }
 
     try {
-        const cate = await Category.findById(id).populate('reviewer_list', 'name _id username')
+        const cate = await Category.findById(id).populate('reviewer_list', '-password')
         if(!cate) {
             return res.status(404).json({error : 'ไม่พบข้อมูล'})
         }

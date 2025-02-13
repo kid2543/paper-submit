@@ -31,11 +31,11 @@ const getPaperArchive = async (req, res) => {
     const { _id } = req.user
 
     try {
-        const paper = await Paper.find({owner: _id, result: 'ACCEPT', award_rate: {$ne : null}})
+        const paper = await Paper.find({ owner: _id, result: 'ACCEPT', award_rate: { $ne: null } })
         res.status(200).json(paper)
     } catch (error) {
         console.log(error)
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -96,12 +96,12 @@ const getReviewPaper = async (req, res) => {
 async function getNextSequenceValue(sequenceId) {
     console.log(sequenceId)
     const sequenceDocument = await Counters.findOneAndUpdate(
-       { _id: sequenceId },
-       { $inc: { sequence_value: 1 } },
-       {upsert: true, new: true }
+        { _id: sequenceId },
+        { $inc: { sequence_value: 1 } },
+        { upsert: true, new: true }
     );
     return sequenceDocument.sequence_value
- }
+}
 
 // create paper
 const createPaper = async (req, res) => {
@@ -308,7 +308,7 @@ const publicPaperSingle = async (req, res) => {
 // get all public
 const publicPaperAll = async (req, res) => {
     try {
-        const paper = await Paper.find({status: 'SUCCESS', result: 'ACCEPT', award_rate: {$ne: null} })
+        const paper = await Paper.find({ status: 'SUCCESS', result: 'ACCEPT', award_rate: { $ne: null } })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -357,6 +357,26 @@ const getPaperAward = async (req, res) => {
 
     try {
         const paper = await Paper.find({ cate_code: id, award_rate: { $ne: '' } })
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
+// get paper award for confr
+const getConfrPaperAward = async (req, res) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสงานประชุมไม่ถูกต้อง' })
+    }
+
+    try {
+        const paper = await Paper.find({
+            confr_code: id,
+            award_rate: { $ne: '' },
+            result: 'ACCEPT'
+        }).populate('cate_code')
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -458,6 +478,7 @@ const authorSearch = async (req, res) => {
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .populate('confr_code cate_code')
+            .sort({'createdAt': -1})
         const count = await Paper.countDocuments(query)
         res.status(200).json({
             items,
@@ -490,16 +511,16 @@ const adminPaper = async (req, res) => {
 // get paper list by owner from admin
 const getPaperOwnerAdmin = async (req, res) => {
     const { id } = req.params
-    
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error : 'รหัสผู้ใช้งานไม่ถูกต้อง'})
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสผู้ใช้งานไม่ถูกต้อง' })
     }
 
     try {
-        const paper = await Paper.find({owner: id})
+        const paper = await Paper.find({ owner: id })
         res.status(200).json(paper)
     } catch (error) {
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -669,14 +690,14 @@ const sendEmailPdf = async (req, res) => {
 
     const { recipient, confr_title, owner, paper_id } = req.body
 
-    
+
     if (!req.file) {
         return res.status(400).json({ error: 'เกิดข้อผิดพลาดเกี่ยวกับการ upload file' })
     }
 
     if (!mongoose.Types.ObjectId.isValid(paper_id)) {
         fs.unlink(req.file.path, (err) => {
-            if(err) {
+            if (err) {
                 console.error('ไม่สามารถลบไฟล์ได้: ', err)
             } else {
                 console.log('ลบไฟล์สำเร็จ')
@@ -684,8 +705,8 @@ const sendEmailPdf = async (req, res) => {
         })
         return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
     }
-    
-    
+
+
     let transpoter = nodemailer.createTransport({
         service: 'Gmail', //สามารถเปลี่ยนเป็นบริการ SMTP ของที่อื่นได้นอกจาก Gmail
         auth: {
@@ -725,8 +746,8 @@ const sendEmailPdf = async (req, res) => {
 
     try {
         const paper = await Paper.findById(paper_id)
-        if(!paper) {
-            return res.status(404).json({error : 'ไม่พบบทความ'})
+        if (!paper) {
+            return res.status(404).json({ error: 'ไม่พบบทความ' })
         }
         paper.letter = req.file.filename
         paper.save()
@@ -734,7 +755,7 @@ const sendEmailPdf = async (req, res) => {
         res.status(200).json(paper)
     } catch (error) {
         console.log(error)
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -743,14 +764,14 @@ const sendCertificate = async (req, res) => {
 
     const { recipient, confr_title, owner, paper_id } = req.body
 
-    
+
     if (!req.file) {
         return res.status(400).json({ error: 'เกิดข้อผิดพลาดเกี่ยวกับการ upload file' })
     }
 
     if (!mongoose.Types.ObjectId.isValid(paper_id)) {
         fs.unlink(req.file.path, (err) => {
-            if(err) {
+            if (err) {
                 console.error('ไม่สามารถลบไฟล์ได้: ', err)
             } else {
                 console.log('ลบไฟล์สำเร็จ')
@@ -758,8 +779,8 @@ const sendCertificate = async (req, res) => {
         })
         return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
     }
-    
-    
+
+
     let transpoter = nodemailer.createTransport({
         service: 'Gmail', //สามารถเปลี่ยนเป็นบริการ SMTP ของที่อื่นได้นอกจาก Gmail
         auth: {
@@ -798,8 +819,8 @@ const sendCertificate = async (req, res) => {
 
     try {
         const paper = await Paper.findById(paper_id)
-        if(!paper) {
-            return res.status(404).json({error : 'ไม่พบบทความ'})
+        if (!paper) {
+            return res.status(404).json({ error: 'ไม่พบบทความ' })
         }
         paper.certificate = req.file.filename
         paper.save()
@@ -807,7 +828,7 @@ const sendCertificate = async (req, res) => {
         res.status(200).json(paper)
     } catch (error) {
         console.log(error)
-        res.status(400).json({error : error.message})
+        res.status(400).json({ error: error.message })
     }
 }
 
@@ -839,5 +860,6 @@ module.exports = {
     sendEmailPdf,
     sendCertificate,
     getPaperArchive,
-    getPaperOwnerAdmin
+    getPaperOwnerAdmin,
+    getConfrPaperAward
 }

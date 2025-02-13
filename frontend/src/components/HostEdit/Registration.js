@@ -9,6 +9,9 @@ import SearchItemNotFound from '../SearchItemNotFound'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify'
+import { Link } from 'react-router-dom'
+
+const api = process.env.REACT_APP_API_URL
 
 function Registration() {
 
@@ -19,6 +22,7 @@ function Registration() {
     const [showModalA, setShowModalA] = useState(false)
     const [showModalB, setShowModalB] = useState(false)
     const [showModalC, setShowModalC] = useState(false)
+    const [showModalD, setShowModalD] = useState(false)
 
     if (status === 'idle' || status === 'loading') {
         return <LoadingPage />
@@ -38,12 +42,17 @@ function Registration() {
                 </div>
             </div>
             <div className='row g-3'>
-                <ModalAcc data={data} show={showModalA} handleClose={() => setShowModalA(false)} setData={setData} />
+                <ModalAcc
+                    data={data}
+                    show={showModalA}
+                    handleClose={() => setShowModalA(false)}
+                    setData={setData}
+                />
                 <div className='col-12 col-lg-6'>
-                    <div className='card  shadow-sm h-100'>
+                    <div className='card shadow-sm h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
-                                <h6 className='fw-bold mb-0'>รายละเอียดบัญชี</h6>
+                                <h4>รายละเอียดบัญชี</h4>
                                 <div>
                                     <button className='btn' onClick={() => setShowModalA(true)}>
                                         <i className='bi bi-pencil-square'></i>
@@ -53,19 +62,19 @@ function Registration() {
                             <table className='table'>
                                 <tbody>
                                     <tr>
-                                        <td>ชื่อธนาคาร</td>
+                                        <th>ชื่อธนาคาร</th>
                                         <td>{data?.bank_name}</td>
                                     </tr>
                                     <tr>
-                                        <td>ชื่อบัญชี</td>
+                                        <th>ชื่อบัญชี</th>
                                         <td>{data?.acc_name}</td>
                                     </tr>
                                     <tr>
-                                        <td>ประเภทบัญชี</td>
+                                        <th>ประเภทบัญชี</th>
                                         <td>{data?.bank_type}</td>
                                     </tr>
                                     <tr>
-                                        <td>เลขบัญชี</td>
+                                        <th>เลขบัญชี</th>
                                         <td>{data?.acc_no}</td>
                                     </tr>
                                 </tbody>
@@ -74,11 +83,16 @@ function Registration() {
                     </div>
                 </div>
                 <div className='col-12 col-lg-6'>
-                    <ModalRegis data={data} show={showModalB} handleClose={() => setShowModalB(false)} setData={setData} />
+                    <ModalRegis
+                        data={data}
+                        show={showModalB}
+                        handleClose={() => setShowModalB(false)}
+                        setData={setData}
+                    />
                     <div className='card  shadow-sm h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
-                                <h6 className='fw-bold mb-0'>อัตราค่าลงทะเบียน</h6>
+                                <h4>อัตราค่าลงทะเบียน</h4>
                                 <button className='btn' onClick={() => setShowModalB(true)}>
                                     <i className='bi bi-pencil-square'></i>
                                 </button>
@@ -110,19 +124,57 @@ function Registration() {
                         </div>
                     </div>
                 </div>
-                <div className='col-12'>
-                    <div className='card  shadow-sm'>
+                <div className='col-12 col-lg-6'>
+                    <div className='card  shadow-sm h-100'>
                         <div className='card-body'>
                             <div>
-                                <ModalRegisDate data={data} setData={setData} handleClose={() => setShowModalC(false)} show={showModalC} />
+                                <ModalRegisDate
+                                    data={data}
+                                    setData={setData}
+                                    handleClose={() => setShowModalC(false)}
+                                    show={showModalC}
+                                />
                                 <div className='d-flex justify-content-between align-items-center mb-4'>
-                                    <h6 className='fw-bold mb-0'>กำหนดการชำระเงิน</h6>
+                                    <h4>กำหนดการชำระเงิน</h4>
                                     <button className='btn' onClick={() => setShowModalC(true)}>
                                         <i className='bi bi-pencil-square'></i>
                                     </button>
                                 </div>
-                                <p>Early bird registration : {data?.regis_eb_start_date && dayjs(data?.regis_eb_start_date).format("DD MMM YYYY")} - {data?.regis_eb_end_date && dayjs(data?.regis_eb_end_date).format("DD MMM YYYY")}</p>
-                                <p>Regular registration : {data?.regis_rl_start_date && dayjs(data?.regis_rl_start_date).format("DD MMM YYYY")} - {data?.regis_rl_end_date && dayjs(data?.regis_rl_end_date).format("DD MMM YYYY")}</p>
+                                <p><b>Early bird</b> : {data?.regis_eb_start_date && dayjs(data?.regis_eb_start_date).format("DD MMM YYYY")} - {data?.regis_eb_end_date && dayjs(data?.regis_eb_end_date).format("DD MMM YYYY")}</p>
+                                <p><b>Regular</b> : {data?.regis_rl_start_date && dayjs(data?.regis_rl_start_date).format("DD MMM YYYY")} - {data?.regis_rl_end_date && dayjs(data?.regis_rl_end_date).format("DD MMM YYYY")}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                    <ModalSchedule
+                        show={showModalD}
+                        handleClose={() => setShowModalD(false)}
+                        setData={setData}
+                        id={id}
+                    />
+                    <div className='card h-100'>
+                        <div className="card-body">
+                            <div>
+                                <div className='d-flex justify-content-between align-items-center mb-4'>
+                                    <h4>กำหนดการงานประชุม</h4>
+                                    <button className='btn' onClick={() => setShowModalD(true)}>
+                                        <i className='bi bi-pencil-square'></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                {data.schedule ? (
+                                    <Link to={`/uploads/${data.schedule}`} target='_blank' rel='noreferrer' className="btn btn-primary">
+                                        <i className="bi bi-file-earmark me-2"></i>
+                                        ดูไฟล์กำหนดการ
+                                    </Link>
+
+                                ) : (
+                                    <button onClick={() => setShowModalD(true)} type='button' className="btn btn-outline-primary">
+                                        อัพโหลดไฟล์กำหนดการ
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -173,7 +225,12 @@ function ModalAcc(props) {
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>เลขบัญชี</label>
-                        <input className='form-control' name='acc_no' defaultValue={props.data?.acc_no} pattern='[0-9]{10}' />
+                        <input
+                            maxLength={10}
+                            className='form-control'
+                            name='acc_no'
+                            defaultValue={props.data?.acc_no}
+                            pattern='[0-9]{10}' />
                         <div className="form-text">เฉพาะตัวเลขเท่านั้น</div>
                     </div>
                 </Modal.Body>
@@ -232,13 +289,17 @@ function ModalRegis(props) {
                     <div className='col-12'>
                         <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
                             <i className="me-2 bi bi-plus-lg"></i>
-                            เพิ่ม
+                            เพิ่มประเภทการลงทะเบียน
                         </button>
                     </div>
                     {edit?.map((items, index) => (
-                        <div key={index} className='row gy-2'>
+                        <div key={index} className='row g-3'>
                             <div className='col-12'>
-                                <label className='form-label'>ประเภทที่ {index + 1}</label>
+                                <div className="form-text">
+                                    ประเภทที่ {index + 1}
+                                </div>
+                                <hr />
+                                <label className="form-label">ชื่อประเภท</label>
                                 <input className='form-control' name='name' defaultValue={items.name} onChange={e => handleChange(e, index)} />
                             </div>
                             <div className='col-12'>
@@ -324,6 +385,66 @@ function ModalRegisDate(props) {
                     </Button>
                     <Button variant="primary" type='submit' disabled={!editStatus}>
                         อัพเดท
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}
+
+function ModalSchedule(props) {
+
+    const [scheduleFile, setScheduleFile] = useState(null)
+
+    const handleUpload = async (e) => {
+        e.preventDefault()
+        if (!scheduleFile) {
+            toast.warning('กรุณาเลือกไฟล์')
+            return
+        }
+
+        try {
+            const formData = new FormData()
+            formData.append('file', scheduleFile)
+            const res = await axios.patch('/api/conference/schedule/' + props.id, formData)
+            props.setData(res.data)
+            toast.success('อัพโหลดไฟล์กำหนดการสำเร็จ')
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            props.handleClose()
+        }
+    }
+
+    return (
+        <Modal show={props.show} onHide={props.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>เพิ่ม / แก้ไขกำหนดการ</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleUpload}>
+                <Modal.Body>
+                    <label className="form-label">
+                        เลือกไฟล์กำหนดการ
+                    </label>
+                    <input
+                        className="form-control"
+                        type='file'
+                        accept='.pdf'
+                        onChange={e => setScheduleFile(e.target.files[0])}
+                        required
+                    />
+                    <div className="form-text">
+                        เฉพาะ PDF เท่านั้น
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="" onClick={props.handleClose}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" type='submit' disabled={!scheduleFile}>
+                        <i className="me-2 bi bi-upload"></i>
+                        อัพโหลด
                     </Button>
                 </Modal.Footer>
             </form>

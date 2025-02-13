@@ -11,7 +11,6 @@ const {
     createHost,
     getHost,
     createCommittee,
-    getUserNotification,
     getCommittee,
     searchHost,
     searchComit,
@@ -75,9 +74,6 @@ router.get('/host', verifyToken, checkRole(['ADMIN']), getHost)
 
 //create committee
 router.post('/committee', verifyToken, checkRole(['HOST', 'ADMIN']), createCommittee)
-
-// get notification
-router.get('/notification', requireAuth, getUserNotification)
 
 // get committee
 router.get('/committee', verifyToken, checkRole(['HOST', 'ADMIN']), getCommittee)

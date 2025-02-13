@@ -11,8 +11,6 @@ const mockPaper = {
   image: bookCover,
 }
 
-const api = process.env.REACT_APP_API_URL
-
 function PaperDetail() {
 
   const { id } = useParams()
@@ -46,7 +44,7 @@ function PaperDetail() {
             <img src={mockPaper.image} alt='cover-book' height={300} width={200} />
           </div>
           <div className='col-lg-8 my-3'>
-            <button type='button' className='btn btn-primary' disabled={!paper?.paper_file} onClick={() => window.open(api + "/pdf/" + paper?.paper_file)}>ดูบทความฉบับเต็ม</button>
+            <button>ดูบทความ</button>
           </div>
         </div>
       </section>

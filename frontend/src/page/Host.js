@@ -3,14 +3,12 @@ import axios from 'axios'
 import PaperStatus, { PaperResult } from '../components/PaperStatus'
 import { Link, useNavigate } from 'react-router-dom'
 import useSearch from '../hook/useSearch'
-import { UserDropdown } from '../components/UserDropdown'
 import { toast } from 'react-toastify'
 import SearchItemNotFound from '../components/SearchItemNotFound'
 
 // react-bootstrap
 import {
   Offcanvas,
-  Breadcrumb
 } from 'react-bootstrap'
 
 // date and time
@@ -27,7 +25,6 @@ function Host() {
   const [Cate, setCate] = useState([])
   const [loading, setLoading] = useState('idle')
   const id = sessionStorage.getItem('host_confr')
-  const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate()
 
   const searchPaper = useSearch('/api/paper/host/search/' + id)
@@ -58,15 +55,7 @@ function Host() {
         console.log(error)
       }
     }
-    const checkRole = async () => {
-      try {
-        await axios.get('/api/user/protected')
-        setIsAdmin(true)
-      } catch (error) {
-        setIsAdmin(false)
-      }
-    }
-    checkRole()
+
     fetchData()
     fethNotification()
   }, [id])
@@ -204,15 +193,7 @@ function Host() {
         onConfirm={handleDelete}
         show={showDelete}
       />
-      <section className='container py-3' style={{ minHeight: '100vh' }}>
-        {isAdmin &&
-          <Breadcrumb>
-            <Breadcrumb.Item href="/admin/conference">Admin dashboard</Breadcrumb.Item>
-            <Breadcrumb.Item active href="">
-              แก้ไขรายละเอียดงานประชุม
-            </Breadcrumb.Item>
-          </Breadcrumb>
-        }
+      <section>
         <div className='card mb-3'>
           <div className='card-body'>
             <div className='d-flex justify-content-between align-items-center'>
@@ -232,7 +213,6 @@ function Host() {
                     </span>
                   }
                 </button>
-                <UserDropdown />
               </div>
             </div>
           </div>
@@ -342,7 +322,7 @@ function Host() {
                         ผลลัพธ์
                       </th>
                       <th>
-                        action
+                        เครื่องมือ
                       </th>
                     </tr>
                   </thead>
@@ -366,10 +346,10 @@ function Host() {
                         </td>
                         <td>
                           <div className="btn-group" role="group" aria-label="Basic example">
-                            <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-dark">
+                            <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-outline-primary">
                               <i className="bi bi-pen"></i>
                             </Link>
-                            <Link to={`/host/assign/${items._id}/${items.cate_code}`} type="button" className="btn btn-dark">
+                            <Link to={`/host/assign/${items._id}/${items.cate_code}`} type="button" className="btn btn-outline-primary">
                               <i className="bi bi-people"></i>
                             </Link>
                           </div>

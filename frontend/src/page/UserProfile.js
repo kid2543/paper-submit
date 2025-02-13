@@ -7,7 +7,6 @@ import axios from 'axios';
 
 // react tosify
 import { toast } from 'react-toastify'
-import { UserDropdown } from '../components/UserDropdown';
 
 function UserProfile() {
 
@@ -78,15 +77,7 @@ function UserProfile() {
 
   return (
     <div>
-      <div className='container py-3'>
-        <section className='card text-bg-light'>
-          <div className='card-body'>
-            <div className='d-flex justify-content-between align-items-center'>
-              <h5 className="fw-bold card-title">Profile</h5>
-              <UserDropdown />
-            </div>
-          </div>
-        </section>
+      <div className='container' style={{padding: '128px 0px'}}>
         <section>
           {data &&
             <div className='my-3'>
@@ -99,19 +90,26 @@ function UserProfile() {
                       <input defaultValue={data.name} name='name' className='form-control' />
                     </div>
                     <div className='col-12 col-md-6'>
+                      <label className='form-label'>ชื่อผู้ใช้งาน</label>
+                      <input defaultValue={data.username} name='username' readOnly className='form-control-plaintext' />
+                    </div>
+                    <div className='col-12 col-md-6'>
                       <label className='form-label'>อีเมล</label>
                       <input defaultValue={data.email} name='email' className='form-control' />
                     </div>
                     <div className='col-12 col-md-6 '>
                       <label className='form-label'>เบอร์โทร</label>
-                      <input defaultValue={data.phone} name='phone' className='form-control' />
+                      <input maxLength={10} pattern='[0-9]{10}' defaultValue={data.phone} name='phone' className='form-control' />
+                      <div className="form-text">
+                        ตัวเลข 10 หลัก
+                      </div>
                     </div>
                     <div className='col-12 col-md-6 '>
                       <label className='form-label'>มหาวิทยาลัย</label>
                       <input defaultValue={data.university} name='university' className='form-control' />
                     </div>
                     <div className='col-12 col-md-6 '>
-                      <label className='form-label'>สังกัด</label>
+                      <label className='form-label'>คณะ</label>
                       <input defaultValue={data.department} name='department' className='form-control' />
                     </div>
                     <div>
@@ -136,7 +134,10 @@ function UserProfile() {
                     </div>
                     <div className='col-12 col-md-6 '>
                       <label className='form-label'>รหัสไปรษณี</label>
-                      <input defaultValue={data.zip_code} name='zip_code' className='form-control' />
+                      <input maxLength={5} pattern='[0-9]{5}' defaultValue={data.zip_code} name='zip_code' className='form-control' />
+                      <div className="form-text">
+                        จำกัด 5 ตัวเลข
+                      </div>
                     </div>
                     <div className="text-end">
                       <button className='btn btn-primary text-white'>
