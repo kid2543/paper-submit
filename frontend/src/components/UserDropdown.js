@@ -81,8 +81,8 @@ export function UserDropdown() {
     return (
         <Dropdown>
             <Dropdown.Toggle className=" align-items-center d-flex" variant="light" id="dropdown-basic">
-                <i className="bi bi-person-fill fs-3 me-2"></i> 
-                <span className="me-2">{user}</span>                    
+                <i className="bi bi-person-fill fs-3 me-2"></i>
+                <span className="me-2">{user}</span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 <Dropdown.Header>
@@ -113,23 +113,32 @@ export function UserDropdown() {
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>การแจ้งเตือน</Offcanvas.Title>
                     <div className='ms-3'>
-                        <button type='button' onClick={handleClear} className='btn btn-outline-dark btn-sm' disabled={notiMessage.length <= 0}>Clear all</button>
+                        <button
+                            type='button'
+                            onClick={handleClear}
+                            className='btn btn-outline-dark btn-sm'
+                            disabled={notiMessage.length <= 0}
+                        >
+                            <i className='bi bi-trash me-2'></i>
+                            ลบการแจ้งเตือนทั้งหมด
+                        </button>
                     </div>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     {notiMessage.length > 0 ? (
-                        <section className="row g-3 row-cols-1">
+                        <section className="list-group">
                             {notiMessage.map(items => (
-                                <div className="card" key={items._id}>
-                                    <div className="card-body">
-                                        <h4 className="card-title">{items.title}</h4>
-                                        <div className="card-text">
-                                            {items.message}
-                                        </div>
-                                        <small className='card-text text-muted'>
+                                <div className="list-group-item d-flex justify-content-between align-items-start" key={items._id}>
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-bold">{items.title}</div>
+                                        {items.message}
+                                        <div className='card-text text-muted'>
                                             {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
-                                        </small>
+                                        </div>
                                     </div>
+                                    {items.status === false &&
+                                        <span className="badge bg-info">New</span>
+                                    }
                                 </div>
                             ))}
                         </section>

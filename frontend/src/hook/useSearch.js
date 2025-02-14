@@ -39,8 +39,9 @@ const useSearch = (fethapi) => {
         }
 
         fetchData()
-    }, [fethapi, page ,searchQuery, searchCate, searchTag, pageSize])
+    }, [fethapi, page, searchQuery, searchCate, searchTag, pageSize])
 
+    // ค้นหาจากชื่อ
     const handleSearchChange = (e) => {
         e.preventDefault()
         setSearchQuery(e.target.search.value)
@@ -49,6 +50,7 @@ const useSearch = (fethapi) => {
         setPage(1)
     }
 
+    // ค้นหาจาก tag
     const handleSearchTag = (e) => {
         e.preventDefault()
         setSearchTag(e.target.tag.value)
@@ -57,6 +59,8 @@ const useSearch = (fethapi) => {
         setPage(1)
     }
 
+
+    // ค้นหาจากหัวข้อ
     const handleSearchCate = (e) => {
         e.preventDefault()
         setSearchCate(e.target.value)
@@ -65,15 +69,47 @@ const useSearch = (fethapi) => {
         setPage(1)
     }
 
+    //หน้าถัดไป
     const handleNextPage = () => {
         if (page < totalPages) setPage(page + 1)
     }
 
+    // หน้าก่อนหน้า
     const handlePreviousPage = () => {
         if (page > 1) setPage(page - 1)
     }
 
-    return { data, error, status, setData, handleSearchChange, handleSearchTag, handleSearchCate, handleNextPage, handlePreviousPage, page, totalPages }
+    // หน้าแรก
+    const handleFirstPage = () => {
+        setPage(1)
+    }
+
+    //หน้าสุดท้าย
+    const handleLastPage = () => {
+        setPage(totalPages)
+    }
+
+    //เลือกจากเลข
+    const handleNumberPage = (number) => {
+        setPage(number)
+    }
+
+    return {
+        data,
+        error,
+        status,
+        setData,
+        handleSearchChange,
+        handleSearchTag,
+        handleSearchCate,
+        handleNextPage,
+        handlePreviousPage,
+        page,
+        totalPages,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage
+    }
 }
 
 export default useSearch

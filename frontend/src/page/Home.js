@@ -25,8 +25,6 @@ function Home() {
     return <div>page have error</div>
   }
 
-  console.log({ data })
-
   return (
     <div>
       <section className='container' style={{ paddingTop: "128px", paddingBottom: "128px" }}>

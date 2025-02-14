@@ -11,8 +11,6 @@ import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify'
 import { Link } from 'react-router-dom'
 
-const api = process.env.REACT_APP_API_URL
-
 function Registration() {
 
     const id = sessionStorage.getItem('host_confr')

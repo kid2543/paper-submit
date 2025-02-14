@@ -228,37 +228,48 @@ const updatePaperResult = async (req, res) => {
             if (!paper) {
                 return res.status(404).json({ error: 'Item not found' })
             }
-            await createNotification(paper.owner, `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`, `บทความของท่านผ่านการพิจารณา ท่านสามารถชำระค่าลงทะเบียนและเข้าร่วมงานประชุมได้ตามกำหนดการงานประชุมหน้าเว็บไซต์`)
-            res.status(200).json(paper)
-        } catch (error) {
-            res.status(400).json({ error: error.message })
-        }
-    } else if (result === 'REVISE') {
-        try {
-            const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
-            if (!paper) {
-                return res.status(404).json({ error: "paper not found" })
-            }
-            await Notification.create({ user_id: paper.owner, title: `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`, message: `มีการแก้ไข กำหนดการส่งบทความคือ ${dayjs(deadline).format('DD MMM, YYYY')}` })
-            paper.deadline.push(deadline)
-            paper.save()
-            res.status(200).json(paper)
-        } catch (error) {
-            console.log(error)
-            res.status(400).json({ error: error.message })
-        }
-    } else {
-        try {
-            const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
-            if (!paper) {
-                return res.status(404).json({ error: 'Item not found' })
-            }
-            await createNotification(paper.owner, `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`, `กรุณาตรวจสอบข้อมูลบทความ`)
-            res.status(200).json(paper)
-        } catch (error) {
-            res.status(400).json({ error: error.message })
-        }
+            await createNotification(
+                paper.owner,
+                `บทควม ${paper.paper_code} ผ่านแล้ว`,
+                'กรุณาชำระเงินค่าลงทะเบียนและเข้าร่วมงานประชุม'
+            )
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
     }
+} else if (result === 'REVISE') {
+    try {
+        const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
+        if (!paper) {
+            return res.status(404).json({ error: "paper not found" })
+        }
+        await Notification.create({
+            user_id: paper.owner,
+            title: `บทความ ${paper.paper_code} มีการแก้ไข`,
+            message: `บทความมีการแก้ไข กรุณาส่งบทความฉบับแก้ไขตามกำหนดการส่งบทความ`
+        })
+        paper.deadline.push(deadline)
+        paper.save()
+        res.status(200).json(paper)
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error: error.message })
+    }
+} else {
+    try {
+        const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
+        if (!paper) {
+            return res.status(404).json({ error: 'Item not found' })
+        }
+        await createNotification(
+            paper.owner,
+            `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`,
+            `กรุณาตรวจสอบข้อมูลบทความ`)
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
 }
 
 // cancel paper
@@ -478,7 +489,7 @@ const authorSearch = async (req, res) => {
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .populate('confr_code cate_code')
-            .sort({'createdAt': -1})
+            .sort({ 'createdAt': -1 })
         const count = await Paper.countDocuments(query)
         res.status(200).json({
             items,

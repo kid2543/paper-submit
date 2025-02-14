@@ -20,7 +20,10 @@ function ConfrList() {
     handleSearchTag,
     page,
     totalPages,
-    status
+    status,
+    handleLastPage,
+    handleFirstPage,
+    handleNumberPage
   } = useSearch('/api/conference/open/search')
 
   const { confrCateArray } = ConferenceCategory()
@@ -152,6 +155,9 @@ function ConfrList() {
               onPageNext={handleNextPage}
               onPagePrev={handlePreviousPage}
               totalPages={totalPages}
+              onFirstPage={handleFirstPage}
+              onLastPage={handleLastPage}
+              onSelectPage={handleNumberPage}
             />
           </div>
         </div>
