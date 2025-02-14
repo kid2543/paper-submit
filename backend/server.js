@@ -3,7 +3,7 @@ const express = require('express')
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const port = 4000;
+const port = process.env.PORT;
 const path = require('path')
 require('dotenv').config()
 
@@ -34,10 +34,8 @@ const paperFile = require('./routes/paper_file')
 const editFile = require('./routes/paper_edit')
 const assignHistory = require('./routes/paper_assign_history')
 const notificationRouter = require('./routes/notification');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 
 app.use(express.static('public'))
-app.use(express.static(path.join(__dirname, '..', 'frontend', 'build')))
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
@@ -65,9 +63,13 @@ app.use('/api/notification', notificationRouter)
 // handle error
 app.use(errorHandler)
 
-app.get('*', (req, res) => { 
-  res.sendFile(path.join(__dirname, '..', 'frontend', 'build', 'index.html'))
- });
+if(process.env.NODE.ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')))
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'))
+  })
+}
 
 mongoose.connect(uri) 
 .then(() => { console.log('Connected to MongoDB!'); }) 
@@ -75,5 +77,5 @@ mongoose.connect(uri)
 
 // start the server 
 app.listen(port, () => {
-  console.log(`Reverse proxy server running on port ${port}`)
+  console.log(`Server is running on port ${port}`)
 })
