@@ -22,6 +22,9 @@ function Author() {
     handleSearchChange,
     handlePreviousPage,
     handleNextPage,
+    handleFirstPage,
+    handleLastPage,
+    handleNumberPage,
     page,
     totalPages
   } = useSearch('/api/paper/author/search')
@@ -188,6 +191,9 @@ function Author() {
                   totalPages={totalPages}
                   onPageNext={handleNextPage}
                   onPagePrev={handlePreviousPage}
+                  onFirstPage={handleFirstPage}
+                  onLastPage={handleLastPage}
+                  onSelectPage={handleNumberPage}
                 />
               </div>
             </div>
