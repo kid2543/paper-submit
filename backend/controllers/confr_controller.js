@@ -424,6 +424,32 @@ const deleteConference = async (req, res) => {
     }
 }
 
+const adminDeleteConference = async (req, res) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสงานประชุมไม่ถูกต้อง' })
+    }
+
+    try {
+        const oldData = await Conferences.findById(id)
+
+        if (oldData.venue_image)
+            fs.unlink(`public/uploads/${oldData.venue_image}`, (err) => {
+                if (err) {
+                    console.log('ลบไฟล์สถานที่จัดงานไม่สำเร็จ', err)
+                } else {
+                    console.log("ลบไฟล์รูปสถานที่จัดงานแล้ว")
+                }
+            })
+
+        await Conferences.deleteOne({ _id: id })
+        res.status(204).send('ลบงานประชุมแล้ว')
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 module.exports = {
     createConference,
     editConference,
@@ -441,5 +467,6 @@ module.exports = {
     getHomeConfr,
     getConferenceOwner,
     searchOpenConference,
-    uploadSchedule
+    uploadSchedule,
+    adminDeleteConference
 }

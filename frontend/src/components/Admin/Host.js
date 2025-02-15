@@ -8,10 +8,24 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import PaginationComponent from '../Pagination';
 
 function Host() {
 
-    const { data, error, status, page, totalPages, setData, handleSearchChange, handleNextPage, handlePreviousPage } = useSearch("/api/user/search/host")
+    const {
+        data,
+        error,
+        status,
+        page,
+        totalPages,
+        setData,
+        handleSearchChange,
+        handleNextPage,
+        handlePreviousPage,
+        handleLastPage,
+        handleFirstPage,
+        handleNumberPage
+    } = useSearch("/api/user/search/host")
     const [show, setShow] = useState(false)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -100,12 +114,12 @@ function Host() {
                     </button>
                 </div>
                 <form onSubmit={handleSearchChange} className='mb-3'>
-                        <input
-                            type="search"
-                            name='search'
-                            placeholder="ค้นหา"
-                            className='form-control text-bg-light'
-                        />
+                    <input
+                        type="search"
+                        name='search'
+                        placeholder="ค้นหา"
+                        className='form-control text-bg-light'
+                    />
                 </form>
             </div>
             <div className='table-responsive' style={{ minHeight: "200px" }}>
@@ -151,17 +165,15 @@ function Host() {
                 )
                 }
             </div>
-            <div className='d-flex justify-content-between align-items-center'>
-                <span>{`Page ${page} of ${totalPages}`}</span>
-                <div>
-                    <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                        <i className="bi bi-arrow-left"></i> ก่อนหน้า
-                    </button>
-                    <button onClick={handleNextPage} disabled={page === totalPages} className='btn btn-link'>
-                        ถัดไป <i className="bi bi-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
+            <PaginationComponent 
+                currentPage={page}
+                onFirstPage={handleFirstPage}
+                onLastPage={handleLastPage}
+                onPageNext={handleNextPage}
+                onPagePrev={handlePreviousPage}
+                onSelectPage={handleNumberPage}
+                totalPages={totalPages}
+            />
         </div>
     )
 

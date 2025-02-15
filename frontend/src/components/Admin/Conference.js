@@ -12,6 +12,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast } from "react-toastify";
 import ConfirmDeleteDialog from "../ConfirmDeleteDialog";
+import PaginationComponent from "../Pagination";
 
 function Conference() {
 
@@ -24,7 +25,10 @@ function Conference() {
         setData,
         handleSearchChange,
         handleNextPage,
-        handlePreviousPage
+        handlePreviousPage,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage
     } = useSearch("/api/conference/search")
     const [show, setShow] = useState(false)
     const [errorText, setErrorText] = useState('')
@@ -55,47 +59,36 @@ function Conference() {
         navigate("/host/confr/")
     }
 
-    const handleDelete = async (confr_id, confr_code, status) => {
-        if (status === true) {
-            handleCloseDelete()
-            return toast.warning('กรุณาปิดงานประชุมก่อนทำการลบ')
-        }
+    // confirm delete
+    const [showDeleteConfr, setShowDeleteConfr] = useState(false)
+    const [confrDeleteId, setConfrDeleteId] = useState('')
 
+    const handleShowDeleteConfr = (id) => {
+        setConfrDeleteId(id)
+        setShowDeleteConfr(true)
+    }
+
+    const handleCloseDeleteConfr = () => {
+        setConfrDeleteId('')
+        setShowDeleteConfr(false)
+    }
+
+    const handleDelete = async () => {
+        if(!confrDeleteId) {
+            toast.warning('กรุณาเลือกงานประชุมก่อนทำการลบ')
+            return 
+        }
+        
         try {
-            await axios.delete('/api/conference/delete/' + confr_id)
-            setData(data.filter(items => items._id !== confr_id))
-            toast.success(`ลบงานประชุม ${confr_code} แล้ว`)
+            await axios.delete('/api/conference/admin/delete/' + confrDeleteId)
+            toast.success('ลบงานประชุมสำเร็จ')
+            setData(data.filter(items => items._id !== confrDeleteId))
         } catch (error) {
             console.log(error)
-            toast.error('เกิดข้อผิดพลาด ' + error.response.data?.error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         } finally {
-            handleCloseDelete()
+            handleCloseDeleteConfr()
         }
-    }
-
-    // confirm delete
-    const [showDelete, setShowDelete] = useState(false)
-    const [deleteId, setDeleteId] = useState({
-        id: '',
-        code: '',
-        status: null
-    })
-
-    const handleShowDelete = (id, code, status) => {
-        setShowDelete(true)
-        setDeleteId({
-            id,
-            code,
-            status
-        })
-    }
-    const handleCloseDelete = () => {
-        setShowDelete(false)
-        setDeleteId({
-            id: '',
-            code: '',
-            status: null
-        })
     }
 
     if (error) {
@@ -141,11 +134,11 @@ function Conference() {
                 </form>
             </Modal>
             <ConfirmDeleteDialog
-                header={`ยืนยันการลบงานประชุม ${deleteId.code} ?`}
-                message='หากมีบทความที่ถูกส่งเข้ามายังงานประชุมนี้ จะไม่สามารถลบได้'
-                onCancel={handleCloseDelete}
-                onConfirm={() => handleDelete(deleteId.id, deleteId.code, deleteId.status)}
-                show={showDelete}
+                header={`ยืนยันการลบงานประชุม`}
+                message='ต้องการลบงานประชุมหรือไม่ เนื่องจากจะไม่สามารถกู้คืนข้อมูลได้'
+                onCancel={handleCloseDeleteConfr}
+                onConfirm={() => handleDelete(confrDeleteId)}
+                show={showDeleteConfr}
             />
             <div className="card shadow-sm">
                 <div className="card-body">
@@ -165,60 +158,42 @@ function Conference() {
                             <table className='table' style={{ minWidth: "1000px", minHeight: '400px' }}>
                                 <thead>
                                     <tr>
-                                        <td>Title</td>
-                                        <td>Code</td>
-                                        <td>End date</td>
-                                        <td>Status</td>
-                                        <td>Action</td>
+                                        <th>#</th>
+                                        <th>ชื่อ</th>
+                                        <th>รหัส</th>
+                                        <th>สิ้นสุด</th>
+                                        <th>สถานะ</th>
+                                        <th>เครื่องมือ</th>
                                     </tr>
                                 </thead>
                                 {data?.length > 0 ? (
                                     <tbody>
-                                        {data?.map((item) => (
+                                        {data?.map((item,index) => (
                                             <tr key={item._id}>
+                                                <td>{index + 1}</td>
                                                 <td>{item.title}</td>
                                                 <td>{item.confr_code}</td>
                                                 <td>{dayjs(item.confr_end_date).format("DD MMM YYYY")}</td>
                                                 <td>
-                                                        {item.status ? (
-                                                            <span className="badge bg-success">
-                                                                เปิด
-                                                            </span>
-                                                        ) : (
-                                                            <span className="badge bg-secondary">
-                                                                ปิด
-                                                            </span>
-                                                        )}
+                                                    {item.status ? (
+                                                        <span className="badge bg-success">
+                                                            เปิด
+                                                        </span>
+                                                    ) : (
+                                                        <span className="badge bg-secondary">
+                                                            ปิด
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td>
                                                     <div className="btn-group">
                                                         <button type="button" className="btn btn-light" onClick={() => handleEdit(item._id)}>
                                                             <i className="bi bi-pencil-square"></i>
                                                         </button>
-                                                        <button className="btn btn-light text-danger" type="button" onClick={() => handleShowDelete(item._id, item.confr_code, item.status)}>
+                                                        <button className="btn btn-light text-danger" type="button" onClick={() => handleShowDeleteConfr(item._id)}>
                                                             <i className="bi bi-trash"></i>
                                                         </button>
                                                     </div>
-                                                    {/* <Dropdown>
-                                                    <Dropdown.Toggle variant="" id="dropdown-basic">
-                                                        <i className="bi bi-three-dots"></i>
-                                                    </Dropdown.Toggle>
-
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item onClick={() => handleEdit(item._id)} type="button">
-                                                            <span className="me-2">
-                                                                <i className="bi bi-pen"></i>
-                                                            </span>
-                                                            แก้ไข
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item type='button' onClick={() => handleDelete(item._id, item.confr_code, item.status)} className="text-danger">
-                                                            <span className="me-2">
-                                                                <i className="bi bi-trash"></i>
-                                                            </span>
-                                                            ลบ
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown> */}
                                                 </td>
                                             </tr>
                                         ))}
@@ -233,17 +208,15 @@ function Conference() {
                             </table>
                         </div>
                     )}
-                    <div className='d-flex justify-content-between align-items-center'>
-                        <span>{`Page ${page} of ${totalPages}`}</span>
-                        <div>
-                            <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                                <i className="bi bi-arrow-left"></i> ก่อนหน้า
-                            </button>
-                            <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link'>
-                                ถัดไป <i className="bi bi-arrow-right"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <PaginationComponent
+                        currentPage={page}
+                        onFirstPage={handleFirstPage}
+                        onLastPage={handleLastPage}
+                        onPageNext={handleNextPage}
+                        onPagePrev={handlePreviousPage}
+                        onSelectPage={handleNumberPage}
+                        totalPages={totalPages}
+                    />
                 </div>
             </div>
 

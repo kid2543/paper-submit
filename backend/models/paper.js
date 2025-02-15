@@ -10,15 +10,15 @@ const Status = {
     PENDING: 'PENDING',
     REVIEW: 'REVIEW',
     SUCCESS: 'SUCCESS',
+    PUBLIC: 'PUBLIC',
     CANCEL: 'CANCEL'
 }
 
 // result status
 const Result = {
     PENDING: 'PENDING',
-    ACCECPT: 'ACCEPT',
+    ACCEPT: 'ACCEPT',
     REVISE: 'REVISE',
-    PUBLIC: 'PUBLIC',
     REJECT: 'REJECT'
 }
 
@@ -94,10 +94,6 @@ const paperSchema = mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref: Publication,
         },
-        abstract: {
-            type: Boolean,
-            default: false
-        },
         regis_type: {
             type: Boolean,
             required: true
@@ -134,7 +130,6 @@ const paperSchema = mongoose.Schema(
         ],
         award_rate: {type: String},
         letter: {type: String},
-        certificate: {type: String}
     }, { timestamps: true }
 )
 

@@ -15,6 +15,7 @@ import {
 import dayjs from 'dayjs'
 import ConfirmDialog from '../components/ConfirmDialog'
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog'
+import PaginationComponent from '../components/Pagination'
 
 function Host() {
 
@@ -45,6 +46,8 @@ function Host() {
         setLoading('success')
       }
     }
+
+    // แจ้งเตือนงานประชุม
     const fethNotification = async () => {
       try {
         const res = await axios.get('/api/notification/confr/' + id)
@@ -82,7 +85,30 @@ function Host() {
   const [endDate] = useState(dayjs())
   const timeAgoH = (startDate) => {
     const diffH = endDate.diff(startDate, 'hour')
-    return diffH
+    if (diffH > 24) {
+      const dffD = endDate.diff(startDate, 'day')
+      return <span>{dffD} วันที่แล้ว</span>
+    }
+
+    return <span>{diffH} ชั่วโมงที่แล้ว</span>
+  }
+
+  // delete notification
+  const deleteNotification = async () => {
+    try {
+      await axios.delete('/api/notification', {
+        user_id: id
+      })
+      toast.success('ล้างข้อมูลสำเร็จ', {
+        position: 'bottom-left'
+      })
+      setNotificationData([])
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', {
+        position: 'bottom-left'
+      })
+    }
   }
 
   // confirm modal
@@ -158,14 +184,27 @@ function Host() {
         <Offcanvas.Body>
           {NotificationData.length > 0 ? (
             <div className="row g-3">
+              <div>
+                <button type='button' onClick={deleteNotification} className="btn btn-secondary">
+                  <i className="bi bi-trash me-2"></i>
+                  ลบการแจ้งเตือนทั้งหมด
+                </button>
+              </div>
               {NotificationData.map((items) => (
                 <div key={items._id} className="col-12">
                   <div className="card">
                     <div className="card-body">
-                      <h5 className="card-title">{items.title}</h5>
+                      <div className="d-flex">
+                        <h5 className="card-title me-2">{items.title}</h5>
+                        {items.status === false &&
+                          <div>
+                            <span className="badge bg-info">ใหม่</span>
+                          </div>
+                        }
+                      </div>
                       <p className="card-text">{items.message}</p>
                       <p className="card-text">
-                        <small className="text-muted">อัพเดทล่าสุดเมื่อ {timeAgoH(items.createdAt)} ชั่วโมงที่แล้ว </small>
+                        <small className="text-muted">อัพเดทล่าสุดเมื่อ {timeAgoH(items.createdAt)}</small>
                       </p>
                     </div>
                   </div>
@@ -302,8 +341,8 @@ function Host() {
                 </div>
               </div>
             ) : (
-              <div className='table-responsive' style={{ minHeight: "328px" }}>
-                <table className='table table-hover' style={{ minWidth: "1260px" }}>
+              <div className='table-responsive' style={{ minHeight: 400 }}>
+                <table className='table table-hover' style={{ minWidth: 1000 }}>
                   <thead>
                     <tr>
                       <th>
@@ -353,28 +392,6 @@ function Host() {
                               <i className="bi bi-people"></i>
                             </Link>
                           </div>
-                          {/* <Link to={`/host/paper/${items._id}`} type='button' className='btn btn-primary me-2'>
-                            <i className='bi bi-pen'></i>
-                          </Link>
-                          <Link to={`/host/assign/${items._id}/${items.cate_code}`} type='button' className='btn btn-outline-dark'>
-                            <i className='bi bi-people'></i>
-                          </Link> */}
-                          {/* <Dropdown>
-                            <Dropdown.Toggle className='' variant="primary" id="dropdown-basic">
-                              เพิ่มเติม
-                            </Dropdown.Toggle>
-
-                            <Dropdown.Menu>
-                              <Dropdown.Item onClick={() => navigate(`/host/paper/${items._id}`)}>
-                                <span className='me-2'><i className='bi bi-eye'></i></span>
-                                ดูรายละเอียด
-                              </Dropdown.Item>
-                              <Dropdown.Item onClick={() => navigate(`/host/assign/${items._id}/${items.cate_code}`)}>
-                                <span className='me-2'><i className='bi bi-pen'></i></span>
-                                มอบหมายบทความ
-                              </Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown> */}
                         </td>
                       </tr>
                     ))}
@@ -383,17 +400,15 @@ function Host() {
               </div>
             )}
 
-            <div className='d-flex justify-content-between align-items-center'>
-              <span>{`Page ${searchPaper.page} of ${searchPaper.totalPages}`}</span>
-              <div>
-                <button onClick={searchPaper.handlePreviousPage} disabled={searchPaper.page === 1} className='btn btn-link'>
-                  <i className='bi bi-arrow-left'></i> ก่อนหน้า
-                </button>
-                <button onClick={searchPaper.handleNextPage} disabled={searchPaper.page + 1 >= searchPaper.totalPages} className='btn btn-link'>
-                  ถัดไป <i className='bi bi-arrow-right'></i>
-                </button>
-              </div>
-            </div>
+            <PaginationComponent
+              currentPage={searchPaper.page}
+              onFirstPage={searchPaper.handleFirstPage}
+              onLastPage={searchPaper.handleLastPage}
+              onPageNext={searchPaper.handleNextPage}
+              onPagePrev={searchPaper.handlePreviousPage}
+              onSelectPage={searchPaper.handleNumberPage}
+              totalPages={searchPaper.totalPages}
+            />
           </div>
         </div>
       </section>

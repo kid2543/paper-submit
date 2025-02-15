@@ -12,6 +12,7 @@ import {
 } from 'react-bootstrap';
 import { toast } from "react-toastify";
 import ConfirmDeleteDialog from "../ConfirmDeleteDialog";
+import PaginationComponent from "../Pagination";
 
 function Publication() {
 
@@ -24,7 +25,10 @@ function Publication() {
         handleNextPage,
         handlePreviousPage,
         page,
-        totalPages
+        totalPages,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage
     } = useSearch("/api/publication/search")
 
     const [createPub, setCreatePub] = useState(false)
@@ -61,12 +65,16 @@ function Publication() {
         setDeleteId('')
         setShowDelete(false)
     }
-    const handleDel = async (id) => {
+    const handleDel = async () => {
         setErrorText(null)
+        if (!deleteId) {
+            toast.warning('กรุณาเลือกวารสารก่อนทำการลบ')
+            return
+        }
         try {
-            await axios.delete('/api/publication/' + id)
+            await axios.delete('/api/publication/' + deleteId)
             let temp = [...data]
-            temp = temp.filter((items) => items._id !== id)
+            temp = temp.filter((items) => items._id !== deleteId)
             setData(temp)
             toast.success('ลบวารสารแล้ว')
         } catch (error) {
@@ -193,17 +201,15 @@ function Publication() {
                                                 ))}
                                             </tbody>
                                         </table>
-                                        <div className='d-flex justify-content-between align-items-center'>
-                                            <span>{`Page ${page} of ${totalPages}`}</span>
-                                            <div>
-                                                <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                                                    <i className="bi bi-arrow-left"></i> ก่อนหน้า
-                                                </button>
-                                                <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link'>
-                                                    ถัดไป <i className="bi bi-arrow-right"></i>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        <PaginationComponent
+                                            currentPage={page}
+                                            onFirstPage={handleFirstPage}
+                                            onLastPage={handleLastPage}
+                                            onPageNext={handleNextPage}
+                                            onPagePrev={handlePreviousPage}
+                                            onSelectPage={handleNumberPage}
+                                            totalPages={totalPages}
+                                        />
                                     </div>
                                 }
                             </div>
@@ -226,6 +232,15 @@ function CreatePubModal(props) {
         en_name: "",
         desc: [""]
     })
+
+    const [key, setKey] = useState(0)
+
+    const deleteDesc = (index) => {
+        let temp = { ...form }
+        temp.desc = temp.desc.filter((items, idx) => idx !== index)
+        setForm(temp)
+        setKey(key + 1)
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -303,11 +318,26 @@ function CreatePubModal(props) {
                             เพิ่มรายละเอียด
                         </button>
                     </div>
-                    <div>
+                    <div key={key}>
                         {form.desc.map((items, index) => (
                             <div key={index} className='mb-3'>
-                                <label className='form-label'>ข้อที่ {index + 1}</label>
-                                <textarea className='form-control' defaultValue={items} onChange={e => handleDesc(e, index)} />
+                                <div className="form-text">
+                                    ข้อที่ {index + 1}
+                                </div>
+                                <hr />
+                                <label className='form-label'>รายละเอียด</label>
+                                <div className="mb-3">
+                                    <button onClick={() => deleteDesc(index)} type="button" className="btn btn-outline-danger">
+                                        <i className="bi bi-trash me-2"></i>
+                                        ลบรายละเอียด
+                                    </button>
+                                </div>
+                                <textarea
+                                    rows={5}
+                                    className='form-control'
+                                    defaultValue={items}
+                                    onChange={e => handleDesc(e, index)}
+                                />
                             </div>
                         ))}
                     </div>
@@ -424,18 +454,25 @@ function EditPubModal(props) {
                         <div className="mb-3">
                             <Button type="button" onClick={handleAdd} variant="success">
                                 <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มวารสาร
+                                เพิ่มรายละเอียด
                             </Button>
                         </div>
                         <div className="row g-3">
                             {data?.desc.map((items, index) => (
                                 <div key={index}>
-                                    <label className="form-label">
+                                    <div className="form-text">
                                         ข้อที่: {index + 1}
-                                        <Button type="button" variant="" onClick={() => handleDelete(index)} className="text-danger">
-                                            <i className="bi bi-trash"></i>
-                                        </Button>
+                                    </div>
+                                    <hr/>
+                                    <label className="form-label">
+                                        รายละเอียด
                                     </label>
+                                    <div className="mb-3">
+                                        <Button type="button" variant="outline-danger" onClick={() => handleDelete(index)}>
+                                            <i className="bi bi-trash me-2"></i>
+                                            ลบรายละเอียด
+                                        </Button>
+                                    </div>
                                     <textarea
                                         value={items}
                                         rows={3}

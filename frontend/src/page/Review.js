@@ -136,28 +136,24 @@ function Review() {
             {paper.data &&
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <p>รายละเอียดบทความ</p>
+                        <h4 className='card-title mb-3'>รายละเอียดบทความ</h4>
                         <div className='row g-3'>
                             <div className='col-12 col-md-6 col-lg-4'>
-                                <div>
-                                    <small className='fw-bold'>ชื่อบทความ</small>
-                                </div>
-                                <small className='text-muted'>{paper.data.paper_id?.title}</small>
+                                <p className='fw-bold'>ชื่อบทความ</p>
+                                <p className='text-muted'>{paper.data.paper_id?.title}</p>
                             </div>
                             <div className='col-12 col-md-6 col-lg-4'>
-                                <div>
-                                    <small className='fw-bold'>รหัสบทความ</small>
-                                </div>
-                                <small className='text-muted'>{paper.data.paper_id?.paper_code}</small>
+                                <p className='fw-bold'>รหัสบทความ</p>
+                                <p className='text-muted'>{paper.data.paper_id?.paper_code}</p>
                             </div>
                             <div className='col-12'>
                                 <div>
-                                    <small className='fw-bold'>File บทความ</small>
+                                    <p className='fw-bold'>File บทความ</p>
                                 </div>
                                 {PaperFile &&
-                                    <ol>
+                                    <ol className="list-group">
                                         {PaperFile.map((items) => (
-                                            <li key={items._id}>
+                                            <li key={items._id} className='list-group-item'>
                                                 <Link
                                                     className='btn btn-success'
                                                     to={items.read_original ? `/uploads/${items.original_file}` : `/uploads/${items.close_name_file}`}
@@ -178,7 +174,7 @@ function Review() {
             }
             <div className='card p-3 mb-3'>
                 <div className='card-body'>
-                    <p className='fw-bold'>แบบประเมิน <span className='text-danger'>*</span></p>
+                    <h4 className='fw-bold mb-3'>แบบประเมิน <span className='text-danger'>*</span></h4>
                     <form>
                         <div className='table-responsive mb-3'>
                             <table className='table table-hover table-bordered align-middle'>
@@ -261,13 +257,13 @@ function Review() {
                                 </label>
                             </div>
                             <div className="form-check">
-                                <input 
-                                className="form-check-input" 
-                                type="radio" 
-                                name="result" 
-                                value="REJECT"
-                                onChange={e => setResult(e.target.value)}
-                                required />
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="result"
+                                    value="REJECT"
+                                    onChange={e => setResult(e.target.value)}
+                                    required />
                                 <label className="form-check-label">
                                     Decline submission (ไม่ผ่าน)
                                 </label>

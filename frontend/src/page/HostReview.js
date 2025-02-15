@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus';
 
 // react bootstrap
@@ -11,6 +11,8 @@ import PaymentStatus from '../components/PaymentStatus';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { UserDropdown } from '../components/UserDropdown';
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 function HostReview() {
 
@@ -19,11 +21,10 @@ function HostReview() {
   const [review, setReview] = useState([])
   const [result, setResult] = useState('')
 
+  const navigate = useNavigate()
+
   // จดหมายเชิญ
   const [sendMailFile, setSendMailFile] = useState(null)
-
-  // ใบประกาศ
-  const [CertiFile, setCertiFile] = useState(null)
 
   useEffect(() => {
     const fetchPaper = async () => {
@@ -72,16 +73,18 @@ function HostReview() {
     e.preventDefault()
     if (result === 'REVISE') {
       try {
-        await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
+        const res = await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
         toast.success('เปลี่ยนสถานะสำเร็จ')
+        setPaper(res.data)
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
       }
     } else {
       try {
-        await axios.patch('/api/paper/result', { _id: id, result: result })
+        const res = await axios.patch('/api/paper/result', { _id: id, result: result })
         toast.success('เปลี่ยนสถานะสำเร็จ')
+        setPaper(res.data)
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -117,8 +120,90 @@ function HostReview() {
     }
   }
 
+  // handle REJECT
+  const [showReject, setShowReject] = useState(false)
+
+  const handleReject = async () => {
+    try {
+      await axios.patch('/api/paper/reject/' + id)
+      toast.success('ส่งคืนบทความสำเร็จ')
+      navigate(-1)
+    } catch (error) {
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+      console.log(error)
+    }
+  }
+
+  // handleSubmit payment
+  const handleSubmitPayment = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axios.patch('/api/paper/check/payment/' + id, {
+        payment_status: e.target.payment_status.value
+      })
+      setPaper(res.data)
+      toast.success('ยืนยันสถานะ การชำระเงินเสร็จสิ้น')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุราลองใหม่อีกครั้ง')
+    }
+  }
+
+  // handlepublic
+  const [showPublic, setShowPublic] = useState(false)
+
+  const handlePublic = async () => {
+    try {
+      const res = await axios.patch('/api/paper/public/' + id)
+      setPaper(res.data)
+      toast.success('เผยแพร่บทความแล้ว')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setShowPublic(false)
+    }
+  }
+
+  // handle un public
+  const [showUnPub, setShowUnPub] = useState(false)
+
+  const handleUnPublic = async () => {
+    try {
+      const res = await axios.patch('/api/paper/unpublic/' + id)
+      setPaper(res.data)
+      toast.success('ยกเลิกการเผยแพร่สำเร็จ')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setShowUnPub(false)
+    }
+  }
+
   return (
     <div className='bg-light'>
+      <ConfirmDeleteDialog
+        header='ยืนยันการส่งคืนบทความ'
+        message='หากส่งคืนบทความแล้วจะไม่สามารถแก้ไขได้ ยืนยันการส่งคืนบทความหรือไม่ ?'
+        onCancel={() => setShowReject(false)}
+        onConfirm={handleReject}
+        show={showReject}
+      />
+      <ConfirmDialog
+        show={showPublic}
+        handleClose={() => setShowPublic(false)}
+        header='ยืนยันการเผยแพร่บทความ'
+        text='ต้องการเผยแพร่บทความหรือไม่ ?'
+        handleSubmit={handlePublic}
+      />
+      <ConfirmDialog
+        show={showUnPub}
+        handleClose={() => setShowUnPub(false)}
+        header='ยกเลิกการเผยแพร่บทความ'
+        text='ต้องการยกเลิกการเผยแพร่บทความหรือไม่ ?'
+        handleSubmit={handleUnPublic}
+      />
       <div className='container py-3'>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
@@ -139,8 +224,37 @@ function HostReview() {
                   <PaperDetailField title='ผู้แต่ง' data={paper.author} />
                   <PaperDetailField title='ผู้ส่งบทความ' data={`${paper.owner?.name ? paper.owner.name : "-"} (${paper.owner?.username})`} />
                   <PaperDetailField title='สถานะบทความ' data={<PaperStatus status={paper.status} />} />
+                  {paper.status === 'SUCCESS' && paper.result === 'ACCEPT' && paper.payment_status === 'ACCEPT' &&
+                    <div>
+                      <button type='button' onClick={() => setShowPublic(true)} className="btn btn-primary">
+                        <i className="me-2 bi bi-arrow-bar-up"></i>
+                        เผยแพร่บทความ
+                      </button>
+                    </div>
+                  }
+                  {paper.status === 'PUBLIC' &&
+                    <div>
+                      <button type='button' onClick={() => setShowUnPub(true)} className="btn btn-warning">
+                        <i className='me-2 bi bi-arrow-bar-down'></i>
+                        ยกเลิกการเผยแพร่บทความ
+                      </button>
+                    </div>
+                  }
                   <PaperDetailField title='ผลลัพธ์บทความ' data={<PaperResult status={paper.result} />} />
                   <PaperDetailField title='สถานะชำระเงิน' data={<PaymentStatus status={paper.payment_status} />} />
+                  {paper.payment_status === 'CHECKING' &&
+                    <form onSubmit={handleSubmitPayment}>
+                      <label className="form-label">ตรวจสอบความถูกต้อง</label>
+                      <select className="form-select" name='payment_status' required>
+                        <option value=''>-- กรุณาเลือก</option>
+                        <option className="text-success" value='ACCEPT'>ข้อมูลถูกต้อง</option>
+                        <option className="text-danger" value='REJECT'>ข้อมูลไม่ถูกต้อง</option>
+                      </select>
+                      <div className="mt-3">
+                        <button className="btn btn-primary">ยืนยันข้อมูล</button>
+                      </div>
+                    </form>
+                  }
                   {paper.payment_image &&
                     <PaperDetailField title='หลักฐานการชำระเงิน' data={<Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>} />
                   }
@@ -148,6 +262,17 @@ function HostReview() {
                   <PaperDetailField title='อีเมล' data={paper.email} />
                   <PaperDetailField title='เบอร์โทร' data={paper.contact} />
                 </div>
+                {paper.status === 'PENDING' && paper.result === 'PENDING' &&
+                  <div className="mt-3">
+                    <div className="text-muted">
+                      หากบทความไม่ผ่านเกณฑ์
+                    </div>
+                    <button type='button' onClick={() => setShowReject(true)} className="btn btn-danger btn-sm">
+                      <i className="bi bi-backspace-fill me-2"></i>
+                      ส่งคืนบทความ
+                    </button>
+                  </div>
+                }
               </div>
             }
           </div>
@@ -210,51 +335,6 @@ function HostReview() {
                 )}
               </div>
             </div>
-            {paper.payment_status === 'ACCEPT' &&
-              <div className='col-12'>
-                <div className='card shadow-sm'>
-                  <div className='card-body'>
-                    <h6 className='fw-bold card-title'>มอบใบประกาศนียบัตร</h6>
-                    <form onSubmit={e => sendMail(e, '/api/paper/send/certificate', CertiFile)} className='row g-3 mb-3'>
-                      <div className='col-auto'>
-                        <label className='form-label'>อีเมล</label>
-                        <input name='recipient' className='form-control-plaintext fw-bold' readOnly value={paper.email} />
-                      </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ชื่องานประชุม</label>
-                        <input name='confr_title' className='form-control-plaintext fw-bold' readOnly value={paper.confr_code?.title} />
-                      </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ชื่อบทความ</label>
-                        <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
-                        <input className='form-control-plaintext fw-bold' readOnly value={paper.title} />
-                      </div>
-                      <div className='col-auto'>
-                        <label className='form-label'>ผู้ส่งบทความ</label>
-                        <input name='owner' className='form-control-plaintext d-none' readOnly value={paper.owner?._id} />
-                        <input className='form-control-plaintext fw-bold' readOnly value={paper.owner?.username} />
-                      </div>
-                      <div className='col-12'>
-                        <label className='form-label'>เลือกไฟล์ใบประกาศนียบัตร</label>
-                        <input
-                          onChange={e => setCertiFile(e.target.files[0])}
-                          required
-                          className='form-control'
-                          type='file'
-                          accept='.pdf, .doc'
-                        />
-                      </div>
-                      <div className='text-end'>
-                        <button className='btn btn-primary' type='submit' disabled={!CertiFile}>
-                          <i className='me-2 bi bi-send'></i>
-                          มอบใบประกาศ
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            }
           </div>
         ) : null
         }

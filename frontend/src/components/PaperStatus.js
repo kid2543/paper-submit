@@ -3,6 +3,7 @@ export default function PaperStatus({status}) {
         case "PENDING" : return <span className="badge rounded-pill bg-primary">รอดำเนินการ</span>
         case "REVIEW" : return <span className="badge rounded-pill bg-warning">กำลังตรวจสอบ</span>
         case "SUCCESS" : return <span className="badge rounded-pill bg-success">ตรวจเสร็จแล้ว</span>
+        case "PUBLIC" : return <span className="badge rounded-pill bg-info">เผยแพร่แล้ว</span>
         case "CANCEL" : return <span className="badge rounded-pill bg-danger">ยกเลิก</span>
         default: return <span className="badge bg-secondary">ไม่พบข้อมูล</span>
     }

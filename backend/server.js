@@ -3,9 +3,9 @@ const express = require('express')
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const port = process.env.PORT;
 const path = require('path')
 require('dotenv').config()
+const port = process.env.PORT;
 
 // connect to mongodb database
 const mongoose = require('mongoose')
@@ -63,13 +63,11 @@ app.use('/api/notification', notificationRouter)
 // handle error
 app.use(errorHandler)
 
-if(process.env.NODE.ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')))
+app.use(express.static(path.join(__dirname, '../frontend/build')))
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'))
-  })
-}
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'))
+})
 
 mongoose.connect(uri) 
 .then(() => { console.log('Connected to MongoDB!'); }) 

@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
 import { toast } from 'react-toastify'
 import { Breadcrumb } from 'react-bootstrap'
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog'
+import PaperStatus, { PaperResult } from '../components/PaperStatus'
 
 function AdminUserDetail() {
 
@@ -59,12 +61,72 @@ function AdminUserDetail() {
         }
     }
 
+    // confirm delete
+    const [showDelete, setShowDelete] = useState(false)
+
+    const handleDeleteUser = async () => {
+        try {
+            await axios.delete('/api/user/' + id)
+            toast.success('ลบผู้ใช้งานสำเร็จ')
+            navigate(-1)
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        }
+    }
+
+
+    // confirm delete paper
+    const [showDeletePaper, setShowDeletePaper] = useState(false)
+    const [deletePaperId, setDeletePaperId] = useState('')
+
+    const handleShowPaperDelete = (id) => {
+        setDeletePaperId(id)
+        setShowDeletePaper(true)
+    }
+
+    const handleClosePaperDelete = () => {
+        setDeletePaperId('')
+        setShowDeletePaper(false)
+    }
+
+    const deletePaper = async () => {
+        if(!deletePaperId) {
+            toast.warning('กรุณาเลือกบทความก่อนทำการลบ')
+            return
+        }
+        try {
+            await axios.delete('/api/paper/' + deletePaperId)
+            toast.success('ลบบทความสำเร็จ')
+            setPaperList(paperList.filter(items => items._id !== deletePaperId))
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            handleClosePaperDelete()
+        }
+    }
+
     if (loading === 'idle' || loading === 'loading') {
         return <LoadingPage />
     }
 
     return (
         <div className='py-3'>
+            <ConfirmDeleteDialog
+                header='ยืนยันการลบผู้ใช้งาน'
+                message='ต้องการลบผู้ใช้งานหรือไม่ เนื่องจากจะไม่สามารถกู้คืนข้อมูลได้ ?'
+                onCancel={() => setShowDelete(false)}
+                onConfirm={handleDeleteUser}
+                show={showDelete}
+            />
+            <ConfirmDeleteDialog 
+                header='ยืนยันการลบบทความ'
+                message='ต้องการลบบทความหรือไม่เนื่องจากจะไม่สามารถกู้คืนข้อมูลได้ ?'
+                onCancel={handleClosePaperDelete}
+                onConfirm={deletePaper}
+                show={showDeletePaper}
+            />
             <div className="card mb-3 shadow-sm">
                 <div className="card-body">
                     <Breadcrumb>
@@ -145,11 +207,9 @@ function AdminUserDetail() {
                                     </div>
                                 </div>
                                 <div className='text-end'>
-                                    {confrList.length <= 0 &&
-                                        <button type='button' className='btn btn-outline-danger me-2'>
-                                            ลบผู้ใช้งาน
-                                        </button>
-                                    }
+                                    <button onClick={() => setShowDelete(true)} type='button' className='btn btn-outline-danger me-2'>
+                                        ลบผู้ใช้งาน
+                                    </button>
                                     <button type='submit' className='btn btn-primary'>
                                         ยืนยัน
                                     </button>
@@ -206,6 +266,8 @@ function AdminUserDetail() {
                                             <th>#</th>
                                             <th>รหัส</th>
                                             <th>ชื่อ</th>
+                                            <th>สถานะ</th>
+                                            <th>ผลลัพธ์</th>
                                             <th>เครื่องมือ</th>
                                         </tr>
                                     </thead>
@@ -216,9 +278,20 @@ function AdminUserDetail() {
                                                 <td>{items.paper_code}</td>
                                                 <td>{items.title}</td>
                                                 <td>
-                                                    <button type='button' className='btn btn-primary'>
-                                                        <i className='bi bi-pencil-square'>เพิ่มให้กดแล้ว link ไปหน้าแสดงรายละเอียดบทความ</i>
-                                                    </button>
+                                                    <PaperStatus status={items.status} />
+                                                </td>
+                                                <td>
+                                                    <PaperResult status={items.result} />
+                                                </td>
+                                                <td>
+                                                    <div className="btn-group">
+                                                        <button 
+                                                        type='button'
+                                                        onClick={() => handleShowPaperDelete(items._id)} 
+                                                        className="btn btn-light text-danger">
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}

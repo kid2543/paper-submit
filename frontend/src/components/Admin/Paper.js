@@ -13,11 +13,25 @@ import { PaperResult } from '../PaperStatus'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import ConfirmDeleteDialog from '../ConfirmDeleteDialog'
+import PaginationComponent from '../Pagination'
 
 
 function AdminPaper() {
 
-    const { data, error, status, setData, handleSearchChange, handleNextPage, handlePreviousPage, page, totalPages } = useSearch("/api/paper/search")
+    const {
+        data,
+        error,
+        status,
+        setData,
+        handleSearchChange,
+        handleNextPage,
+        handlePreviousPage,
+        page,
+        totalPages,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage
+    } = useSearch("/api/paper/search")
     const navigate = useNavigate()
 
     // cancel confirm
@@ -32,16 +46,31 @@ function AdminPaper() {
         setShowCancel(false)
     }
 
-    const cancelPaper = async (paper_id) => {
+    const cancelPaper = async () => {
+        if(!cancelId) {
+            toast.warning('กรุณาเลือกบทความก่อนทำการกดยกเลิก')
+            return 
+        }
         try {
-            await axios.patch('/api/paper/status', {
-                id: paper_id,
+            const res = await axios.patch('/api/paper/status', {
+                id: cancelId,
                 status: 'CANCEL'
             })
             toast.success('อัพเดทข้อมูลสำเร็จ')
+            let temp = [...data]
+            let newData = temp.map(items => {
+                if(items._id === res.data._id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            })
+            setData(newData)
         } catch (error) {
             console.log(error)
             toast.error('ไม่สามารถอัพเดทข้อมูลได้')
+        } finally {
+            handleCloseCancel()
         }
     }
 
@@ -58,14 +87,20 @@ function AdminPaper() {
         setDeleteId(id)
     }
 
-    const handleDelete = async (paper_id) => {
+    const handleDelete = async () => {
+        if(!deleteId) {
+            toast.warning('กรุณาเลือกบทความก่อนทำการลบ')
+            return
+        }
         try {
-            await axios.delete(`/api/paper/${paper_id}`)
-            setData(data.filter(items => items._id !== paper_id))
+            await axios.delete(`/api/paper/${deleteId}`)
+            setData(data.filter(items => items._id !== deleteId))
             toast.success('ลบบทความสำเร็จ')
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            handleClose()
         }
     }
 
@@ -79,20 +114,20 @@ function AdminPaper() {
                 header={`ต้องการลบบทความหรือไม่ ? `}
                 message='หากบทความอยู่ระหว่างการดำเนินการจะไม่สามารถลบได้'
                 onCancel={handleClose}
-                onConfirm={() => handleDelete(deleteId.id)}
+                onConfirm={handleDelete}
                 show={show}
             />
-            <ConfirmDeleteDialog 
+            <ConfirmDeleteDialog
                 header={`ต้องการยกเลิกบทความหรือไม่ ?`}
                 message='หากทำการยกเลิกแล้วจะไม่สามารถเปลี่ยนสถานะกลับมาเป็นเหมือนเดิมได้'
                 onCancel={handleCloseCancel}
-                onConfirm={() => cancelPaper(cancelId)}
+                onConfirm={cancelPaper}
                 show={showCancel}
             />
             <div className='card shadow-sm'>
                 <div className='card-body'>
                     <h4 className='fw-bold card-title mb-3'>รายการบทความ</h4>
-                    <form onSubmit={handleSearchChange}>
+                    <form onSubmit={handleSearchChange} className="mb-3">
                         <input type='search' className='form-control' name='search' placeholder='ค้นหา...' />
                     </form>
                     {status === 'idle' || status === 'loading' ? (
@@ -102,6 +137,7 @@ function AdminPaper() {
                             <table className='table'>
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>รหัสบทความ</th>
                                         <th style={{ width: 500 }}>ชื่อบทความ</th>
                                         <th>สถานะ</th>
@@ -110,8 +146,9 @@ function AdminPaper() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data?.map((items) => (
+                                    {data?.map((items, index) => (
                                         <tr key={items._id}>
+                                            <td>{index + 1}</td>
                                             <td>{items.paper_code}</td>
                                             <td>{items.title}</td>
                                             <td>
@@ -176,17 +213,15 @@ function AdminPaper() {
                             </table>
                         </div>
                     )}
-                    <div className='d-flex justify-content-between align-items-center'>
-                        <span>{`Page ${page} of ${totalPages}`}</span>
-                        <div>
-                            <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                                <i className='bi bi-arrow-left'></i> ก่อนหน้า
-                            </button>
-                            <button onClick={handleNextPage} disabled={page === totalPages} className='btn btn-link'>
-                                ถัดไป <i className='bi bi-arrow-right'></i>
-                            </button>
-                        </div>
-                    </div>
+                    <PaginationComponent 
+                        currentPage={page}
+                        onFirstPage={handleFirstPage}
+                        onLastPage={handleLastPage}
+                        onPageNext={handleNextPage}
+                        onPagePrev={handlePreviousPage}
+                        onSelectPage={handleNumberPage}
+                        totalPages={totalPages}
+                    />
                 </div>
             </div>
         </div>

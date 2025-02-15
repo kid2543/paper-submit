@@ -15,16 +15,14 @@ const {
     searchHost,
     searchComit,
     searchAuthor,
-    deleteHost,
-    deleteAuthor,
-    deleteCommittee,
     authForNavigate,
     getOwnerDetail,
     getAll,
     adminViewUser,
     updateUser,
     userUpdateDetail,
-    changePassword
+    changePassword,
+    adminDelete
 } = require('../controllers/user_controller')
 const checkRole = require('../middlewares/checkRole')
 
@@ -94,13 +92,7 @@ router.get('/search/author', verifyToken, checkRole(['ADMIN']), searchAuthor)
 router.get('/profile', verifyToken, getOwnerDetail)
 
 // delete host
-router.delete('/host/:id', verifyToken, checkRole(['ADMIN']), deleteHost)
-
-// delete author
-router.delete('/author/:id', verifyToken, checkRole(['ADMIN']), deleteAuthor)
-
-// delete committee
-router.delete('/committee/:id', verifyToken, checkRole(['ADMIN']), deleteCommittee)
+router.delete('/:id', verifyToken, checkRole(['ADMIN']), adminDelete)
 
 // admin get user detail
 router.get('/admin/user/:id', verifyToken, checkRole(['ADMIN']), adminViewUser)

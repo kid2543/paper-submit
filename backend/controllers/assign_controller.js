@@ -249,7 +249,8 @@ const getOneReview = async (req, res) => {
 
 // edit review version
 const editReview = async (req, res) => {
-    const { id, paper_code } = req.params
+    const { id } = req.params
+    const { paper_code } = req.body
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })

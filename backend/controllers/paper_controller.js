@@ -18,7 +18,72 @@ const dayjs = require('dayjs')
 //get all paper
 const getPapers = async (req, res) => {
     try {
-        const paper = await Paper.find({})
+        const paper = await Paper.find()
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
+// public paper
+const PublicPaper = async (req, res) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+
+    try {
+        const check = await Paper.findById(id)
+
+        if (!check) {
+            return res.status(404).json({ error: 'ไม่พบบทความนี้' })
+        }
+
+        if (check.result !== 'ACCEPT') {
+            return res.status(400).json({ error: 'บทความต้องผ่านการพิจารณาก่อน ถึงจะทำการเผยแพร่ได้' })
+        }
+
+        const paper = await Paper.findByIdAndUpdate(id, {
+            status: 'PUBLIC'
+        }, { new: true })
+        await Notification.create({
+            user_id: paper.owner,
+            title: 'บทความของท่านได้เผยแพร่แล้ว',
+            message: `บทความ ${paper.paper_code} ได้ถูกเผยแพร่บนเว็บไซต์แล้ว`
+        })
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
+// cancel public paper
+const UnPublicPaper = async (req, res) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+
+    try {
+        const check = await Paper.findById(id)
+
+        if (!check) {
+            return res.status(404).json({ error: 'ไม่พบข้อมูลบทความ' })
+        }
+
+        if (check.result !== 'ACCEPT') {
+            return res.status(400).json({ error: 'บทความต้องผ่านการพิจารณาก่อน ถึงจะทำการแก้ไขสถานะเผยแพร่ได้' })
+        }
+        const paper = await Paper.findByIdAndUpdate(id, {
+            status: 'SUCCESS'
+        }, { new: true })
+        await Notification.create({
+            user_id: paper.owner,
+            title: 'บทความของท่านได้ยกเลิกการเผยแพร่แล้ว',
+            message: `บทความ ${paper.paper_code} ไม่สามารถดูผ่านเว็บไซต์ได้แล้ว`
+        })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -27,14 +92,20 @@ const getPapers = async (req, res) => {
 
 // get paper when paper is 
 const getPaperArchive = async (req, res) => {
-
-    const { _id } = req.user
-
+    const { page = 1, limit = 10, search = '' } = req.query
+    const query = search ? { title: { $regex: search, $options: 'i' }, status: 'PUBLIC'} : { status: 'PUBLIC' }
     try {
-        const paper = await Paper.find({ owner: _id, result: 'ACCEPT', award_rate: { $ne: null } })
-        res.status(200).json(paper)
+        const items = await Paper.find(query)
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec()
+        const count = await Paper.countDocuments(query)
+        res.status(200).json({
+            items,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page,
+        })
     } catch (error) {
-        console.log(error)
         res.status(400).json({ error: error.message })
     }
 }
@@ -214,6 +285,70 @@ const uploadEditPaper = async (req, res) => {
     }
 }
 
+// author upload payment
+const uploadPayment = async (req, res) => {
+    const { id } = req.params
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'ไม่พบข้อมูลหลักฐานการชำระเงินที่อัพโหลดมา' })
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                console.log('ลบรูปหลักฐานไม่สำเร็จ ERROR จาก uploadPayment')
+            } else {
+                console.log('ลบรูปหลักฐานสำเร็จ SUCCESS')
+            }
+        })
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+
+    const { filename } = req.file
+
+    try {
+        const paper = await Paper.findByIdAndUpdate(id, {
+            payment_status: 'CHECKING',
+            payment_image: filename
+        }, { new: true })
+        res.status(200).json(paper)
+    } catch (error) {
+        if (req.file) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.log('ลบไฟล์หลักฐานไม่สำเร็จ ERROR จาก uploadPayment')
+                } else {
+                    console.log('ลบไฟล์หลักฐานสำเร็จ')
+                }
+            })
+        }
+        res.status(400).json({ error: error.message })
+    }
+}
+
+const checkPayment = async (req, res) => {
+    const { id } = req.params
+    const { payment_status } = req.body
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+
+    try {
+        const paper = await Paper.findByIdAndUpdate(id, {
+            payment_status
+        }, { new: true })
+        await Notification.create({
+            user_id: paper.owner,
+            title: `ตรวจสอบข้อมูลการชำระเงินเรียบร้อยแล้ว`,
+            message: `บทความ ${paper.paper_code} ได้ถูกตรวจสอบข้อมูลการชำระเงินแล้ว`
+        })
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 // host change paper status
 const updatePaperResult = async (req, res) => {
     const { _id, result, deadline } = req.body
@@ -233,43 +368,43 @@ const updatePaperResult = async (req, res) => {
                 `บทควม ${paper.paper_code} ผ่านแล้ว`,
                 'กรุณาชำระเงินค่าลงทะเบียนและเข้าร่วมงานประชุม'
             )
-        res.status(200).json(paper)
-    } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-} else if (result === 'REVISE') {
-    try {
-        const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
-        if (!paper) {
-            return res.status(404).json({ error: "paper not found" })
+            res.status(200).json(paper)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
         }
-        await Notification.create({
-            user_id: paper.owner,
-            title: `บทความ ${paper.paper_code} มีการแก้ไข`,
-            message: `บทความมีการแก้ไข กรุณาส่งบทความฉบับแก้ไขตามกำหนดการส่งบทความ`
-        })
-        paper.deadline.push(deadline)
-        paper.save()
-        res.status(200).json(paper)
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ error: error.message })
-    }
-} else {
-    try {
-        const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
-        if (!paper) {
-            return res.status(404).json({ error: 'Item not found' })
+    } else if (result === 'REVISE') {
+        try {
+            const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
+            if (!paper) {
+                return res.status(404).json({ error: "paper not found" })
+            }
+            await Notification.create({
+                user_id: paper.owner,
+                title: `บทความ ${paper.paper_code} มีการแก้ไข`,
+                message: `บทความมีการแก้ไข กรุณาส่งบทความฉบับแก้ไขตามกำหนดการส่งบทความ`
+            })
+            paper.deadline.push(deadline)
+            paper.save()
+            res.status(200).json(paper)
+        } catch (error) {
+            console.log(error)
+            res.status(400).json({ error: error.message })
         }
-        await createNotification(
-            paper.owner,
-            `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`,
-            `กรุณาตรวจสอบข้อมูลบทความ`)
-        res.status(200).json(paper)
-    } catch (error) {
-        res.status(400).json({ error: error.message })
+    } else {
+        try {
+            const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
+            if (!paper) {
+                return res.status(404).json({ error: 'Item not found' })
+            }
+            await createNotification(
+                paper.owner,
+                `บทความ ${paper.paper_code} ตรวจเสร็จแล้ว`,
+                `กรุณาตรวจสอบข้อมูลบทความ`)
+            res.status(200).json(paper)
+        } catch (error) {
+            res.status(400).json({ error: error.message })
+        }
     }
-}
 }
 
 // cancel paper
@@ -297,6 +432,27 @@ const cancelPaper = async (req, res) => {
     }
 }
 
+// reject paper
+const rejectPaper = async (req, res) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
+    }
+
+    try {
+        const paper = await Paper.findByIdAndUpdate(id,
+            {
+                status: 'SUCCESS',
+                result: 'REJECT'
+            }
+        )
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 // get single public
 const publicPaperSingle = async (req, res) => {
     const { id } = req.params
@@ -306,10 +462,15 @@ const publicPaperSingle = async (req, res) => {
     }
 
     try {
-        const paper = await Paper.findOne({ _id: id, "published.status": true })
+        const paper = await Paper.findOne({
+            _id: id,
+            status: 'PUBLIC'
+        })
+
         if (!paper) {
             return res.status(404).json({ error: 'ไม่พบข้อมูล' })
         }
+
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -319,7 +480,9 @@ const publicPaperSingle = async (req, res) => {
 // get all public
 const publicPaperAll = async (req, res) => {
     try {
-        const paper = await Paper.find({ status: 'SUCCESS', result: 'ACCEPT', award_rate: { $ne: null } })
+        const paper = await Paper.find({
+            status: 'PUBLIC'
+        })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -335,7 +498,7 @@ const getPaperForConference = async (req, res) => {
     }
 
     try {
-        const paper = await Paper.find({ confr_code: id, status: { $ne: 'CANCEL' } })
+        const paper = await Paper.find({ confr_code: id })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -385,7 +548,7 @@ const getConfrPaperAward = async (req, res) => {
     try {
         const paper = await Paper.find({
             confr_code: id,
-            award_rate: { $ne: '' },
+            award_rate: { $ne: null },
             result: 'ACCEPT'
         }).populate('cate_code')
         res.status(200).json(paper)
@@ -428,8 +591,15 @@ const updatePaperAward = async (req, res) => {
     }
 
     try {
-        const paper = await Paper.findByIdAndUpdate(id, { award_rate }, { new: true })
-        res.status(200).json(paper)
+        if (award_rate === '5') {
+            const paper = await Paper.findByIdAndUpdate(id, {
+                award_rate: null
+            }, { new: true })
+            res.status(200).json(paper)
+        } else {
+            const paper = await Paper.findByIdAndUpdate(id, { award_rate }, { new: true })
+            res.status(200).json(paper)
+        }
     } catch (error) {
         console.log(error)
         res.status(400).json({ error: error.message })
@@ -460,7 +630,19 @@ const searchPaper = async (req, res) => {
 const hostSeachPaper = async (req, res) => {
     const { page = 1, limit = 10, search = '' } = req.query
     const { id } = req.params
-    const query = search ? { title: { $regex: search, $options: 'i' }, confr_code: id } : { confr_code: id }
+    const query = search ? {
+        $or: [
+            {
+                title: { $regex: search, $options: 'i' },
+                confr_code: id,
+            },
+            {
+                keyword: { $regex: search, $options: 'i' },
+                confr_code: id,
+            }
+        ]
+    }
+        : { confr_code: id, }
     try {
         const items = await Paper.find(query)
             .limit(limit * 1)
@@ -547,10 +729,6 @@ const deletePaper = async (req, res) => {
         const paper = await Paper.findById(id)
         if (!paper) {
             return res.status(404).json({ error: 'ไม่พบบทความ' })
-        }
-
-        if (paper.status !== 'CANCEL') {
-            return res.status(400).json({ error: 'ยกเลิกบทความก่อนทำงานลบบทความ' })
         }
 
         if (paper.payment_image) {
@@ -770,80 +948,6 @@ const sendEmailPdf = async (req, res) => {
     }
 }
 
-// ส่ง mail ใบประกาศ
-const sendCertificate = async (req, res) => {
-
-    const { recipient, confr_title, owner, paper_id } = req.body
-
-
-    if (!req.file) {
-        return res.status(400).json({ error: 'เกิดข้อผิดพลาดเกี่ยวกับการ upload file' })
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(paper_id)) {
-        fs.unlink(req.file.path, (err) => {
-            if (err) {
-                console.error('ไม่สามารถลบไฟล์ได้: ', err)
-            } else {
-                console.log('ลบไฟล์สำเร็จ')
-            }
-        })
-        return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
-    }
-
-
-    let transpoter = nodemailer.createTransport({
-        service: 'Gmail', //สามารถเปลี่ยนเป็นบริการ SMTP ของที่อื่นได้นอกจาก Gmail
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.GMAIL_PASS,
-        }
-    })
-
-    let mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: recipient,
-        subject: `หนังสือรับรองโดย ${confr_title}`,
-        attachments: [
-            {
-                filename: req.file.original_file,
-                path: req.file.path
-            }
-        ]
-    }
-
-    transpoter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            fs.unlink(req.file.path, (unlinkError) => {
-                if (unlinkError) {
-                    console.error('ลบไฟล์ล้มเหลว: ', unlinkError)
-                } else {
-                    console.log('ลบไฟล์สำเร็จ')
-                }
-            })
-            console.log(error)
-            return res.status(500).json({ error: error.message })
-        } else {
-            console.log('Email send: ' + info.response)
-        }
-    })
-
-    try {
-        const paper = await Paper.findById(paper_id)
-        if (!paper) {
-            return res.status(404).json({ error: 'ไม่พบบทความ' })
-        }
-        paper.certificate = req.file.filename
-        paper.save()
-        await Notification.create({ user_id: owner, title: 'คุณได้รับใบรับรอง', message: `กรุณาตรวจสอบอีเมล ${recipient} เพื่อตรวจสอบใบรับรอง` })
-        res.status(200).json(paper)
-    } catch (error) {
-        console.log(error)
-        res.status(400).json({ error: error.message })
-    }
-}
-
-
 module.exports = {
     getPapers,
     getSinglePaper,
@@ -869,8 +973,12 @@ module.exports = {
     getPaperByCategory,
     getPaperAward,
     sendEmailPdf,
-    sendCertificate,
     getPaperArchive,
     getPaperOwnerAdmin,
-    getConfrPaperAward
+    getConfrPaperAward,
+    PublicPaper,
+    UnPublicPaper,
+    rejectPaper,
+    uploadPayment,
+    checkPayment
 }

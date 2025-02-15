@@ -19,11 +19,32 @@ import ConfirmDialog from '../components/ConfirmDialog'
 function AuthorPaper() {
 
   const { id } = useParams()
-  const { data, error, loading } = useFetch('/api/paper/owner/' + id)
+  const { data, error, loading, setData } = useFetch('/api/paper/owner/' + id)
   const paperFile = useFetch('/api/paperfile/read/' + id)
   const comment = useFetch(`/api/assign/${id}`)
 
   const [uploaded, setUploaded] = useState([''])
+
+
+  // hadnle payment
+  const [paymentFile, setPaymentFile] = useState(null)
+
+  const handleUploadPayment = async () => {
+    if (!paymentFile) {
+      toast.warning('กรุณาเลือกไฟล์ก่อนทำการกดอัพโหลด')
+      return
+    }
+    try {
+      const formData = new FormData()
+      formData.append('image', paymentFile)
+      const res = await axios.patch('/api/paper/upload/payment/' + id, formData)
+      setData(res.data)
+      toast.success('อัพโหลดหลักฐานการชำระเงินสำเร็จ รอติดตามผลการตรวจสอบ')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    }
+  }
 
 
   const handleUpdate = async (e) => {
@@ -189,6 +210,16 @@ function AuthorPaper() {
                   <div>
                     <PaymentStatus status={data.payment_status} />
                   </div>
+                  {data.payment_image &&
+                    <div className="mt-2">
+                      <Link
+                        target='_blank'
+                        rel='noreferrer'
+                        to={`/uploads/${data.payment_image}`}>
+                        ดูหลักฐาน
+                      </Link>
+                    </div>
+                  }
                 </div>
                 <div className='col-12'>
                   <label className='form-label'>ส่งบทความเมื่อ</label>
@@ -237,7 +268,7 @@ function AuthorPaper() {
                   </div>
                   {paperFile.data &&
                     <div>
-                      <h4>ไฟล์เอกสาร</h4>
+                      <h4 className="mt-3">ไฟล์เอกสาร</h4>
                       <hr />
                       <div className='table-responsive'>
                         <table className='table'>
@@ -343,6 +374,81 @@ function AuthorPaper() {
               </div>
             </section>
           }
+          {(data.payment_status === 'PENDING' || data.payment_status === 'REJECT') &&
+            <section>
+              <div className="card">
+                <div className="card-body">
+                  <h4 className="card-title">ชำระเงินและแนบหลักฐานการชำระเงิน</h4>
+                  <div className="card-text">
+                    อัตราค่าลงทะเบียน
+                  </div>
+                  บทความนี้ลงทะเบียนแบบ: {data.regis_type ? 'Early bird' : 'Regular'}
+                  <div className="table-responsive">
+                    <table className="table" style={{ minWidth: 1000 }}>
+                      <thead>
+                        <tr>
+                          <th>ประเภทการลงทะเบียน</th>
+                          <th>
+                            Early Bird <br />
+                            {
+                              data.confr_code?.regis_eb_start_date &&
+                              <span className="badge text-bg-primary">{dayjs(data.confr_code.regis_eb_start_date).format('DD MMM YYYY')}</span>
+                            }
+                            {data.confr_code?.regis_eb_end_date &&
+                              <>
+                                <span className="mx-2">-</span>
+                                <span className="badge text-bg-primary">{dayjs(data.confr_code.regis_eb_end_date).format('DD MMM YYYY')}</span>
+                              </>
+                            }
+                          </th>
+                          <th>
+                            Regular <br />
+                            {
+                              data.confr_code?.regis_rl_start_date &&
+                              <span className="badge text-bg-primary">{dayjs(data.confr_code.regis_rl_start_date).format('DD MMM YYYY')}</span>
+                            }
+                            {data.confr_code?.regis_rl_end_date &&
+                              <>
+                                <span className="mx-2">-</span>
+                                <span className="badge text-bg-primary">{dayjs(data.confr_code.regis_rl_end_date).format('DD MMM YYYY')}</span>
+                              </>
+                            }
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {data.confr_code.regis_type?.map((types) => (
+                          <tr key={types._id}>
+                            <td>{types.name}</td>
+                            <td>{new Intl.NumberFormat('en-US').format(types.price_1)}</td>
+                            <td>{new Intl.NumberFormat('en-US').format(types.price_1)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className='card-text'>
+                    <form>
+                      <div className="mb-3">
+                        <label className="form-label">แนบหลักฐาน</label>
+                        <input
+                          className="form-control"
+                          type='file' accept='image/*'
+                          onChange={e => setPaymentFile(e.target.files[0])}
+                        />
+                      </div>
+                      <div className="text-end">
+                        <button type='button' disabled={!paymentFile} onClick={handleUploadPayment} className="btn btn-primary">
+                          <i className="bi bi-upload me-2"></i>
+                          อัพโหลด
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </section>
+          }
         </div>
       }
 
@@ -390,7 +496,7 @@ function AuthorPaper() {
       </section>
       <section className='card  shadow-sm my-3'>
         <div className='card-body'>
-          <h4 className="fw-bold mb-3 card-title">ประวัติความคิดเห็นกรรมการ</h4>
+          <h4 className="card-title">ประวัติความคิดเห็นกรรมการ</h4>
           {comment.data &&
             <div>
               {comment.data.length <= 0 ?
@@ -424,7 +530,11 @@ function AuthorPaper() {
               }
             </div>
           }
-          <HistoryComment show={showHistoryComment} handleClose={handleCloseHistoryComment} id={HistoryCommentId} />
+          <HistoryComment
+            show={showHistoryComment}
+            handleClose={handleCloseHistoryComment}
+            id={HistoryCommentId}
+          />
         </div>
       </section>
     </div>

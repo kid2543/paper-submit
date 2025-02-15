@@ -31,21 +31,15 @@ const PaginationComponent = ({
   return (
     <Pagination>
       <Pagination.First disabled={currentPage === 1} onClick={onFirstPage} >
-        <i className="bi bi-caret-left-fill"></i>
-        <i className="bi bi-caret-left-fill"></i>
       </Pagination.First>
       <Pagination.Prev onClick={onPagePrev} disabled={currentPage - 1 <= 0}>
-        <i className="bi bi-caret-left"></i>
       </Pagination.Prev>
       {pageNumbers.map((pages) => (
         <Pagination.Item key={pages} onClick={() => onSelectPage(pages)} active={currentPage === pages}>{pages}</Pagination.Item>
       ))}
       <Pagination.Next onClick={onPageNext} disabled={currentPage + 1 > totalPages} >
-        <i className="bi bi-caret-right"></i>
       </Pagination.Next>
       <Pagination.Last disabled={currentPage >= totalPages} onClick={onLastPage}>
-        <i className="bi bi-caret-right-fill"></i>
-        <i className="bi bi-caret-right-fill"></i>
       </Pagination.Last>
     </Pagination>
   );

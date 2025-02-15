@@ -1,8 +1,8 @@
 const express = require('express')
 
 //midlewares
-const requireAuth = require('../middlewares/requireAuth')
 const uploadPdf = require('../middlewares/uploadFile')
+const uploadImage = require('../middlewares/uploadImage')
 
 // controller
 const {
@@ -33,7 +33,12 @@ const {
     sendCertificate,
     getPaperArchive,
     getPaperOwnerAdmin,
-    getConfrPaperAward
+    getConfrPaperAward,
+    PublicPaper,
+    UnPublicPaper,
+    rejectPaper,
+    uploadPayment,
+    checkPayment
 } = require('../controllers/paper_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
@@ -42,6 +47,12 @@ const router = express.Router()
 
 //all paper เปลี่ยนเป็น เฉพาะ admin สามารถดูได้ทั้งหมด
 router.get('/', verifyToken, checkRole(['ADMIN']), getPapers)
+
+// public  paper
+router.patch('/public/:id', verifyToken, checkRole(['ADMIN', 'HOST']), PublicPaper)
+
+// change public paper
+router.patch('/unpublic/:id', verifyToken, checkRole(['ADMIN', 'HOST']), UnPublicPaper)
 
 // get for user in process
 router.get('/owner', verifyToken, checkRole(['AUTHOR']), getPaperByUser)
@@ -54,6 +65,9 @@ router.get('/host/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getReviewPape
 
 // get single public
 router.get('/single/:id', publicPaperSingle)
+
+// reject paper
+router.patch('/reject/:id', verifyToken, checkRole(['ADMIN', 'HOST']), rejectPaper)
 
 // get all public
 router.get('/all', publicPaperAll)
@@ -82,6 +96,12 @@ router.patch('/close/file', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf
 // upload edit paper file
 router.patch('/edit/file', verifyToken, checkRole(['AUTHOR']), uploadPdf.single('file'), uploadEditPaper)
 
+// upload payment author
+router.patch('/upload/payment/:id', verifyToken, checkRole(['AUTHOR']), uploadImage.single('image'), uploadPayment)
+
+// host admin check payment
+router.patch('/check/payment/:id', verifyToken, checkRole(['HOST', 'ADMIN']), checkPayment)
+
 // author edit paper detail
 router.patch('/update/:id', verifyToken, checkRole(['AUTHOR']), editPaperDetail)
 
@@ -97,8 +117,8 @@ router.patch('/award', verifyToken, checkRole(['ADMIN', 'HOST']), updatePaperAwa
 // search paper
 router.get('/search', verifyToken, checkRole(['ADMIN']), searchPaper)
 
-// get paper is pass
-router.get('/archive', verifyToken, checkRole(['AUTHOR']), getPaperArchive)
+// get paper is pass for search
+router.get('/archive', getPaperArchive)
 
 // host search paper
 router.get('/host/search/:id', verifyToken, checkRole(['HOST', 'ADMIN']), hostSeachPaper)
@@ -120,9 +140,6 @@ router.patch('/edit/status/:id', verifyToken, checkRole(['AUTHOR']), editPaperSt
 
 // send email
 router.post('/send/email', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), sendEmailPdf)
-
-// send certificate
-router.post('/send/certificate', verifyToken, checkRole(['HOST', 'ADMIN']), uploadPdf.single('file'), sendCertificate)
 
 
 module.exports = router

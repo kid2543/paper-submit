@@ -186,7 +186,7 @@ const searchAuthor = async (req, res) => {
 }
 
 // delete host
-const deleteHost = async (req, res) => {
+const adminDelete = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -194,71 +194,10 @@ const deleteHost = async (req, res) => {
     }
 
     try {
-        // check if host have conference cannot remove
-        const confr = await Conferences.find({ owner: id })
-        if (confr.length > 0) {
-            return res.status(400).json({ error: 'ลบงานประชุมก่อนทำการลบผู้ใช้งาน' })
-        }
-
-        // check if user is host role
-        const host = await User.findOne({ _id: id, role: "HOST" })
-        if (host) {
-            await host.deleteOne()
-            res.status(204).send("User has deleted")
-        } else {
-            return res.status(400).json({ error: 'ไม่พบผู้ใช้งาน' })
-        }
-
+        await User.deleteOne({_id: id})
+        res.status(204).send('ลบผู้ใช้งานแล้ว')
     } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-}
-
-// delete author
-const deleteAuthor = async (req, res) => {
-    const { id } = req.params
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'รหัสผู้ใช้งานไม่ถูกต้อง' })
-    }
-
-    try {
-        // check if author have paper in progress cannot remove
-        const paper = await Paper.find({ owner: id })
-        if (paper.length > 0) {
-            return res.status(400).json({ error: 'ลบบทความก่อนทำการลบผู้ใช้งาน' })
-        }
-
-        // check if user is host role
-        const author = await User.findOne({ _id: id, role: "AUTHOR" })
-        if (author) {
-            await author.deleteOne()
-            res.status(204).send("User has deleted")
-        } else {
-            res.status(400).json({ error: 'ไม่พบผู้ใช้งาน' })
-        }
-    } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-}
-
-// delete Committee
-const deleteCommittee = async (req, res) => {
-    const { id } = req.params
-
-    if (!mongoose.Types.ObjectId.isValid(id))
-        return res.status(400).json({ error: "รหัสกรรมการไม่ถูกต้อง" })
-
-    try {
-        const user = await User.findOne({ _id: id, role: 'COMMITTEE' })
-        if (user) {
-            await user.deleteOne()
-            res.status(204).send("User and comment is delete")
-        } else {
-            res.status(404).json({ error: 'ไม่พบผู้ใช้งาน' })
-        }
-    } catch (error) {
-        res.status(400).json({ error: error.message })
+        res.status(400).json({error : error.message})
     }
 }
 
@@ -370,9 +309,7 @@ module.exports = {
     searchHost,
     searchComit,
     searchAuthor,
-    deleteHost,
-    deleteAuthor,
-    deleteCommittee,
+    adminDelete,
     authForNavigate,
     getOwnerDetail,
     getAll,

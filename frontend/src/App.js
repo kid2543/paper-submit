@@ -60,7 +60,6 @@ import LoadingPage from './components/LoadingPage';
 import PageNotFound from './page/PageNotFound';
 import AdminUserDetail from './page/AdminUserDetail';
 import Award from './components/HostEdit/Award';
-import ViewAward from './components/ViewAward';
 import AwardCateList from './components/HostEdit/AwardCateList';
 import AdminSignUp from './page/AdminSignUp';
 import AuthorLayout from './layout/AuthorLayout';
@@ -223,16 +222,6 @@ function App() {
             <PrivateRoute api={hostApi}>
               <HostEditLayout>
                 <Award />
-              </HostEditLayout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path='/host/view/award/:id'
-          element={
-            <PrivateRoute api={hostApi} >
-              <HostEditLayout>
-                <ViewAward />
               </HostEditLayout>
             </PrivateRoute>
           }

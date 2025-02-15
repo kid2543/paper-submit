@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useFetch from '../../hook/useFetch'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 // react bootstrap
 import {
@@ -16,7 +16,6 @@ function Award() {
     const { id } = useParams()
     const paper = useFetch('/api/paper/category/' + id)
     const cate = useFetch('/api/category/one/' + id)
-    const navigate = useNavigate()
 
     const [show, setShow] = useState(false)
     const [modalData, setModalData] = useState({
@@ -46,7 +45,6 @@ function Award() {
                     </Breadcrumb>
                     <h4 className='fw-bold card-title'>รางวัลดีเด่นประจำหัวข้อ <span className='text-primary'>{cate.data?.name}</span></h4>
                     <p className='text-muted card-text'>จัดอันดับรางวัลดีเด่นได้ที่นี่!</p>
-                    <button type='button' onClick={() => navigate(`/host/view/award/${id}`)} className='btn btn-primary text-white'>ดูการจัดอันดับ</button>
                 </div>
             </div>
             {paper.data &&
@@ -126,12 +124,19 @@ function UpdateAwardRateModal(props) {
             <form onSubmit={handleUpdate}>
                 <Modal.Body>
                     <label className='form-label'>เลือกอันดับ</label>
-                    <select name='award' className="form-select" value={award} onChange={e => setAward(e.target.value)} required>
+                    <select
+                        ame='award'
+                        className="form-select"
+                        value={award}
+                        onChange={e => setAward(e.target.value)}
+                        required
+                    >
                         <option value="">เลือกอันดับ</option>
                         <option value="1">อันดับที่ 1</option>
                         <option value="2">อันดับที่ 2</option>
                         <option value="3">อันดับที่ 3</option>
-                        <option value="4">อันดับที่ 4</option>
+                        <option value="4">รางวัลชมเชย</option>
+                        <option value="5">ไม่มีอันดับ</option>
                     </select>
                 </Modal.Body>
                 <Modal.Footer>

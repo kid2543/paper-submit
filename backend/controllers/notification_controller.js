@@ -35,10 +35,10 @@ const getAllNotification = async (req, res) => {
 
     try {
         if (!user_id) {
-            const notification = await Notification.find({ user_id: _id })
+            const notification = await Notification.find({ user_id: _id }).sort({'createdAt': -1})
             return res.status(200).json(notification)
         } else {
-            const notification = await Notification.find({ user_id })
+            const notification = await Notification.find({ user_id }).sort({'createdAt': -1})
             return res.status(200).json(notification)
         }
 
@@ -75,7 +75,7 @@ const getConfrNotification = async (req, res) => {
     }
 
     try {
-        const noti = await Notification.find({ user_id: id })
+        const noti = await Notification.find({ user_id: id }).sort({'createdAt': -1})
         res.status(200).json(noti)
     } catch (error) {
         res.status(400).json({ error: error.message })

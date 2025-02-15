@@ -25,7 +25,8 @@ const {
     getHomeConfr, 
     getConferenceOwner,
     searchOpenConference,
-    uploadSchedule
+    uploadSchedule,
+    adminDeleteConference
  } = require('../controllers/confr_controller')
 
 const router = express.Router()
@@ -78,6 +79,8 @@ router.get('/open/search', searchOpenConference)
 
 // delete conference
 router.delete('/delete/:id', verifyToken, checkRole(['ADMIN', 'HOST']), deleteConference)
+
+router.delete('/admin/delete/:id', verifyToken, checkRole(['ADMIN']), adminDeleteConference)
 
 // search conference for host
 router.get('/search/host', verifyToken, checkRole(['ADMIN', 'HOST']), hostSeachConference)

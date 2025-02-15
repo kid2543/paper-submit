@@ -71,20 +71,16 @@ const deletePublication = async (req, res) => {
     }
 
     try {
-        const check = await Paper.find({publication : id, status: {$ne : 'CANCEL'}})
-
-        if(check.length > 0) {
-            return res.status(400).json({error : 'ไม่สามารถลบวารสารได้ เนื่องจากมีบทความส่งมายังวารสารนี้แล้ว'})
-        }
-
         const find = await Publication.findById(id)
 
         if(!find) {
             return res.status(404).json({error : 'ไม่พบข้อมูล'})
         }
+
         await Conference.updateMany({ publication : id }, { $pull: {publication : id}})
+        await Paper.updateMany({publication: id}, {publication: null})
         await Publication.deleteOne({_id : id})
-        res.status(204).send("item has deleted")
+        res.status(204).send("ลบวารสารแล้ว")
     } catch (error) {
         console.log(error)
         res.status(400).json({error : error.message})

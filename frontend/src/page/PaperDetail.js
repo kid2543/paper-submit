@@ -1,53 +1,89 @@
-import React, { useEffect, useState } from 'react'
-import bookCover from '../asset/book.png'
-import dayjs from 'dayjs'
-import axios from 'axios'
-import { useParams } from 'react-router-dom'
-
-const mockPaper = {
-  title: "ชื่อบทความ",
-  desc: "รายละเอียดบทความ",
-  create_date: Date("12-12-2024"),
-  image: bookCover,
-}
+import React from 'react'
+import useFetch from '../hook/useFetch'
+import LoadingPage from '../components/LoadingPage'
+import { Link, useParams } from 'react-router-dom'
 
 function PaperDetail() {
 
   const { id } = useParams()
+  const { data, error, status } = useFetch('/api/paper/single/' + id)
+  const paperFile = useFetch('/api/paperfile/read/' + id)
 
-  const [paper, setPaper] = useState({})
-
-  useEffect(() => {
-
-  const fethPaper = async () => {
-    try {
-      const res = await axios.get('/api/paper/' + id)
-      setPaper(res.data)
-    } catch (error) {
-      console.log(error)
-    }
+  if (status === 'idle' || status === 'loading') {
+    return <LoadingPage />
   }
 
-    fethPaper()
-
-  },[id])
+  if(error) {
+    return <div>Error...</div>
+  }
 
   return (
-    <div className='container py-3'>
-      <section className='my-4'>
-        <h2>{paper?.title}</h2>
-        <p className='text-muted'><ion-icon name="time-outline"></ion-icon>เผยแพร่เมื่อ {dayjs(paper?.create_date).format("DD MM YYYY")}</p>
-      </section>
-      <section className='container-fluid my-4'>
-        <div className='row'>
-          <div className='col-lg-4 my-3'>
-            <img src={mockPaper.image} alt='cover-book' height={300} width={200} />
-          </div>
-          <div className='col-lg-8 my-3'>
-            <button>ดูบทความ</button>
-          </div>
+    <div className='bg-light' style={{ minHeight: '100vh' }}>
+      {data &&
+        <div>
+          <section style={{ padding: "180px 0px" }} className="text-center">
+            <h1 className="fw-bold">{data.title}</h1>
+            <div className="text-muted">
+              <div className="row g-3">
+                {data.author}
+              </div>
+            </div>
+          </section>
+          <section className="bg-white" style={{ padding: "64px 0px" }}>
+            <div className="container">
+              <div className="card">
+                <div className="card-body">
+                  <div className="card-text mb-3">
+                    <h6 className="fw-bold">รายละเอียด</h6>
+                    <hr />
+                    <div className="row g-3">
+                      <div className="col-12 col-md-4">มหาวิทยาลัย</div>
+                      <div className="col-12 col-md-8 text-muted">{data.universiry}</div>
+                      <div className="col-12 col-md-4">สาขาวิชา</div>
+                      <div className="col-12 col-md-8 text-muted">{data.group}</div>
+                      <div className="col-12 col-md-4">อาจารย์ที่ปรึกษา</div>
+                      <div className="col-12 col-md-8 text-muted">{data.advise}</div>
+                    </div>
+                  </div>
+                  <div className='card-text'>
+                    <div>
+                      <h6 className="fw-bold">ติดต่อ</h6>
+                      <hr />
+                      <div className="row g-3">
+                        <div className="col-12 col-md-4">ที่อยู่</div>
+                        <div className="col-12 col-md-8 text-muted">{data.address}</div>
+                        <div className="col-12 col-md-4">อีเมล</div>
+                        <div className="col-12 col-md-8 text-muted">{data.email}</div>
+                        <div className="col-12 col-md-4">เบอร์โทร</div>
+                        <div className="col-12 col-md-8 text-muted">{data.contact}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {paperFile.data?.length > 0 &&
+                    <div className="mt-3">
+                      <h6>ดูไฟล์บทความ</h6>
+                      <hr />
+                      <div className="row g-3">
+                        {paperFile.data.map((items) => (
+                          <div key={items._id} className="col-auto">
+                            <Link
+                              to={`/uploads/${items.original_file}`}
+                              target='_blank'
+                              rel='noreferrer'
+                              className="btn btn-primary">
+                              {items.name}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      }
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import useFetch from '../hook/useFetch'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
 
 function ConfrPaperAward() {
@@ -11,6 +11,13 @@ function ConfrPaperAward() {
         error,
         status
     } = useFetch('/api/paper/confr/award/' + id)
+
+    console.log(data)
+
+    const handleSplit = (author) => {
+        const arr = author.split(",")
+        return arr
+    }
 
     if (status === 'idle' || status === 'loading') {
         return <LoadingPage />
@@ -28,35 +35,37 @@ function ConfrPaperAward() {
                     <p className='text-muted'>ดูบทความที่ได้รับรางวัลได้ที่นี่</p>
                 </div>
             </section>
-            {data.length > 0 &&
-                <div>
-                    {data.map(items => (
-                        <div key={items._id}>
-                            {items._id}
-                        </div>
-                    ))}
-                </div>
-            }
             <section style={{ padding: "64px 0px" }}>
-                <div className="container">
-                    <div className="row g-3 row-cols-1">
-                        <div className="col">
-                            <div className="row">
-                                <div className="col-12 col-md-8 mx-auto">
-                                    <div className="card">
-                                        <div className='card-body'>
-                                            <h5 className="fw-bold">No. 1</h5>
-                                            <h6 className="card-title">การจัดการทางสังคมเมืองน่านในการป้องกันปัญหาความขัดแย้งทางสังคม</h6>
-                                            <div className="card-subtitle mb-2 text-muted">พระชยานันทมุนี,ดร.</div>
-                                            <button className="btn btn-primary">ดูเพิ่มเติม</button>
+                {data && 
+                    <div className="row row-cols-1 g-3">
+                        {data.map((items) => (
+                            <div key={items._id} className="card">
+                                <div className="card-body">
+                                    <h4 className="card-title">
+                                        อันดับที่: {items.award_rate}
+                                    </h4>
+                                    <div className="card-text">
+                                        {items.title}
+                                    </div>
+                                    <div className='row g-3'>
+                                        <div className="">
+                                            {handleSplit(items.author).map((authors,index) => (
+                                                <span key={index} className="badge bg-primary">{authors}</span>
+                                            ) )}
                                         </div>
+                                    </div>
+                                    <div>
+                                        <Link 
+                                        to={'/paper/' + items._id} 
+                                        className="btn btn-outline-dark">
+                                            ดูเพิ่มเติม
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-
-                </div>
+                }
             </section>
         </div>
     )

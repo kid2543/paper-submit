@@ -40,10 +40,23 @@ function HostAssign() {
 
   // confirm edit data
   const [showEditConfirm, setShowEditConfirm] = useState(false)
+  const [editPaperCode, setEditPaperCode] = useState('')
+
+  const handleShowEdit = (code) => {
+    setEditPaperCode(code)
+    setShowEditConfirm(true)
+  }
+
+  const handleCloseEdit = () => {
+    setEditPaperCode('')
+    setShowEditConfirm(false)
+  }
 
   const handleEdit = async () => {
     try {
-      const res = await axios.post('/api/assign/edit/paper/' + id)
+      const res = await axios.post('/api/assign/edit/paper/' + id, {
+        paper_code: editPaperCode
+      })
       console.log(res)
     } catch (error) {
       console.log(error)
@@ -230,7 +243,7 @@ function HostAssign() {
       />
       <ConfirmDialog
         show={showEditConfirm}
-        handleClose={() => setShowEditConfirm(false)}
+        handleClose={handleCloseEdit}
         header='ยืนยันการแก้ไข'
         text='ต้องการยืนยันการแก้ไขหรือไม่ ?'
         handleSubmit={handleEdit}
@@ -254,7 +267,7 @@ function HostAssign() {
         </div>
         <div className='card  shadow-sm mb-3'>
           <div className='card-body'>
-            <h6 className="fw-bold mb-3">รายละเอียดบทความ</h6>
+            <h4 className="card-title mb-3">รายละเอียดบทความ</h4>
             {paper &&
               <div className='row g-3'>
                 <div className='col-12 col-md-6 col-lg-4'>
@@ -336,11 +349,14 @@ function HostAssign() {
                   <small>{paper.contact}</small>
                 </div>
                 <div className='col-12'>
-                  <h6 className='fw-bold mb-3'>รายการบทความ</h6>
+                  <h4>รายการบทความ</h4>
+                  <div className="text-warning mb-3">
+                    ** กรุณาอัพโหลดไฟล์ ปิดชื่อ หรือ คลิก อนุญาติให้อ่านไฟล์ต้นฉบับ หากไม่ดำเนินการกรรมการจะไม่สามารถเห็นบทความได้
+                  </div>
                   {paperFile.data &&
                     <div className='table-resonsive'>
                       <table className='table'>
-                        <thead className='table-dark'>
+                        <thead>
                           <tr>
                             <th>
                               วันที่ส่ง
@@ -415,7 +431,10 @@ function HostAssign() {
                   }
                   {paper.status === 'PENDING' && paper.deadline?.length > 0 &&
                     <div>
-                      <button onClick={() => setShowEditConfirm(true)} type='button' className='btn btn-primary'>ยืนยันการแก้ไข</button>
+                      <button onClick={() => handleShowEdit(paper.paper_code)} type='button' className='btn btn-primary'>ยืนยันการแก้ไข</button>
+                      <div className='text-warning'>
+                        ** กรุณาอัพโหลดไฟล์ปิดชื่อฉบับแก้ไข หรือ อนุญาติให้อ่านต้นฉบับ ก่อนทำการกดยืนยัน หากไม่ดำเนินการ กรรมการจะไม่สามารถอ่านบทความได้
+                      </div>
                     </div>
                   }
                 </div>
@@ -473,7 +492,7 @@ function HostAssign() {
                               <button
                                 onClick={() => handleShowDelete(items._id)}
                                 type='button'
-                                className="btn btn-danger">
+                                className="btn btn-light text-danger">
                                 <i className="bi bi-trash"></i>
                               </button>
                             }
@@ -611,7 +630,7 @@ function UploadCloseNameFile(props) {
   return (
     <Modal show={props.show} onHide={props.handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Uploadบทความฉบับปิดชื่อ: {props.data.name}</Modal.Title>
+        <Modal.Title>อัพโหลดบทความฉบับปิดชื่อ:  <br/> <span className="text-primary">{props.data.name}</span></Modal.Title>
       </Modal.Header>
       <form onSubmit={handleUpload}>
         <Modal.Body>

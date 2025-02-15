@@ -1,9 +1,6 @@
 const express = require('express')
 
-
 // middelwares
-const requireAdmin = require('../middlewares/requireAdmin')
-const requireHost = require('../middlewares/requireHost')
 
 // controllers
 const { createPublication, getPublication, updatePublication, deletePublication, searchPublication } = require('../controllers/publication_controller')

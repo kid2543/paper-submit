@@ -3,11 +3,24 @@ import useSearch from "../../hook/useSearch";
 
 // react boostrap
 import { Link } from "react-router-dom";
+import PaginationComponent from "../Pagination";
 
 function Author() {
 
-    const { data, error, status, handleSearchChange, handleNextPage, handlePreviousPage, page, totalPages } = useSearch("/api/user/search/author")
-    
+    const {
+        data,
+        error,
+        status,
+        handleSearchChange,
+        handleNextPage,
+        handlePreviousPage,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage,
+        page,
+        totalPages
+    } = useSearch("/api/user/search/author")
+
     // render
     if (error) {
         return <div>Error page</div>
@@ -62,17 +75,15 @@ function Author() {
                                 </tbody>
                             </table>
                         )}
-                        <div className='d-flex justify-content-between align-items-center'>
-                            <span>{`Page ${page} of ${totalPages}`}</span>
-                            <div>
-                                <button onClick={handlePreviousPage} disabled={page === 1} className='btn btn-link'>
-                                    <i className="bi bi-arrow-left"></i> ก่อนหน้า
-                                </button>
-                                <button onClick={handleNextPage} disabled={page >= totalPages} className='btn btn-link'>
-                                    ถัดไป <i className="bi bi-arrow-right"></i>
-                                </button>
-                            </div>
-                        </div>
+                        <PaginationComponent 
+                            currentPage={page}
+                            onFirstPage={handleFirstPage}
+                            onLastPage={handleLastPage}
+                            onPageNext={handleNextPage}
+                            onPagePrev={handlePreviousPage}
+                            onSelectPage={handleNumberPage}
+                            totalPages={totalPages}
+                        />
                     </div>
                 </div>
             }
