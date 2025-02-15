@@ -97,6 +97,7 @@ const getPaperArchive = async (req, res) => {
     try {
         const items = await Paper.find(query)
             .limit(limit * 1)
+            .sort({'updatedAt': 1})
             .skip((page - 1) * limit)
             .exec()
         const count = await Paper.countDocuments(query)

@@ -148,7 +148,7 @@ function AdminPaper() {
                                 <tbody>
                                     {data?.map((items, index) => (
                                         <tr key={items._id}>
-                                            <td>{index + 1}</td>
+                                            <td>{(page -1 ) * 10 + (index  + 1)}</td>
                                             <td>{items.paper_code}</td>
                                             <td>{items.title}</td>
                                             <td>

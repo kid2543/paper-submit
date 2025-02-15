@@ -24,9 +24,7 @@ function PaperDetail() {
           <section style={{ padding: "180px 0px" }} className="text-center">
             <h1 className="fw-bold">{data.title}</h1>
             <div className="text-muted">
-              <div className="row g-3">
                 {data.author}
-              </div>
             </div>
           </section>
           <section className="bg-white" style={{ padding: "64px 0px" }}>
@@ -34,11 +32,11 @@ function PaperDetail() {
               <div className="card">
                 <div className="card-body">
                   <div className="card-text mb-3">
-                    <h6 className="fw-bold">รายละเอียด</h6>
+                    <h4>รายละเอียด</h4>
                     <hr />
                     <div className="row g-3">
                       <div className="col-12 col-md-4">มหาวิทยาลัย</div>
-                      <div className="col-12 col-md-8 text-muted">{data.universiry}</div>
+                      <div className="col-12 col-md-8 text-muted">{data.university}</div>
                       <div className="col-12 col-md-4">สาขาวิชา</div>
                       <div className="col-12 col-md-8 text-muted">{data.group}</div>
                       <div className="col-12 col-md-4">อาจารย์ที่ปรึกษา</div>
@@ -47,7 +45,7 @@ function PaperDetail() {
                   </div>
                   <div className='card-text'>
                     <div>
-                      <h6 className="fw-bold">ติดต่อ</h6>
+                      <h4>ติดต่อ</h4>
                       <hr />
                       <div className="row g-3">
                         <div className="col-12 col-md-4">ที่อยู่</div>
@@ -61,7 +59,7 @@ function PaperDetail() {
                   </div>
                   {paperFile.data?.length > 0 &&
                     <div className="mt-3">
-                      <h6>ดูไฟล์บทความ</h6>
+                      <h4>ดูไฟล์บทความ</h4>
                       <hr />
                       <div className="row g-3">
                         {paperFile.data.map((items) => (

@@ -108,9 +108,17 @@ function Author() {
                   </Link>
                 </div>
               </div>
-              <form onSubmit={handleSearchChange} className="mb-3">
-                <div>
-                  <input name='search' type="search" className="form-control" placeholder="ค้นหาบทความ" />
+              <form onSubmit={handleSearchChange} className="mb-3 col-12 col-md-3">
+                <div className="input-group">
+                  <input
+                    name='search'
+                    type="search"
+                    className="form-control"
+                    placeholder="ค้นหาบทความ"
+                  />
+                  <button className="btn btn-primary">
+                    <i className="bi bi-search"></i>
+                  </button>
                 </div>
               </form>
               <div style={{ minHeight: 300 }}>
@@ -159,12 +167,10 @@ function Author() {
                           </div>
                           <div className="card-body">
                             <div className="btn-group">
-
                               <Link className="btn btn-primary" to={`/author/paper/${items._id}`}>
                                 <i className="bi bi-pencil-square me-2"></i>
                                 แก้ไขและดูรายละเอียด
                               </Link>
-
                               {items.status === 'PENDING' && items.result === 'PENDING' &&
                                 <button
                                   className="btn btn-light text-danger"

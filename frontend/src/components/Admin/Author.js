@@ -61,7 +61,7 @@ function Author() {
                                 <tbody>
                                     {data.map((items, index) => (
                                         <tr key={items._id}>
-                                            <td>{index + 1}</td>
+                                            <td>{(page -1 ) * 10 + (index  + 1)}</td>
                                             <td>{items.name}</td>
                                             <td>{items.username}</td>
                                             <td>{items.email}</td>

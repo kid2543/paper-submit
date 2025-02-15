@@ -170,7 +170,7 @@ function Conference() {
                                     <tbody>
                                         {data?.map((item,index) => (
                                             <tr key={item._id}>
-                                                <td>{index + 1}</td>
+                                                <td>{(page -1 ) * 10 + (index  + 1)}</td>
                                                 <td>{item.title}</td>
                                                 <td>{item.confr_code}</td>
                                                 <td>{dayjs(item.confr_end_date).format("DD MMM YYYY")}</td>

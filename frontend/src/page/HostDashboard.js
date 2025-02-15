@@ -15,6 +15,7 @@ import useSearch from '../hook/useSearch';
 import { UserDropdown } from '../components/UserDropdown';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import PaginationComponent from '../components/Pagination';
 
 function HostDashboard() {
     const searchConfr = useSearch('/api/conference/search/host')
@@ -163,7 +164,7 @@ function HostDashboard() {
                                                 <tbody>
                                                     {searchConfr.data.map((item, index) => (
                                                         <tr key={item._id}>
-                                                            <td>{index + 1}</td>
+                                                            <td>{(searchConfr.page -1 ) * 10 + (index  + 1)}</td>
                                                             <td>{item.confr_code}</td>
                                                             <td>
                                                                 {item.title}
@@ -187,8 +188,15 @@ function HostDashboard() {
                                             )
                                             }
                                         </table>
-
-
+                                        <PaginationComponent 
+                                            currentPage={searchConfr.page}
+                                            onFirstPage={searchConfr.handleFirstPage}
+                                            onLastPage={searchConfr.handleLastPage}
+                                            onPageNext={searchConfr.handleNextPage}
+                                            onPagePrev={searchConfr.handlePreviousPage}
+                                            onSelectPage={searchConfr.handleNumberPage}
+                                            totalPages={searchConfr.totalPages}
+                                        />
                                     </div >
                                 }
                             </div>

@@ -237,76 +237,78 @@ function AuthorPaper() {
                     </span>
                   </p>
                 </div>
-                <form onSubmit={handleUpdate}>
-                  <h4>แก้ไขรายละเอียดบทความ</h4>
-                  <hr />
-                  <div className='mb-3'>
-                    <label className='form-label'>คำสำคัญ</label>
-                    <textarea rows={3} name='keyword' className='form-control' defaultValue={data.keyword} />
-                    <div className='form-text'>ใช้ ',' ในการแบ่ง keyword</div>
-                  </div>
-                  <div className='mb-3'>
-                    <label className='form-label'>ชื่อผู้แต่ง</label>
-                    <textarea rows={3} name='author' className='form-control' defaultValue={data.author} />
-                    <div className="form-text">
-                      ระบุชื่อผู้แต่งทุกท่าน
+                {data.status === 'PENDING' &&
+                  <form onSubmit={handleUpdate}>
+                    <h4>แก้ไขรายละเอียดบทความ</h4>
+                    <hr />
+                    <div className='mb-3'>
+                      <label className='form-label'>คำสำคัญ</label>
+                      <textarea rows={3} name='keyword' className='form-control' defaultValue={data.keyword} />
+                      <div className='form-text'>ใช้ ',' ในการแบ่ง keyword</div>
                     </div>
-                  </div>
-                  <div className='mb-3'>
-                    <label className='form-label'>ที่อยู่ในการติดต่อ</label>
-                    <textarea rows={3} name='address' className='form-control' defaultValue={data.address} />
-                  </div>
-                  <div className='row gy-3'>
-                    <div className='col-md-6 mb-3'>
-                      <label className='form-label'>เบอร์โทร</label>
-                      <input type='tel' pattern='[0-9]{10}' maxLength={10} name='contact' className='form-control' defaultValue={data.contact} />
-                    </div>
-                    <div className='col-md-6 mb-3'>
-                      <label className='form-label'>อีเมล</label>
-                      <input type='email' name='email' className='form-control' defaultValue={data.email} />
-                    </div>
-                  </div>
-                  {paperFile.data &&
-                    <div>
-                      <h4 className="mt-3">ไฟล์เอกสาร</h4>
-                      <hr />
-                      <div className='table-responsive'>
-                        <table className='table'>
-                          <thead>
-                            <tr>
-                              <th>แก้ไขล่าสุด</th>
-                              <th>ชื่อ</th>
-                              <th>บทความ</th>
-                              <th>ประวัติ</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {paperFile.data.map(items => (
-                              <tr key={items._id}>
-                                <td>
-                                  {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
-                                </td>
-                                <td>
-                                  {items.name}
-                                </td>
-                                <td>
-                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
-                                </td>
-                                <td>
-                                  <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <HistoryPaper file_id={HistoryId} show={showHistory} handleClose={handleCloseHistory} name={HistoryName} />
+                    <div className='mb-3'>
+                      <label className='form-label'>ชื่อผู้แต่ง</label>
+                      <textarea rows={3} name='author' className='form-control' defaultValue={data.author} />
+                      <div className="form-text">
+                        ระบุชื่อผู้แต่งทุกท่าน
                       </div>
                     </div>
-                  }
-                  <div className='text-end'>
-                    <button className='btn btn-primary' type='submit'>ยืนยันการแก้ไข</button>
-                  </div>
-                </form>
+                    <div className='mb-3'>
+                      <label className='form-label'>ที่อยู่ในการติดต่อ</label>
+                      <textarea rows={3} name='address' className='form-control' defaultValue={data.address} />
+                    </div>
+                    <div className='row gy-3'>
+                      <div className='col-md-6 mb-3'>
+                        <label className='form-label'>เบอร์โทร</label>
+                        <input type='tel' pattern='[0-9]{10}' maxLength={10} name='contact' className='form-control' defaultValue={data.contact} />
+                      </div>
+                      <div className='col-md-6 mb-3'>
+                        <label className='form-label'>อีเมล</label>
+                        <input type='email' name='email' className='form-control' defaultValue={data.email} />
+                      </div>
+                    </div>
+                    {paperFile.data &&
+                      <div>
+                        <h4 className="mt-3">ไฟล์เอกสาร</h4>
+                        <hr />
+                        <div className='table-responsive'>
+                          <table className='table'>
+                            <thead>
+                              <tr>
+                                <th>แก้ไขล่าสุด</th>
+                                <th>ชื่อ</th>
+                                <th>บทความ</th>
+                                <th>ประวัติ</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {paperFile.data.map(items => (
+                                <tr key={items._id}>
+                                  <td>
+                                    {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
+                                  </td>
+                                  <td>
+                                    {items.name}
+                                  </td>
+                                  <td>
+                                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
+                                  </td>
+                                  <td>
+                                    <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <HistoryPaper file_id={HistoryId} show={showHistory} handleClose={handleCloseHistory} name={HistoryName} />
+                        </div>
+                      </div>
+                    }
+                    <div className='text-end'>
+                      <button className='btn btn-primary' type='submit'>ยืนยันการแก้ไข</button>
+                    </div>
+                  </form>
+                }
                 {data.edit_paper?.map((items, index) => (
                   <div key={index}>
                     {index + 1} : {items}
