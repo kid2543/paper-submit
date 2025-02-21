@@ -3,7 +3,7 @@ const express = require('express')
 // middelwares
 
 // controllers
-const { createPublication, getPublication, updatePublication, deletePublication, searchPublication } = require('../controllers/publication_controller')
+const { createPublication, getPublication, updatePublication, deletePublication, searchPublication, getPublicationForConfr } = require('../controllers/publication_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
 
@@ -11,19 +11,21 @@ const checkRole = require('../middlewares/checkRole')
 const router = express.Router()
 
 // create pub
-router.post('/', verifyToken, checkRole(['ADMIN']), createPublication)
+router.post('/', verifyToken, checkRole(['ADMIN', 'HOST']), createPublication)
 
 // read pub
-router.get('/', verifyToken, checkRole(['HOST', 'ADMIN']), getPublication)
+router.get('/', verifyToken, checkRole(['ADMIN']), getPublication)
+
+router.get('/confr/:id', getPublicationForConfr)
 
 // update pub
-router.patch('/:id', verifyToken, checkRole(['ADMIN']), updatePublication)
+router.patch('/:id', verifyToken, checkRole(['ADMIN', 'HOST']), updatePublication)
 
 // delete pub
-router.delete('/:id', verifyToken, checkRole(['ADMIN']), deletePublication)
+router.delete('/:id', verifyToken, checkRole(['ADMIN', 'HOST']), deletePublication)
 
 // search pub
-router.get('/search', verifyToken, checkRole(['ADMIN']), searchPublication)
+router.get('/search', verifyToken, checkRole(['ADMIN', 'HOST']), searchPublication)
 
 
 

@@ -89,7 +89,7 @@ export function UserDropdown() {
                     {user}
                 </Dropdown.Header>
                 <Dropdown.Item href="/setting">
-                    ระบบรับส่งบทความ
+                    แผงควบคุม
                 </Dropdown.Item>
                 <Dropdown.Item href="/profile">
                     การตั้งค่า

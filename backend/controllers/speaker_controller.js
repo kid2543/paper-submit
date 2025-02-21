@@ -50,7 +50,7 @@ const updateInv = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     try {
@@ -75,7 +75,7 @@ const uploadInvImage = async (req, res) => {
             }
             console.log("file is deleted")
         })
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     if (!req.file) {
@@ -113,7 +113,7 @@ const uploadInvCv = async (req, res) => {
             }
             console.log("file is deleted")
         })
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     if (!req.file) {
@@ -145,7 +145,7 @@ const deleteImage = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     try {
@@ -172,7 +172,7 @@ const deleteCv = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     try {
@@ -199,7 +199,7 @@ const removeInv = async (req, res) => {
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ error: 'รหัสพิธีกรไม่ถูกต้อง' })
+        return res.status(400).json({ error: 'รหัสวิทยากรไม่ถูกต้อง' })
     }
 
     try {

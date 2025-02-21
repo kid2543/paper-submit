@@ -37,7 +37,7 @@ function HostSidebar() {
                             <Nav.Link className='mb-2' href="/host/edit/category">หัวข้องานประชุม</Nav.Link>
                             <Nav.Link className='mb-2' href="/host/edit/publication">วารสาร</Nav.Link>
                             <Nav.Link className='mb-2' href="/host/edit/submission">การส่งบทความ</Nav.Link>
-                            <Nav.Link className='mb-2' href="/host/edit/invite-speaker">พิธีกร</Nav.Link>
+                            <Nav.Link className='mb-2' href="/host/edit/invite-speaker">วิทยากร</Nav.Link>
                             <Nav.Link className='mb-2' href="/host/edit/award">รางวัลดีเด่น</Nav.Link>
                         </Nav>
                     </div>

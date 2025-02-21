@@ -34,7 +34,6 @@ export function HomeNavbar() {
                     <Navbar.Collapse id="basic-navbar-nav" className='d-lg-flex justify-content-between'>
                         <Nav>
                             <div className='d-lg-flex align-items-center'>
-                                <Nav.Link href="/paper">บทความ</Nav.Link>
                                 <Nav.Link href="/confr">งานประชุม</Nav.Link>
                             </div>
                         </Nav>
@@ -44,7 +43,7 @@ export function HomeNavbar() {
                             </div>
                         ) : (
                             <div>
-                                <Link to='/login' type='button' className='btn btn-dark'>Login</Link>
+                                <Link to='/login' type='button' className='btn btn-dark'>เข้าสู่ระบบ</Link>
                             </div>
                         )}
                     </Navbar.Collapse>

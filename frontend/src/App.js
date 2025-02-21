@@ -16,7 +16,6 @@ import HomeLayout from './layout/HomeLayout';
 import Home from './page/Home';
 import SignUp from './page/SignUp';
 import Login from './page/Login';
-import Paper from './page/Paper';
 import PaperDetail from './page/PaperDetail';
 import ConfrList from './page/ConfrList';
 import Confr from './page/Confr';
@@ -87,7 +86,6 @@ function App() {
         <Route path='/signup' element={!user ? <SignUp /> : <Navigate to='/' />} />
         <Route path='/' element={<HomeLayout><Home /></HomeLayout>} />
         <Route path='/confr' element={<HomeLayout><ConfrList /></HomeLayout>} />
-        <Route path='/paper' element={<HomeLayout><Paper /></HomeLayout>} />
         <Route path='/paper/:id' element={<HomeLayout><PaperDetail /></HomeLayout>} />
         <Route path='/confr/:id' element={<ConfrLayout><Confr /></ConfrLayout>} />
         <Route

@@ -4,11 +4,13 @@ import axios from 'axios'
 import Cookies from "js-cookie";
 
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export const useLogin = () => {
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(null)
     const { dispatch } = useAuthContext()
+    const navigate = useNavigate()
 
     const login = async (username, password) => {
         setIsLoading(true)
@@ -19,6 +21,7 @@ export const useLogin = () => {
             if (res) {
                 Cookies.set('username', username, { expires: 1 })
                 dispatch({ type: 'LOGIN', payload: username })
+                navigate('/setting')
             }
             setIsLoading(false)
         } catch (error) {

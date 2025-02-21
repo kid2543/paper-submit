@@ -14,8 +14,8 @@ import { toast } from 'react-toastify'
 function Award() {
 
     const { id } = useParams()
-    const paper = useFetch('/api/paper/category/' + id)
-    const cate = useFetch('/api/category/one/' + id)
+    const paper = useFetch('/api/paper/edit/award/' + id)
+    const cate = useFetch('/api/paper/one/' + id)
 
     const [show, setShow] = useState(false)
     const [modalData, setModalData] = useState({

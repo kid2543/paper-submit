@@ -1,158 +1,435 @@
-import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import {
+    Modal,
+    Button
+} from 'react-bootstrap'
 import { toast } from 'react-toastify'
-import ConfirmDialog from '../components/ConfirmDialog'
+import useFetch from '../hook/useFetch'
+import { Link } from 'react-router-dom'
+import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog'
 
 function HostEditPub() {
 
-    const [pub, setPub] = useState([])
-    const [pubConfr, setPubConfr] = useState([])
-    const [newPub, setNewPub] = useState([])
-    const [query, setQuery] = useState('')
+    // modal
+    const [showCreate, setShowCreate] = useState(false)
+    const id = sessionStorage.getItem('host_confr')
+    const pub = useFetch('/api/publication/confr/' + id)
 
-    const confr_id = sessionStorage.getItem("host_confr")
+    // edit modal
+    const [showEdit, setShowEdit] = useState(false)
+    const [editData, setEditData] = useState({
+        _id: '',
+        th_name: '',
+        en_name: '',
+        desc: [''],
+        confr_id: ''
+    })
 
-    //modal
-    const [show, setShow] = useState(false)
-    const handleShow = () => setShow(true)
-    const handleClose = () => setShow(false)
-
-    // handle check in publcation table
-    const handleCheck = (e) => {
-        const { checked, value } = e.target
-        if (checked === true) {
-            setNewPub([...newPub, value])
-        } else {
-            setNewPub(newPub.filter((items) => items !== value))
-        }
+    const handleShowEdit = (data) => {
+        setShowEdit(true)
+        setEditData(data)
     }
 
-    // update publication list
-    const handleUpdate = async (e) => {
-        e.preventDefault()
+    const handleCloseEdit = () => {
+        setShowEdit(false)
+        setEditData({
+            _id: '',
+            th_name: '',
+            en_name: '',
+            desc: [''],
+            confr_id: ''
+        })
+    }
+
+    // handleDelete publication
+    const handleDelete = async () => {
+        if (!deleteId) {
+            toast.warning('เลือกวารสารก่อนทำการกดลบ')
+            return
+        }
+
         try {
-            const res = await axios.patch('/api/conference', {
-                _id: confr_id,
-                publication: newPub
-            })
-            setPubConfr(res.data.publication)
-            toast.success('แก้ไขรายชื่อวารสารสำเร็จ')
-            handleClose()
-            setNewPub([])
+            await axios.delete('/api/publication/' + deleteId)
+            pub.setData(pub.data.filter(items => items._id !== deleteId))
+            toast.success('ลบวารสารสำเร็จ')
         } catch (error) {
-            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกคร้ง')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            handleCloseDelete()
         }
     }
 
-    useEffect(() => {
+    // confirm delete modal
+    const [showDelete, setShowDelete] = useState(false)
+    const [deleteId, setDeleteId] = useState('')
 
-        const fethPub = async () => {
-            try {
-                const res = await axios.get('/api/publication')
-                setPub(res.data)
-            } catch (error) {
-                console.log(error)
-            }
-        }
+    const handleCloseDelete = () => {
+        setDeleteId('')
+        setShowDelete(false)
+    }
 
-        const fethConfrPub = async () => {
-            try {
-                const res = await axios.get('/api/conference/host/' + confr_id)
-                setPubConfr(res.data.publication)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        fethPub()
-        fethConfrPub()
-    }, [confr_id])
-
-    const filterPub = pub?.filter(items =>
-        items.en_name.toLowerCase().includes(query.toLowerCase())
-    )
+    const handleShowDelete = (pub_id) => {
+        setDeleteId(pub_id)
+        setShowDelete(true)
+    }
+    if (!id) {
+        return <div>เกิดข้อผิดพลาด <Link to='/'>กลับหน้าแรก</Link></div>
+    }
 
     return (
         <div>
-            <ConfirmDialog
-                show={show}
-                handleClose={handleClose}
-                header='ยืนยันการเลือกวารสาร ?'
-                text='เมื่อทำการเลือกวารสารใหม่วารสารที่เคยเลือกไว้จะหายไป ต้องการยืนยันการเลือกหรือไม่ ?'
-                handleSubmit={handleUpdate}
-            />
-            <div className='mb-3 card'>
-                <div className="card-body">
-                    <h4 className='fw-bold card-title'>วารสาร</h4>
-                    <p className='text-muted card-text'>แก้ไขรายการวารสารได้ที่นี่</p>
-                </div>
-            </div>
-            <div className='card  shadow-sm mb-3'>
-                <div className='card-body'>
-                    <div className='mb-3'>
-                        <h4 className='card-title'>รายชื่อวารสารในงานประชุม</h4>
-                        <small className='text-muted card-text'>เลือกวารสารที่ต้องการทั้งหมดแล้วกดบันทึกเพื่อ หากต้องการเปลี่ยนให้เลือกวารสารทั้งหมดใหม่อีกครั้ง</small>
+            <section>
+                <div className='card mb-3'>
+                    <div className="card-body">
+                        <h4 className="card-title">วารสาร</h4>
+                        <p className="text-muted card-text">เพิ่มวารสารได้ที่นี่</p>
                     </div>
-                    <ol>
-                        {pubConfr.length <= 0 && <div>ไม่พบข้อมูล</div>}
-                        {pubConfr?.map((items) => (
-                            <li key={items._id}>
-                                <p>{items.en_name} ({items.th_name})</p>
-                            </li>
-                        ))}
-                    </ol>
                 </div>
-            </div>
-            <div className='card  shadow-sm'>
-                <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <h4 className='card-title'>รายชื่อวารสารทั้งหมด</h4>
-                        <div>
-                            <input className='form-control' placeholder='ค้นหาวารสาร' onChange={e => setQuery(e.target.value)} />
+                <div className="card">
+                    <div className="card-body">
+                        <div className="d-md-flex justify-content-between mb-3">
+                            <h4 className="card-title">รายการวารสาร</h4>
+                            <div>
+                                <button className="btn btn-primary" type='button' onClick={() => setShowCreate(true)}>เพิ่มวารสาร</button>
+                                <CreatePublicationModal
+                                    show={showCreate}
+                                    handleClose={() => setShowCreate(false)}
+                                    data={pub.data}
+                                    setData={pub.setData}
+                                />
+                                <EditPublicationModal
+                                    show={showEdit}
+                                    handleClose={handleCloseEdit}
+                                    editData={editData}
+                                    data={pub.data}
+                                    setData={pub.setData}
+                                />
+                                <ConfirmDeleteDialog
+                                    header='ยืนยันการลบวารสาร'
+                                    message='ต้องการลบวารสารนี้หรือไม่ ?'
+                                    onCancel={handleCloseDelete}
+                                    onConfirm={handleDelete}
+                                    show={showDelete}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <form onSubmit={handleUpdate}>
-                        <table className='table'>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>ชื่อ EN</th>
-                                    <th>ชื่อ TH</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filterPub?.map((items) => (
-                                    <tr key={items._id}>
-                                        <td>
-                                            <input type='checkbox' value={items._id} onChange={e => handleCheck(e)} checked={newPub.includes(items._id)} />
-                                        </td>
-                                        <td>
-                                            {items.en_name}
-                                        </td>
-                                        <td>
-                                            {items.th_name}
-                                        </td>
+                        <div className="table-responsive">
+                            <table className="table" style={{ minWidth: 1000 }}>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>ชื่อภาษาไทย</th>
+                                        <th>ชื่อภาษาอังกฤษ</th>
+                                        <th>เครื่องมือ</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className='text-end'>
-                            <button
-                                onClick={handleShow}
-                                className='btn btn-success'
-                                type='button'
-                                disabled={newPub.length <= 0}
-                            >
-                                <i className='bi bi-floppy me-2'></i>
-                                บันทึก
-                            </button>
+                                </thead>
+                                <tbody>
+                                    {pub.data?.map((items, index) => (
+                                        <tr key={items._id}>
+                                            <td>
+                                                {index + 1}
+                                            </td>
+                                            <td>
+                                                {items.th_name}
+                                            </td>
+                                            <td>
+                                                {items.en_name}
+                                            </td>
+                                            <td>
+                                                <div className="btn-group">
+                                                    <button
+                                                        className="btn btn-light"
+                                                        type='button'
+                                                        onClick={() => handleShowEdit(items)}
+                                                    >
+                                                        <i className="bi bi-pencil-square"></i>
+                                                    </button>
+                                                    <button
+                                                        type='button'
+                                                        onClick={() => handleShowDelete(items._id)}
+                                                        className="btn btn-light"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     )
 }
 
 export default HostEditPub
+
+function CreatePublicationModal({ show, handleClose, setData, data }) {
+
+    const [th_name, setThName] = useState('')
+    const [en_name, setEnName] = useState('')
+    const [desc, setDesc] = useState([''])
+    const confr_id = sessionStorage.getItem('host_confr')
+
+    const handleChange = (e, index) => {
+        const { value } = e.target
+        let temp = [...desc]
+        temp[index] = value
+        setDesc(temp)
+    }
+
+    const handleDelete = (index) => {
+        let temp = [...desc]
+        temp = temp.filter((items, idx) => idx !== index)
+        setDesc(temp)
+    }
+
+    const handleCreate = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axios.post('/api/publication', {
+                th_name,
+                en_name,
+                desc,
+                confr_id
+            })
+            setData([res.data, ...data])
+            toast.success('เพิ่มวารสารสำเร็จ')
+            setThName('')
+            setEnName('')
+            setDesc([''])
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            handleClose()
+        }
+    }
+
+    return (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>เพิ่มวารสาร</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleCreate}>
+                <Modal.Body>
+                    <div className="row g-3">
+                        <div>
+                            <label className="form-label">
+                                ชื่อภาษาไทย
+                            </label>
+                            <input
+                                className="form-control"
+                                value={th_name}
+                                onChange={e => setThName(e.target.value)}
+                                required
+                                placeholder='หากไม่มีให้ใส่ -'
+                                autoFocus
+                            />
+                        </div>
+                        <div>
+                            <label className="form-label">
+                                ชื่อภาษาอังกฤษ
+                            </label>
+                            <input
+                                className="form-control"
+                                value={en_name}
+                                onChange={e => setEnName(e.target.value)}
+                                required
+                                placeholder='หากไม่มีให้ใส่ -'
+                            />
+                        </div>
+                        <p>รายละเอียดวารสาร</p>
+                        {desc.map((descs, index) => (
+                            <div key={index}>
+                                <div className="text-muted">
+                                    บรรทัดที่: {index + 1}
+                                </div>
+                                <hr />
+                                <label className="form-label">
+                                    รายละเอียด
+                                </label>
+                                <textarea
+                                    value={descs}
+                                    className='form-control mb-3'
+                                    rows={5}
+                                    onChange={e => handleChange(e, index)}
+                                />
+                                <div>
+                                    <button
+                                        className="btn btn-outline-danger"
+                                        type='button'
+                                        onClick={() => handleDelete(index)}
+                                    >
+                                        <i className="bi bi-trash me-1"></i>
+                                        ลบ
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <div>
+                            <button
+                                type='button'
+                                className="btn btn-success"
+                                onClick={() => setDesc([...desc, ''])}
+                            >
+                                <i className="bi bi-plus-lg me-1"></i>
+                                เพิ่มรายละเอียด
+                            </button>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="" onClick={handleClose}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" type='submit'>
+                        สร้าง
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}
+
+
+function EditPublicationModal({ show, handleClose, data, setData, editData }) {
+
+    const [th_name, setThName] = useState('')
+    const [en_name, setEnName] = useState('')
+    const [desc, setDesc] = useState([''])
+
+    useEffect(() => {
+        setThName(editData.th_name)
+        setEnName(editData.en_name)
+        setDesc(editData.desc)
+    }, [editData])
+
+    const handleChange = (e, index) => {
+        const { value } = e.target
+        let temp = [...desc]
+        temp[index] = value
+        setDesc(temp)
+    }
+
+    const handleDelete = (index) => {
+        let temp = [...desc]
+        temp = temp.filter((items, idx) => idx !== index)
+        setDesc(temp)
+    }
+
+    const handleUpdate = async (e) => {
+        e.preventDefault()
+        try {
+            const res = await axios.patch('/api/publication/' + editData._id, {
+                th_name,
+                en_name,
+                desc,
+            })
+            let temp = [...data]
+            temp = temp.map(items => {
+                if (items._id === res.data._id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            })
+            setData(temp)
+            toast.success('เพิ่มวารสารสำเร็จ')
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            handleClose()
+        }
+    }
+
+    return (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>{editData?.th_name}</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleUpdate}>
+                <Modal.Body>
+                    <div className="row g-3">
+                        <div>
+                            <label className="form-label">
+                                ชื่อภาษาไทย
+                            </label>
+                            <input
+                                className="form-control"
+                                value={th_name}
+                                onChange={e => setThName(e.target.value)}
+                                required
+                                placeholder='หากไม่มีให้ใส่ -'
+                                autoFocus
+                            />
+                        </div>
+                        <div>
+                            <label className="form-label">
+                                ชื่อภาษาอังกฤษ
+                            </label>
+                            <input
+                                className="form-control"
+                                value={en_name}
+                                onChange={e => setEnName(e.target.value)}
+                                required
+                                placeholder='หากไม่มีให้ใส่ -'
+                            />
+                        </div>
+                        <p className="form-label">รายละเอียดวารสาร</p>
+                        {desc.map((descs, index) => (
+                            <div key={index}>
+                                <div className="text-muted">
+                                    บรรทัดที่: {index + 1}
+                                </div>
+                                <hr />
+                                <label className="form-label">
+                                    รายละเอียด
+                                </label>
+                                <textarea
+                                    value={descs}
+                                    className='form-control mb-3'
+                                    rows={5}
+                                    onChange={e => handleChange(e, index)}
+                                />
+                                <div>
+                                    <button
+                                        className="btn btn-outline-danger"
+                                        type='button'
+                                        onClick={() => handleDelete(index)}
+                                    >
+                                        ลบรายละเอียด
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        <div>
+                            <button
+                                type='button'
+                                className="btn btn-success"
+                                onClick={() => setDesc([...desc, ''])}
+                            >
+                                <i className="bi bi-plus-lg me-1"></i>
+                                เพิ่มรายละเอียด
+                            </button>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="" onClick={handleClose}>
+                        ปิด
+                    </Button>
+                    <Button variant="primary" type='submit'>
+                        อัพเดท
+                    </Button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}

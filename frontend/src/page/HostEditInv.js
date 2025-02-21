@@ -61,7 +61,7 @@ function HostEditInv() {
             try {
                 await axios.delete('/api/inv/' + deleteId)
                 setData(data.filter(item => item._id !== deleteId))
-                toast.success('ลบพิธีกรสำเร็จ')
+                toast.success('ลบวิทยากรสำเร็จ')
                 handleCancel()
             } catch (error) {
                 console.log(error)
@@ -88,7 +88,7 @@ function HostEditInv() {
                 }
             })
             setData(newData)
-            toast.success('แก้ไขพิธีกรสำเร็จ')
+            toast.success('แก้ไขวิทยากรสำเร็จ')
         } catch (error) {
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่ภายหลัง')
             console.log(error)
@@ -108,17 +108,17 @@ function HostEditInv() {
         <div>
             <div className='mb-3 card'>
                 <div className="card-body">
-                    <h4 className='fw-bold card-title'>พิธีกร</h4>
-                    <p className='text-muted card-text'>เพิ่มพิธีกรรวมถึงแก้ไขรายละเอียดเกี่ยวกับพิธีกรได้ที่นี่</p>
+                    <h4 className='fw-bold card-title'>วิทยากร</h4>
+                    <p className='text-muted card-text'>เพิ่มวิทยากรรวมถึงแก้ไขรายละเอียดเกี่ยวกับวิทยากรได้ที่นี่</p>
                 </div>
             </div>
             <div className='card shadow-sm  mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
-                        <h4 className='card-title'>รายการพิธีกร</h4>
+                        <h4 className='card-title'>รายการวิทยากร</h4>
                         <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
                             <i className='me-2 bi bi-plus-lg'></i>
-                            เพิ่มพิธีกร
+                            เพิ่มวิทยากร
                         </button>
                     </div>
                 </div>
@@ -150,8 +150,8 @@ function HostEditInv() {
                 />
                 <ConfirmDeleteDialog
                     show={showDialog}
-                    header='ยืนยันการลบพิธีกร'
-                    message='ต้องการลบรายละเอียดและรูปภาพของพิธีกรท่านนี้หรือไม่'
+                    header='ยืนยันการลบวิทยากร'
+                    message='ต้องการลบรายละเอียดและรูปภาพของวิทยากรท่านนี้หรือไม่'
                     onCancel={handleCancel}
                     onConfirm={handleDelete}
                 />
@@ -159,7 +159,7 @@ function HostEditInv() {
                     <div className='row g-3'>
                         {data.map((items, index) => (
                             <div className='col-12 col-md-6 position-relative' key={items._id}>
-                                <h6 className='mb-3'>พิธีกรท่านที่: {index + 1}</h6>
+                                <h6 className='mb-3'>วิทยากรท่านที่: {index + 1}</h6>
                                 <div className="card h-100">
                                     <div className='card-body text-center'>
                                         {items.img ? (
@@ -179,7 +179,7 @@ function HostEditInv() {
                                     <div className='card-body'>
                                         <form className='row g-3' onSubmit={e => updateInv(e, items._id)}>
                                             <div className='col-12'>
-                                                <label className='form-label'>ชื่อพิธีกร</label>
+                                                <label className='form-label'>ชื่อวิทยากร</label>
                                                 <input name='name' className='form-control' defaultValue={items.name} />
                                             </div>
                                             <div className='col-12'>
@@ -227,7 +227,7 @@ function CreateInvModal(props) {
             const json = Object.fromEntries(formData.entries())
             const res = await axios.post('/api/inv', json)
             props.setData([...props.data, res.data])
-            toast.success('เพิ่มพิธีกรสำเร็จ')
+            toast.success('เพิ่มวิทยากรสำเร็จ')
             props.handleClose()
         } catch (error) {
             console.log(error)
@@ -238,12 +238,12 @@ function CreateInvModal(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>เพิ่มพิธีกร</Modal.Title>
+                <Modal.Title>เพิ่มวิทยากร</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleCreate}>
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
-                        <label className='form-label'>ชื่อพิธีกร</label>
+                        <label className='form-label'>ชื่อวิทยากร</label>
                         <input className='form-control' name='name' required />
                     </div>
                     <div className='col-12'>

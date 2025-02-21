@@ -18,6 +18,7 @@ import UnAuthorized from './UnAuthorized'
 function Confr() {
 
     const [data, setData] = useState({})
+    const [pub,setPub] = useState([])
     const [topic, setTopic] = useState([])
     const [inv, setInv] = useState([])
     const [partner, setPartner] = useState([])
@@ -40,6 +41,8 @@ function Confr() {
                 if (res.data.status === false && host_confr !== id) {
                     setIsOpen(false)
                 }
+                const Pub = await axios.get('/api/publication/confr/' + id)
+                setPub(Pub.data)
                 const cate = await axios.get('/api/category/' + id)
                 setTopic(cate.data)
                 const Inv = await axios.get('/api/inv/' + id)
@@ -80,7 +83,7 @@ function Confr() {
                             }
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
                             <h5 className='text-muted mb-3'>{data.sub_title} <br /> {data.confr_code} </h5>
-                            {topic && data.publication && dayjs(data.confr_end_date).format('YYYY-MM-DD') > today &&
+                            {topic && dayjs(data.confr_end_date).format('YYYY-MM-DD') > today &&
                                 <div>
                                     <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
                                         <i className="bi bi-send me-2"></i>
@@ -139,7 +142,7 @@ function Confr() {
                                                     <a className='text-secondary' href='#7'>วารสาร</a>
                                                 </li>
                                                 <li>
-                                                    <a className='text-secondary' href='#8'>พิธีกร</a>
+                                                    <a className='text-secondary' href='#8'>วิทยากร</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -243,13 +246,13 @@ function Confr() {
                                         </section>
                                     }
 
-                                    {data.publication &&
+                                    {pub.length > 0 &&
                                         <section id='7' style={{ padding: "64px 0px" }}>
                                             <div className='mb-4'>
                                                 <h4 className='fw-bold'>วารสาร</h4>
                                             </div>
                                             <div className='list-group'>
-                                                {data.publication?.map((items) => (
+                                                {pub.map((items) => (
                                                     <div className='list-group-item' key={items._id}>
                                                         <div className="mb-3">
                                                             <h6 className="fw-bold">{items.en_name} / {items.th_name}</h6>
@@ -268,7 +271,7 @@ function Confr() {
                                     {inv &&
                                         <section id='8' style={{ padding: "64px 0px" }}>
                                             <div className='mb-4'>
-                                                <h4 className='fw-bold mb-3'>พิธีกรประจำงานประชุม</h4>
+                                                <h4 className='fw-bold mb-3'>วิทยากรประจำงานประชุม</h4>
                                             </div>
                                             <div className='row row-cols-1 row-cols-lg-2 g-3'>
                                                 {inv?.map((items) => (

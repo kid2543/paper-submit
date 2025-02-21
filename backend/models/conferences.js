@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const Publication = require("./publication")
 const User = require("./user")
 const fs = require('fs')
 
@@ -13,10 +12,6 @@ const conferencesSchema = mongoose.Schema({
   confr_desc: [{ type: String }],
   important_date: [{ date_name: { type: String }, start_date: { type: Date }, end_date: { type: Date } }],
   schedule: String,
-  publication: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: Publication
-  }],
   submit_detail: [{
     type: String,
   }],
@@ -72,9 +67,9 @@ conferencesSchema.pre('deleteOne', { document: true, query: false }, async funct
         if (file.img)
           fs.unlink(`public/uploads/${file.img}`, (err) => {
             if(err) {
-              console.log('ลบรูปพิธีกรไม่สำเร็จ',err)
+              console.log('ลบรูปวิทยากรไม่สำเร็จ',err)
             } else {
-              console.log('ลบรูปพิธีกรแล้ว')
+              console.log('ลบรูปวิทยากรแล้ว')
             }
           })
         if (file.cv)

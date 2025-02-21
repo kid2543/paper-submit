@@ -25,7 +25,6 @@ function AuthorPaper() {
 
   const [uploaded, setUploaded] = useState([''])
 
-
   // hadnle payment
   const [paymentFile, setPaymentFile] = useState(null)
 
@@ -34,6 +33,7 @@ function AuthorPaper() {
       toast.warning('กรุณาเลือกไฟล์ก่อนทำการกดอัพโหลด')
       return
     }
+
     try {
       const formData = new FormData()
       formData.append('image', paymentFile)
@@ -43,21 +43,6 @@ function AuthorPaper() {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
-    }
-  }
-
-
-  const handleUpdate = async (e) => {
-    e.preventDefault()
-    try {
-      const formData = new FormData(e.target)
-      const json = Object.fromEntries(formData.entries())
-      const res = await axios.patch('/api/paper/update/' + id, json)
-      toast.success('Success')
-      console.log(res.data)
-    } catch (error) {
-      console.log(error)
-      toast.error('Error')
     }
   }
 
@@ -77,21 +62,6 @@ function AuthorPaper() {
     setHistoryId('')
     setHistoryName('')
   }
-
-  // comment history
-  const [showHistoryComment, setShowHistoryComment] = useState(false)
-  const [HistoryCommentId, setHistoryCommentId] = useState('')
-
-  const handleCloseHistoryComment = () => {
-    setShowHistoryComment(false)
-    setHistoryCommentId('')
-  }
-
-  const handleShowHistoryComment = (id) => {
-    setHistoryCommentId(id)
-    setShowHistoryComment(true)
-  }
-
 
   const hanleEditPaper = async (e, file_id) => {
     e.preventDefault()
@@ -118,8 +88,9 @@ function AuthorPaper() {
 
   const handleEditStatus = async () => {
     try {
-      await axios.patch('/api/paper/edit/status/' + id)
+      const res = await axios.patch('/api/paper/edit/status/' + id)
       toast.success('แก้ไขบทความสำเร็จ')
+      setData(res.data)
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -135,7 +106,7 @@ function AuthorPaper() {
   }
 
   if (error) {
-    return <div>{error}</div>
+    return <div>Error</div>
   }
 
   return (
@@ -164,151 +135,154 @@ function AuthorPaper() {
             <div className='card-body'>
               <h4>รายละเอียดบทความ</h4>
               <hr />
-              <div className='row g-3'>
-                <div className='col-12'>
-                  <label className='form-label'>อาจารย์ประจำวิชา</label>
-                  <input className='form-control' value={data.advise} disabled />
+              <div className='row g-3 row-cols-1'>
+                <div>
+                  <label className='form-label'>ชื่อบทความ (ภาษาไทย)</label>
+                  <input className='form-control' value={data.title} readOnly />
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>คณะ</label>
-                  <input className='form-control' value={data.group} disabled />
+                <div>
+                  <label className='form-label'>ชื่อบทความ (ภาษาอังกฤษ)</label>
+                  <input className='form-control' value={data.title_en} readOnly />
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>มหาวิทยาลัย</label>
-                  <input className='form-control' value={data.university} disabled />
+                <div>
+                  <label className="form-label">Abstract</label>
+                  <textarea
+                    rows={10}
+                    name='abstract'
+                    className="form-control"
+                    defaultValue={data.abstract}
+                    readOnly
+                  />
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>ประเภทบทความ</label>
-                  <input className='form-control' value={data.cate_code?.name} disabled />
+                <div>
+                  <label className='form-label'>คำสำคัญ</label>
+                  <textarea
+                    rows={5}
+                    readOnly
+                    name='keyword'
+                    className='form-control'
+                    defaultValue={data.keyword}
+                  />
+                  <div className='form-text'>ใช้ ',' ในการแบ่ง keyword</div>
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>ชื่อบทความ</label>
-                  <input className='form-control' value={data.title} disabled />
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>รหัสบทความ</label>
-                  <input className='form-control' value={data.paper_code} disabled />
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>วารสาร</label>
-                  <input className='form-control' value={data.publication?.en_name} disabled />
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>สถานะบทความ</label>
-                  <div>
-                    <PaperStatus status={data.status} />
+                <div>
+                  <label className='form-label'>ชื่อผู้แต่ง</label>
+                  <textarea
+                    rows={5}
+                    name='author'
+                    className='form-control'
+                    defaultValue={data.author}
+                    readOnly
+                  />
+                  <div className="form-text">
+                    ระบุชื่อผู้แต่งทุกท่าน
                   </div>
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>ผลลัพธ์บทความ</label>
-                  <div>
-                    <PaperResult status={data.result} />
+                <div>
+                  <label className='form-label'>ที่อยู่ในการติดต่อ</label>
+                  <textarea
+                    rows={5}
+                    name='address'
+                    className='form-control'
+                    defaultValue={data.address}
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className='form-label'>เบอร์โทร</label>
+                  <input
+                    type='tel'
+                    pattern='[0-9]{10}'
+                    maxLength={10}
+                    name='contact'
+                    className='form-control'
+                    defaultValue={data.contact}
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className='form-label'>อีเมล</label>
+                  <input
+                    type='email'
+                    name='email'
+                    className='form-control'
+                    defaultValue={data.email}
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <h4>สถานะบทความ</h4>
+                  <div className="row row-cols-1 row-cols-md-4 g-3">
+                    <div>
+                      <label className="form-label">สถานะบทความ</label>
+                      <div>
+                        <PaperStatus status={data.status} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">ผลลัพธ์บทความ</label>
+                      <div>
+                        <PaperResult status={data.result} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">สถานะการชำระเงิน</label>
+                      <div>
+                        <PaymentStatus status={data.payment_status} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">หลักฐานการชำระเงิน</label>
+                      <div>
+                        {data.payment_image ? (
+                          <Link to={`/uploads/${data.payment_image}`} target='_blank' rel='noreferrer'>
+                            {data.payment_image}
+                          </Link>
+                        ) : '-'}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>สถานะการชำระเงิน</label>
-                  <div>
-                    <PaymentStatus status={data.payment_status} />
-                  </div>
-                  {data.payment_image &&
-                    <div className="mt-2">
-                      <Link
-                        target='_blank'
-                        rel='noreferrer'
-                        to={`/uploads/${data.payment_image}`}>
-                        ดูหลักฐาน
-                      </Link>
+                <div>
+                  {paperFile.data &&
+                    <div>
+                      <h4 className="mt-3">ไฟล์บทความ</h4>
+                      <hr />
+                      <div className='table-responsive'>
+                        <table className='table'>
+                          <thead>
+                            <tr>
+                              <th>แก้ไขล่าสุด</th>
+                              <th>ชื่อ</th>
+                              <th>บทความ</th>
+                              <th>ประวัติ</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            {paperFile.data.map(items => (
+                              <tr key={items._id}>
+                                <td>
+                                  {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
+                                </td>
+                                <td>
+                                  {items.name}
+                                </td>
+                                <td>
+                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
+                                </td>
+                                <td>
+                                  <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <HistoryPaper file_id={HistoryId} show={showHistory} handleClose={handleCloseHistory} name={HistoryName} />
+                      </div>
                     </div>
                   }
                 </div>
-                <div className='col-12'>
-                  <label className='form-label'>ส่งบทความเมื่อ</label>
-                  <p>
-                    <span className='badge bg-success'>
-                      {dayjs(data.createdAt).format('DD MMM YYYY HH:MM')}
-                    </span>
-                  </p>
-                </div>
-                <div className='col-12'>
-                  <label className='form-label'>แก้ไขล่าสุดเมื่อ</label>
-                  <p>
-                    <span className='badge bg-success'>
-                      {dayjs(data.updatedAt).format('DD MMM YYYY HH:MM')}
-                    </span>
-                  </p>
-                </div>
-                {data.status === 'PENDING' &&
-                  <form onSubmit={handleUpdate}>
-                    <h4>แก้ไขรายละเอียดบทความ</h4>
-                    <hr />
-                    <div className='mb-3'>
-                      <label className='form-label'>คำสำคัญ</label>
-                      <textarea rows={3} name='keyword' className='form-control' defaultValue={data.keyword} />
-                      <div className='form-text'>ใช้ ',' ในการแบ่ง keyword</div>
-                    </div>
-                    <div className='mb-3'>
-                      <label className='form-label'>ชื่อผู้แต่ง</label>
-                      <textarea rows={3} name='author' className='form-control' defaultValue={data.author} />
-                      <div className="form-text">
-                        ระบุชื่อผู้แต่งทุกท่าน
-                      </div>
-                    </div>
-                    <div className='mb-3'>
-                      <label className='form-label'>ที่อยู่ในการติดต่อ</label>
-                      <textarea rows={3} name='address' className='form-control' defaultValue={data.address} />
-                    </div>
-                    <div className='row gy-3'>
-                      <div className='col-md-6 mb-3'>
-                        <label className='form-label'>เบอร์โทร</label>
-                        <input type='tel' pattern='[0-9]{10}' maxLength={10} name='contact' className='form-control' defaultValue={data.contact} />
-                      </div>
-                      <div className='col-md-6 mb-3'>
-                        <label className='form-label'>อีเมล</label>
-                        <input type='email' name='email' className='form-control' defaultValue={data.email} />
-                      </div>
-                    </div>
-                    {paperFile.data &&
-                      <div>
-                        <h4 className="mt-3">ไฟล์เอกสาร</h4>
-                        <hr />
-                        <div className='table-responsive'>
-                          <table className='table'>
-                            <thead>
-                              <tr>
-                                <th>แก้ไขล่าสุด</th>
-                                <th>ชื่อ</th>
-                                <th>บทความ</th>
-                                <th>ประวัติ</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {paperFile.data.map(items => (
-                                <tr key={items._id}>
-                                  <td>
-                                    {dayjs(items.updatedAt).format('DD MMM YYYY HH:mm')}
-                                  </td>
-                                  <td>
-                                    {items.name}
-                                  </td>
-                                  <td>
-                                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
-                                  </td>
-                                  <td>
-                                    <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                          <HistoryPaper file_id={HistoryId} show={showHistory} handleClose={handleCloseHistory} name={HistoryName} />
-                        </div>
-                      </div>
-                    }
-                    <div className='text-end'>
-                      <button className='btn btn-primary' type='submit'>ยืนยันการแก้ไข</button>
-                    </div>
-                  </form>
-                }
                 {data.edit_paper?.map((items, index) => (
                   <div key={index}>
                     {index + 1} : {items}
@@ -317,8 +291,8 @@ function AuthorPaper() {
               </div>
             </div>
           </section>
-          {data.result === 'REVISE' && data.status === 'SUCCESS' &&
-            <section className='card  shadow-sm'>
+          {(data.result === 'MAJOR' || data.result === 'MINOR') && data.status === 'SUCCESS' &&
+            <section className='card  shadow-sm mb-3'>
               <div className='card-body'>
                 <div>
                   <h4>อัพโหลดบทความฉบับแก้ไข</h4>
@@ -328,7 +302,13 @@ function AuthorPaper() {
                   </p>
                   <ul>
                     {data.deadline?.map((date, index) => (
-                      <li key={date._id}>{data.deadline.length > index + 1 ? <del>{dayjs(date.date).format('DD MMM YYYY')}</del> : <p>{dayjs(date.date).format('DD MMM YYYY')}</p>}</li>
+                      <li key={date._id}>
+                        {
+                          data.deadline?.length > index + 1 ?
+                            <del>{dayjs(date.date).format('DD MMM YYYY')}</del> :
+                            <p>{date.name} <br /> {dayjs(date.date).format('DD MMM YYYY')}</p>
+                        }
+                      </li>
                     ))}
                   </ul>
                   {paperFile.data &&
@@ -351,7 +331,7 @@ function AuthorPaper() {
                             }
                           </div>
                           <div className='mt-3'>
-                            <button type='submit' className='btn btn-outline-primary'>
+                            <button disabled={uploaded.includes(items._id)} type='submit' className='btn btn-outline-primary'>
                               <i className="bi bi-upload me-2"></i>
                               อัพโหลด
                             </button>
@@ -377,7 +357,7 @@ function AuthorPaper() {
             </section>
           }
           {(data.payment_status === 'PENDING' || data.payment_status === 'REJECT') &&
-            <section>
+            <section className="mb-3">
               <div className="card">
                 <div className="card-body">
                   <h4 className="card-title">ชำระเงินและแนบหลักฐานการชำระเงิน</h4>
@@ -453,92 +433,53 @@ function AuthorPaper() {
           }
         </div>
       }
-
-      <section className='card shadow-sm my-3'>
-        <div className='card-body'>
-          <h4 className="card-title">ความคิดเห็นกรรมการ</h4>
-          {data?.status !== 'SUCCESS' &&
-            <p>รอการดำเนินการบทความ</p>
-          }
-          {comment.data && data?.status === 'SUCCESS' &&
-            <div>
-              {comment.data.length <= 0 &&
-                <p>No Comment</p>
-              }
-              {comment.data.map((items, index) => (
-                <div key={items._id}>
-                  <div>
-                    <div className="text-muted">กรรมการท่านที่ {index + 1}</div>
-                    <div className="mb-3">
-                      <span className="me-2">
-                        <ReviewStatus status={items.status} />
-                      </span>
-                      <PaperResult status={items.result} />
-                    </div>
-                  </div>
-                  <div>
-                    {items.suggestion &&
-                      <p>
-                        <b>ข้อแนะนำ:</b> <br /> {items.suggestion}
-                      </p>
-                    }
-                    {items.suggestion_file &&
-                      <p>
-                        <b>ไฟล์ข้อแนะนำ</b> <br />
-                        คลิกที่นี่เพื่อดูข้อแนะนำ: <Link to={`/uploads/${items.suggestion_file}`} target='_blank' rel='noreferrer'>{items.suggestion_file}</Link>
-                      </p>
-                    }
-                  </div>
-                  <hr />
-                </div>
-              ))}
-            </div>
-          }
-        </div>
-      </section>
-      <section className='card  shadow-sm my-3'>
-        <div className='card-body'>
-          <h4 className="card-title">ประวัติความคิดเห็นกรรมการ</h4>
-          {comment.data &&
-            <div>
-              {comment.data.length <= 0 ?
-                <p>ไม่พบประวัติการแก้ไข</p> : (
-                  <div className='table-responsive'>
-                    <table className='table'>
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>ประวัติ</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {comment.data.map((items, index) => (
-                          <tr key={items._id}>
-                            <td>กรรมการท่านที่: {index + 1}</td>
-                            <td>
-                              <Link
-                                className="btn btn-sm btn-link"
-                                onClick={() => handleShowHistoryComment(items._id)}
-                              >
-                                ดูประวัติ
-                              </Link>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )
-              }
-            </div>
-          }
-          <HistoryComment
-            show={showHistoryComment}
-            handleClose={handleCloseHistoryComment}
-            id={HistoryCommentId}
-          />
-        </div>
-      </section>
+      {comment.data?.length > 0 &&
+        <section className='card'>
+          <div className="card-body">
+            <h4 className="card-title">ข้อแนะนำของกรรมการ</h4>
+            {comment.data?.map((coments, index) => (
+              <div key={coments._id} className="table-responsive">
+                <p>กรรมการท่านที่: {index + 1}</p>
+                <table className="table" style={{ minWidth: 1000 }}>
+                  <thead>
+                    <tr>
+                      <th>วันที่</th>
+                      <th>ข้อแนะนำ</th>
+                      <th>สถานะ</th>
+                      <th>ผลลัพธ์</th>
+                      <th>ไฟล์</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <HistoryComent id={coments._id} />
+                    <tr>
+                      <td>{dayjs(coments.updatedAt).format('DD MMM YYYY HH:mm')}</td>
+                      <td>{coments.suggestion}</td>
+                      <td>
+                        <PaperStatus status={coments.status} />
+                      </td>
+                      <td>
+                        <PaperResult status={coments.result} />
+                      </td>
+                      <td>
+                        {coments.suggestion_file ? (
+                          <Link
+                            to={`/uploads/${coments.suggestion_file}`}
+                            target='_blank'
+                            rel='noreferrer'
+                          >
+                            {coments.suggestion_file}
+                          </Link>
+                        ) : '-'}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </section>
+      }
     </div>
   )
 }
@@ -569,7 +510,7 @@ function HistoryPaper(props) {
         <Modal.Title>ประวัติการแก้ไข: {props.name}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {data &&
+        {data?.length > 0 ? (
           <div className='table-responsive'>
             <table className='table'>
               <thead>
@@ -592,6 +533,7 @@ function HistoryPaper(props) {
               </tbody>
             </table>
           </div>
+        ) : <div className="text-center">ไม่พบข้อมูล</div>
         }
       </Modal.Body>
       <Modal.Footer>
@@ -604,65 +546,52 @@ function HistoryPaper(props) {
 
 }
 
-function HistoryComment(props) {
-
+function HistoryComent({ id }) {
   const [data, setData] = useState([])
 
   useEffect(() => {
     const fethHistory = async () => {
       try {
-        const res = await axios.get('/api/history/read/' + props.id)
+        const res = await axios.get('/api/history/read/' + id)
         setData(res.data)
       } catch (error) {
         console.log(error)
       }
     }
-    if (props.id) {
+
+    if (id) {
       fethHistory()
     }
-  }, [props.id])
+
+  }, [id])
 
   return (
-    <Modal show={props.show} onHide={props.handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>ประวัติความเห็น</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div>
-          {data?.map((items) => (
-            <div key={items._id} className='card mb-3'>
-              <div className='card-body row'>
-                <div className='col-12 col-md-4'>
-                  <PaperResult status={items.result} />
-                  <div>
-                    <small>
-                      {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
-                    </small>
-                  </div>
-                </div>
-                <div className='col-12 col-md-8'>
-                  <p>{items.suggestion}</p>
-                  {items.suggestion_file &&
-                    <div>
-                      <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`/uploads/${items.suggestion_file}`}>File ข้อแนะนำ</Link>
-                    </div>
-                  }
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        {data.length <= 0 &&
-          <div className="text-center">
-            ไม่พบข้อมูล
-          </div>
-        }
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="" onClick={props.handleClose}>
-          ปิด
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <>
+      {data.map((items) => (
+        <tr key={items._id}>
+          <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+          <td>{items.suggestion}</td>
+          <td>
+            <PaperStatus status={items.status} />
+          </td>
+          <td>
+            <PaperResult status={items.result} />
+          </td>
+          <td>
+            {items.suggestion_file ? (
+
+              <Link
+                to={`/uploads/${items.suggestion_file}`}
+                target='_blank'
+                rel='noreferrer'
+              >
+                {items.suggestion_file}
+              </Link>
+            ) : '-'
+            }
+          </td>
+        </tr>
+      ))}
+    </>
   )
 }

@@ -11,7 +11,7 @@ const checkInvImageUpload = async (req, res, next) => {
     }
 
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(400).json({error : 'รหัสพิธีกรไม่ถูกต้อง'})
+        return res.status(400).json({error : 'รหัสวิทยากรไม่ถูกต้อง'})
     }
 
     try {
@@ -33,7 +33,7 @@ const checkInvCvUpload = async (req, res, next) => {
     const { id } = req.params
 
     if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({error : 'รหัสพิธีกรไม่ถูกต้อง'})
+        return res.status(400).json({error : 'รหัสวิทยากรไม่ถูกต้อง'})
     }
 
     try {

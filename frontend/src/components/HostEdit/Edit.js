@@ -248,21 +248,21 @@ function EditTitleModal(props) {
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
                         <label className='form-label'>หัวข้อ</label>
-                        <textarea 
-                        required 
-                        name='title' 
-                        className='form-control' 
-                        rows={3}
-                        defaultValue={props.data?.title} onChange={e => handleChange(e)} />
+                        <textarea
+                            required
+                            name='title'
+                            className='form-control'
+                            rows={3}
+                            defaultValue={props.data?.title} onChange={e => handleChange(e)} />
                     </div>
                     <div>
                         <label className='form-label'>หัวข้อรอง</label>
-                        <textarea 
-                        name='sub_title' 
-                        className='form-control' 
-                        rows={3} 
-                        defaultValue={props.data?.sub_title} 
-                        onChange={e => handleChange(e)} />
+                        <textarea
+                            name='sub_title'
+                            className='form-control'
+                            rows={3}
+                            defaultValue={props.data?.sub_title}
+                            onChange={e => handleChange(e)} />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
@@ -310,11 +310,18 @@ function EditDescModal(props) {
                     {desc?.map((items, index) => (
                         <div className='col-12' key={index}>
                             <label className='form-label text-muted me-2'>ย่อหน้าที่ {index + 1}</label>
-                            <div className="input-group">
-                                <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
-                                    <i className="bi bi-trash"></i>
+                            <div>
+                                <textarea
+                                    required
+                                    className='form-control mb-2'
+                                    defaultValue={items}
+                                    onChange={e => handleChange(e, index)}
+                                    rows={10}
+                                />
+                                <button className='btn btn-outline-danger' type='button' onClick={() => handleDel(index)}>
+                                    <i className="bi bi-trash me-1"></i>
+                                    ลบรายละเอียด
                                 </button>
-                                <textarea required className='form-control' defaultValue={items} onChange={e => handleChange(e, index)} />
                             </div>
                         </div>
                     ))}

@@ -38,7 +38,8 @@ const {
     UnPublicPaper,
     rejectPaper,
     uploadPayment,
-    checkPayment
+    checkPayment,
+    getPaperWithAcceptStatus
 } = require('../controllers/paper_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
@@ -78,6 +79,9 @@ router.get('/confr/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getPaperForC
 // get by category
 router.get('/category/:id', verifyToken, getPaperByCategory)
 
+// get paper only accept status
+router.get('/edit/award/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getPaperWithAcceptStatus )
+
 //get only have awarad
 router.get('/category/award/:id', verifyToken, getPaperAward)
 
@@ -85,7 +89,7 @@ router.get('/category/award/:id', verifyToken, getPaperAward)
 router.get('/confr/award/:id', getConfrPaperAward)
 
 // cancel paper
-router.patch('/cancel', verifyToken, cancelPaper)
+router.patch('/cancel/:id', verifyToken, cancelPaper)
 
 //create paper
 router.post('/create', verifyToken, checkRole(['AUTHOR']), createPaper)
@@ -103,7 +107,7 @@ router.patch('/upload/payment/:id', verifyToken, checkRole(['AUTHOR']), uploadIm
 router.patch('/check/payment/:id', verifyToken, checkRole(['HOST', 'ADMIN']), checkPayment)
 
 // author edit paper detail
-router.patch('/update/:id', verifyToken, checkRole(['AUTHOR']), editPaperDetail)
+router.patch('/update/:id', verifyToken, checkRole(['HOST']), editPaperDetail)
 
 // update paper result 
 router.patch('/result', verifyToken, checkRole(['HOST', 'ADMIN']), updatePaperResult)

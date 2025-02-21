@@ -76,67 +76,124 @@ function UserProfile() {
   }
 
   return (
-    <div>
-      <div className='container' style={{padding: '128px 0px'}}>
+    <div className="bg-light">
+      <div className='container' style={{ padding: '128px 0px' }}>
         <section>
           {data &&
             <div className='my-3'>
-              <div className='card text-bg-light'>
+              <div className='card'>
                 <div className='card-body'>
-                  <h4 className='fw-bold mb-3'>แก้ไขโปรไฟล์</h4>
-                  <form onSubmit={handleUpdate} className='row g-3'>
-                    <div className='col-12 col-md-6'>
-                      <label className='form-label'>ชื่อ - นามสกุล</label>
-                      <input defaultValue={data.name} name='name' className='form-control' />
-                    </div>
-                    <div className='col-12 col-md-6'>
-                      <label className='form-label'>ชื่อผู้ใช้งาน</label>
-                      <input defaultValue={data.username} name='username' readOnly className='form-control-plaintext' />
-                    </div>
-                    <div className='col-12 col-md-6'>
-                      <label className='form-label'>อีเมล</label>
-                      <input defaultValue={data.email} name='email' className='form-control' />
-                    </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>เบอร์โทร</label>
-                      <input maxLength={10} pattern='[0-9]{10}' defaultValue={data.phone} name='phone' className='form-control' />
-                      <div className="form-text">
-                        ตัวเลข 10 หลัก
+                  <div>
+                    <h4>แก้ไขโปรไฟล์</h4>
+                    <hr />
+                  </div>
+                  <form onSubmit={handleUpdate}>
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>ชื่อ - นามสกุล</label>
+                      <div className="col-sm-10">
+                        <input
+                          defaultValue={data.name}
+                          name='name'
+                          className='form-control'
+                        />
                       </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>มหาวิทยาลัย</label>
-                      <input defaultValue={data.university} name='university' className='form-control' />
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>ชื่อผู้ใช้งาน</label>
+                      <div className="col-sm-10">
+                        <input
+                          defaultValue={data.username}
+                          name='username'
+                          readOnly
+                          className='form-control-plaintext' />
+                      </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>คณะ</label>
-                      <input defaultValue={data.department} name='department' className='form-control' />
+                    <div className='row mb-3'>
+                      <label className='col-form-label col-sm-2'>อีเมล</label>
+                      <div className="col-sm-10">
+                        <input
+                          defaultValue={data.email}
+                          name='email'
+                          className='form-control'
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <h6 className="fw-bold">ข้อมูลที่อยู่</h6>
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>เบอร์โทร</label>
+                      <div className="col-sm-10">
+                        <input maxLength={10} pattern='[0-9]{10}' defaultValue={data.phone} name='phone' className='form-control' />
+                        <div className="form-text">
+                          ตัวเลข 10 หลัก
+                        </div>
+                      </div>
+                    </div>
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>มหาวิทยาลัย</label>
+                      <div className="col-sm-10">
+                        <input defaultValue={data.university} name='university' className='form-control' />
+                      </div>
+                    </div>
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>คณะ</label>
+                      <div className="col-sm-10">
+                        <input defaultValue={data.department} name='department' className='form-control' />
+                      </div>
+                    </div>
+                    <div className='mt-5'>
+                      <h4>ข้อมูลที่อยู่</h4>
                       <hr />
                     </div>
-                    <div className='col-12'>
-                      <label className='form-label'>ที่อยู่</label>
-                      <textarea defaultValue={data.address} name='address' className='form-control' rows={3} />
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>ที่อยู่</label>
+                      <div className="col-sm-10">
+                        <textarea
+                          defaultValue={data.address}
+                          name='address'
+                          className='form-control'
+                          rows={3}
+                        />
+                      </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>ตำบล</label>
-                      <input defaultValue={data.sub_district} name='sub_district' className='form-control' />
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>ตำบล</label>
+                      <div className='col-sm-10'>
+                        <input
+                          defaultValue={data.sub_district}
+                          name='sub_district'
+                          className='form-control'
+                        />
+                      </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>อำเภอ</label>
-                      <input defaultValue={data.district} name='district' className='form-control' />
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>อำเภอ</label>
+                      <div className="col-sm-10">
+                        <input
+                          defaultValue={data.district}
+                          name='district'
+                          className='form-control'
+                        />
+                      </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>จังหวัด</label>
-                      <input defaultValue={data.province} name='province' className='form-control' />
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>จังหวัด</label>
+                      <div className="col-sm-10">
+                        <input
+                          defaultValue={data.province}
+                          name='province'
+                          className='form-control'
+                        />
+                      </div>
                     </div>
-                    <div className='col-12 col-md-6 '>
-                      <label className='form-label'>รหัสไปรษณี</label>
-                      <input maxLength={5} pattern='[0-9]{5}' defaultValue={data.zip_code} name='zip_code' className='form-control' />
-                      <div className="form-text">
-                        จำกัด 5 ตัวเลข
+                    <div className='row mb-3'>
+                      <label className='col-sm-2 col-form-label'>รหัสไปรษณี</label>
+                      <div className="col-sm-10">
+                        <input 
+                        maxLength={5} 
+                        pattern='[0-9]{5}' 
+                        defaultValue={data.zip_code} name='zip_code' className='form-control' />
+                        <div className="form-text">
+                          จำกัด 5 ตัวเลข
+                        </div>
                       </div>
                     </div>
                     <div className="text-end">

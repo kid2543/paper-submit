@@ -57,10 +57,15 @@ function HostAssign() {
       const res = await axios.post('/api/assign/edit/paper/' + id, {
         paper_code: editPaperCode
       })
-      console.log(res)
+      toast.success('ยืนยันการแก้ไขสำเร็จ')
+      setPaper(res.data)
     } catch (error) {
       console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      handleCloseEdit()
     }
+
   }
 
 
@@ -94,52 +99,6 @@ function HostAssign() {
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     } finally {
       handleCloseDelete()
-    }
-  }
-
-  // handle read original file
-  const [showReadConfirm, setShowReadConfirm] = useState(false)
-  const [readData, setReadData] = useState({
-    checked: null,
-    id: ''
-  })
-
-  const handleShowRead = (checked, id) => {
-    setReadData({
-      checked,
-      id
-    })
-    setShowReadConfirm(true)
-  }
-
-  const handleCloseRead = () => {
-    setReadData({
-      checked: null,
-      id: ''
-    })
-    setShowReadConfirm(false)
-  }
-
-
-
-  const handleReadOriginalFile = async (checked, id) => {
-    try {
-      const res = await axios.patch('/api/paperfile/original/read/' + id, { read_original: checked })
-      let temp = [...paperFile.data]
-      const update = temp.map(prev => {
-        if (prev._id === id) {
-          return res.data
-        } else {
-          return prev
-        }
-      })
-      paperFile.setData(update)
-      toast('แก้ไขสำเร็จ')
-    } catch (error) {
-      console.log(error)
-      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
-    } finally {
-      handleCloseRead()
     }
   }
 
@@ -235,13 +194,6 @@ function HostAssign() {
         handleSubmit={handleAssign}
       />
       <ConfirmDialog
-        show={showReadConfirm}
-        handleClose={handleCloseRead}
-        header='เปลี่ยนสถานะการอ่านบทความ'
-        text='ต้องการเปลี่ยนสถานะการอ่านบทความต้นฉบับหรือไม่'
-        handleSubmit={() => handleReadOriginalFile(readData.checked, readData.id)}
-      />
-      <ConfirmDialog
         show={showEditConfirm}
         handleClose={handleCloseEdit}
         header='ยืนยันการแก้ไข'
@@ -259,7 +211,7 @@ function HostAssign() {
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
             <div>
-              <h4 className='fw-bold'>ดูผลลัพธ์บทความ</h4>
+              <h4 className='fw-bold'>มอบหมายบทความ</h4>
             </div>
           </div>
         </div>
@@ -267,91 +219,83 @@ function HostAssign() {
         </div>
         <div className='card  shadow-sm mb-3'>
           <div className='card-body'>
-            <h4 className="card-title mb-3">รายละเอียดบทความ</h4>
+            <h4>รายละเอียดบทความ</h4>
             {paper &&
-              <div className='row g-3'>
-                <div className='col-12 col-md-6 col-lg-4'>
+              <div>
+                <div className='row row-cols-1 row-cols-md-4 g-3'>
                   <div>
-                    <small className='fw-bold'>ชื่อบทความ</small>
-                  </div>
-                  <small>{paper.title}</small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>รหัสบทความ</small>
-                  </div>
-                  <small>{paper.paper_code}</small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>ผู้แต่ง</small>
-                  </div>
-                  <small>{paper.author}</small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>ผู้ส่งบทความ</small>
-                  </div>
-                  <small>{paper.owner?.name} ({paper.owner?.username})</small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>สถานะบทความ</small>
-                  </div>
-                  <small>
-                    <PaperStatus status={paper.status} />
-                  </small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>ผลลัพธ์บทความ</small>
-                  </div>
-                  <small>
-                    <PaperResult status={paper.result} />
-                  </small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>สถานะชำระเงิน</small>
-                  </div>
-                  <small>
-                    <PaymentStatus status={paper.payment_status} />
-                  </small>
-                </div>
-                {paper.payment_image &&
-                  <div className='col-12 col-md-6 col-lg-4'>
                     <div>
-                      <small className='fw-bold'>หลักฐานการชำระเงิน</small>
+                      <small className='fw-bold'>ชื่อบทความ</small>
+                    </div>
+                    <small>{paper.title}</small>
+                  </div>
+                  <div>
+                    <div>
+                      <small className='fw-bold'>รหัสบทความ</small>
+                    </div>
+                    <small>{paper.paper_code}</small>
+                  </div>
+                  <div>
+                    <div>
+                      <small className='fw-bold'>ผู้แต่ง</small>
+                    </div>
+                    <small>{paper.author}</small>
+                  </div>
+                  <div>
+                    <div>
+                      <small className='fw-bold'>ผู้ส่งบทความ</small>
+                    </div>
+                    <small>{paper.owner?.name} ({paper.owner?.username})</small>
+                  </div>
+                  <div>
+                    <div>
+                      <small className='fw-bold'>สถานะบทความ</small>
                     </div>
                     <small>
-                      <Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>
+                      <PaperStatus status={paper.status} />
                     </small>
                   </div>
-                }
-                <div className='col-12 col-md-6 col-lg-4'>
                   <div>
-                    <small className='fw-bold'>ที่อยู่ในการติดต่อ</small>
+                    <div>
+                      <small className='fw-bold'>ผลลัพธ์บทความ</small>
+                    </div>
+                    <small>
+                      <PaperResult status={paper.result} />
+                    </small>
                   </div>
-                  <small>
-                    {paper.address}
-                  </small>
-                </div>
-                <div className='col-12 col-md-6 col-lg-4'>
                   <div>
-                    <small className='fw-bold'>Email</small>
+                    <div>
+                      <small className='fw-bold'>สถานะชำระเงิน</small>
+                    </div>
+                    <small>
+                      <PaymentStatus status={paper.payment_status} />
+                    </small>
                   </div>
-                  <small>{paper.email}</small>
+                  {paper.payment_image ? (
+                    <div>
+                      <div>
+                        <small className='fw-bold'>หลักฐานการชำระเงิน</small>
+                      </div>
+                      <small>
+                        <Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>
+                      </small>
+                    </div>
+                  ) : (
+                    <div>
+                      <div>
+                        <small className='fw-bold'>หลักฐานการชำระเงิน</small>
+                      </div>
+                      <small>
+                        -
+                      </small>
+                    </div>
+                  )
+                  }
                 </div>
-                <div className='col-12 col-md-6 col-lg-4'>
-                  <div>
-                    <small className='fw-bold'>เบอร์โทร</small>
-                  </div>
-                  <small>{paper.contact}</small>
-                </div>
-                <div className='col-12'>
+                <div className='col-12 my-5'>
                   <h4>รายการบทความ</h4>
                   <div className="text-warning mb-3">
-                    ** กรุณาอัพโหลดไฟล์ ปิดชื่อ หรือ คลิก อนุญาติให้อ่านไฟล์ต้นฉบับ หากไม่ดำเนินการกรรมการจะไม่สามารถเห็นบทความได้
+                    ** กรุณาอัพโหลดไฟล์ ปิดชื่อ เนื่องจากหากไม่อัพโหลดกรรมการจะไม่สามารถอ่านไฟล์ได้
                   </div>
                   {paperFile.data &&
                     <div className='table-resonsive'>
@@ -369,9 +313,6 @@ function HostAssign() {
                             </th>
                             <th>
                               ไฟล์ต้นฉบับ
-                            </th>
-                            <th>
-                              อ่านไฟล์ต้นฉบับ
                             </th>
                             <th>
                               ไฟล์ปิดชื่อ
@@ -395,11 +336,6 @@ function HostAssign() {
                               </td>
                               <td>
                                 <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`} className='btn btn-link'>ดูไฟล์</Link>
-                              </td>
-                              <td>
-                                <div>
-                                  <input type='checkbox' checked={items.read_original} onChange={e => handleShowRead(e.target.checked, items._id)} />
-                                </div>
                               </td>
                               <td>
                                 {items.close_name_file ? (
@@ -431,10 +367,8 @@ function HostAssign() {
                   }
                   {paper.status === 'PENDING' && paper.deadline?.length > 0 &&
                     <div>
+                      <div className="form-text mb-3">ในกรณีที่มีการแก้ไขให้อัพโหลดไฟล์บทความปิดชื่อใหม่ และกด "ยืนยันการแก้ไข" เพื่อมอบหมายให้กรรมการตรวจอีกครั้ง</div>
                       <button onClick={() => handleShowEdit(paper.paper_code)} type='button' className='btn btn-primary'>ยืนยันการแก้ไข</button>
-                      <div className='text-warning'>
-                        ** กรุณาอัพโหลดไฟล์ปิดชื่อฉบับแก้ไข หรือ อนุญาติให้อ่านต้นฉบับ ก่อนทำการกดยืนยัน หากไม่ดำเนินการ กรรมการจะไม่สามารถอ่านบทความได้
-                      </div>
                     </div>
                   }
                 </div>
@@ -553,11 +487,11 @@ function HostAssign() {
                     </div>
                   }
                   <div className="text-end">
-                    <button 
-                    type='button' 
-                    onClick={() => setShowAssign(true)} 
-                    className='btn btn-primary' 
-                    disabled={newList.length < 3 && oldList.length <= 0}>
+                    <button
+                      type='button'
+                      onClick={() => setShowAssign(true)}
+                      className='btn btn-primary'
+                      disabled={newList.length < 3 && oldList.length <= 0}>
                       <i className="me-2 bi bi-check"></i>
                       ยืนยัน
                     </button>
@@ -630,7 +564,7 @@ function UploadCloseNameFile(props) {
   return (
     <Modal show={props.show} onHide={props.handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>อัพโหลดบทความฉบับปิดชื่อ:  <br/> <span className="text-primary">{props.data.name}</span></Modal.Title>
+        <Modal.Title>อัพโหลดบทความฉบับปิดชื่อ:  <br /> <span className="text-primary">{props.data.name}</span></Modal.Title>
       </Modal.Header>
       <form onSubmit={handleUpload}>
         <Modal.Body>
@@ -676,30 +610,32 @@ function HistotyDetail(props) {
         <Modal.Title>ประวัติการแก้ไข: {props.name}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className='table-responsive'>
-          <table className='table'>
-            <thead>
-              <tr>
-                <th>แก้ไขเมื่อ</th>
-                <th>ต้นฉบับ</th>
-                <th>ปิดชื่อ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.map((items) => (
-                <tr key={items._id}>
-                  <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
-                  <td>
-                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>View</Link>
-                  </td>
-                  <td>
-                    <Link target='_blank' rel='noreferrer' to={`/uploads/${items.close_name_file}`}>View</Link>
-                  </td>
+        {data.length > 0 ? (
+          <div className='table-responsive'>
+            <table className='table'>
+              <thead>
+                <tr>
+                  <th>แก้ไขเมื่อ</th>
+                  <th>ต้นฉบับ</th>
+                  <th>ปิดชื่อ</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {data?.map((items) => (
+                  <tr key={items._id}>
+                    <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+                    <td>
+                      <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>View</Link>
+                    </td>
+                    <td>
+                      <Link target='_blank' rel='noreferrer' to={`/uploads/${items.close_name_file}`}>View</Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : <div className="text-center">ไม่พบข้อมูล</div>}
       </Modal.Body>
     </Modal>
   )

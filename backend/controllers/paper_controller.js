@@ -179,12 +179,13 @@ async function getNextSequenceValue(sequenceId) {
 const createPaper = async (req, res) => {
     const {
         title,
+        abstract,
         paper_code,
         cate_code,
         confr_code,
         publication,
         regis_type,
-        advise,
+        title_en,
         group,
         university,
         keyword,
@@ -194,6 +195,8 @@ const createPaper = async (req, res) => {
         address
     } = req.body
 
+    console.log(req.body)
+    
     const user_id = req.user._id
 
     //check if user resumit but not cancel paper before
@@ -208,6 +211,7 @@ const createPaper = async (req, res) => {
         let paperCode = paper_code + paperId
         const paper = await Paper.create({
             title,
+            abstract,
             paper_code: paperCode,
             cate_code,
             confr_code,
@@ -219,7 +223,7 @@ const createPaper = async (req, res) => {
             contact,
             email,
             author,
-            advise,
+            title_en,
             group,
             keyword,
         })
@@ -373,7 +377,7 @@ const updatePaperResult = async (req, res) => {
         } catch (error) {
             res.status(400).json({ error: error.message })
         }
-    } else if (result === 'REVISE') {
+    } else if (result === 'MINOR' || result === 'MAJOR') {
         try {
             const paper = await Paper.findByIdAndUpdate(_id, { status: "SUCCESS", result }, { new: true })
             if (!paper) {
@@ -411,22 +415,23 @@ const updatePaperResult = async (req, res) => {
 // cancel paper
 const cancelPaper = async (req, res) => {
     const { _id } = req.user
+    const { id } = req.params
 
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: 'รหัสบทความไม่ถูกต้อง' })
     }
 
     try {
-        const find = await Paper.findOne({ _id, owner: req.user._id })
+        const find = await Paper.findOne({ _id: id, owner: _id })
         if (!find) {
-            return res.status(400).json({ error: 'Item not found' })
+            return res.status(400).json({ error: 'ไม่พบข้อมูลบทความ' })
         }
 
         if (find.status !== 'PENDING')
             return res.status(400).json({ error: 'ไม่สามารถยกเลิกบทความได้เนื่องจากมอบหมายให้กรรมการแล้ว' })
-        const paper = await Paper.findByIdAndUpdate(_id, { status: 'CANCEL' })
+        const paper = await Paper.findByIdAndUpdate(id, { status: 'CANCEL' })
         // create notification
-        await createNotification(req.user._id, `ยกเลิกบทความสำเร็จ`, `บทความ ${paper.paper_code} ถูกยกเลิกแล้ว`)
+        await createNotification(_id, `ยกเลิกบทความสำเร็จ`, `บทความ ${paper.paper_code} ถูกยกเลิกแล้ว`)
         res.status(204).send('Cancel paper success')
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -506,6 +511,22 @@ const getPaperForConference = async (req, res) => {
     }
 }
 
+// get only accept status
+const getPaperWithAcceptStatus = async (req, res) => {
+    const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({error : 'รหัสห้วข้องานประชุมไม่ถูกต้อง'})
+    }
+
+    try {
+        const paper = await Paper.find({cate_code: id, result: 'ACCEPT'})
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({error: error.message})
+    }
+}
+
 // get by category
 const getPaperByCategory = async (req, res) => {
     const { id } = req.params
@@ -548,10 +569,10 @@ const getConfrPaperAward = async (req, res) => {
 
     try {
         const paper = await Paper.find({
-            confr_code: id,
+            cate_code: id,
             award_rate: { $ne: null },
             result: 'ACCEPT'
-        }).populate('cate_code')
+        }).sort({'award_rate': 1})
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -648,6 +669,7 @@ const hostSeachPaper = async (req, res) => {
         const items = await Paper.find(query)
             .limit(limit * 1)
             .skip((page - 1) * limit)
+            .populate('cate_code')
             .exec()
         const count = await Paper.countDocuments(query)
         res.status(200).json({
@@ -860,14 +882,12 @@ const editPaperStatus = async (req, res) => {
 const editPaperDetail = async (req, res) => {
     const { id } = req.params
 
-    const { _id } = req.user
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "รหัสบทความไม่ถูกต้อง" })
     }
-
+    
     try {
-        const update = await Paper.findOneAndUpdate({ _id: id, owner: _id }, req.body, { new: true })
+        const update = await Paper.findOneAndUpdate({ _id: id }, req.body, { new: true })
         res.status(200).json(update)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -981,5 +1001,6 @@ module.exports = {
     UnPublicPaper,
     rejectPaper,
     uploadPayment,
-    checkPayment
+    checkPayment,
+    getPaperWithAcceptStatus
 }

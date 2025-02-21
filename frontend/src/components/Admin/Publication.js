@@ -308,16 +308,6 @@ function CreatePubModal(props) {
                             onChange={handleChange}
                         />
                     </div>
-                    <div className='mb-3'>
-                        <button
-                            className='btn btn-success'
-                            type='button'
-                            onClick={handleAdd}
-                        >
-                            <i className="bi bi-plus-lg me-2"></i>
-                            เพิ่มรายละเอียด
-                        </button>
-                    </div>
                     <div key={key}>
                         {form.desc.map((items, index) => (
                             <div key={index} className='mb-3'>
@@ -340,6 +330,16 @@ function CreatePubModal(props) {
                                 />
                             </div>
                         ))}
+                    </div>
+                    <div className='mt-3'>
+                        <button
+                            className='btn btn-success'
+                            type='button'
+                            onClick={handleAdd}
+                        >
+                            <i className="bi bi-plus-lg me-2"></i>
+                            เพิ่มรายละเอียด
+                        </button>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
@@ -451,19 +451,13 @@ function EditPubModal(props) {
                     </div>
                     <div>
                         <p className="fw-bold mb-0">รายละเอียดวารสาร</p>
-                        <div className="mb-3">
-                            <Button type="button" onClick={handleAdd} variant="success">
-                                <i className="bi bi-plus-lg me-2"></i>
-                                เพิ่มรายละเอียด
-                            </Button>
-                        </div>
                         <div className="row g-3">
                             {data?.desc.map((items, index) => (
                                 <div key={index}>
                                     <div className="form-text">
                                         ข้อที่: {index + 1}
                                     </div>
-                                    <hr/>
+                                    <hr />
                                     <label className="form-label">
                                         รายละเอียด
                                     </label>
@@ -482,6 +476,12 @@ function EditPubModal(props) {
                                     />
                                 </div>
                             ))}
+                        </div>
+                        <div className="mt-3">
+                            <Button type="button" onClick={handleAdd} variant="success">
+                                <i className="bi bi-plus-lg me-2"></i>
+                                เพิ่มรายละเอียด
+                            </Button>
                         </div>
                     </div>
                 </Modal.Body>

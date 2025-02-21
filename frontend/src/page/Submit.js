@@ -30,7 +30,8 @@ function Submit() {
             return
         }
         const {
-            advise,
+            title_en,
+            abstract,
             group,
             university,
             cate_paper_code,
@@ -43,14 +44,17 @@ function Submit() {
             email,
             regis_type,
         } = e.target
-        console.log(title.value)
         let cateCode = cate_paper_code.value.split(",")
         const formData = new FormData()
         try {
-            formData.append('advise', advise.value)
+            if (pub.length > 0) {
+                formData.append('publication', publication.value)
+            }
+
+            formData.append('abstract', abstract.value)
+            formData.append('title_en', title_en.value)
             formData.append('group', group.value)
             formData.append('university', university.value)
-            formData.append('publication', publication.value)
             formData.append('title', title.value)
             formData.append('keyword', keyword.value)
             formData.append('author', author.value)
@@ -101,8 +105,9 @@ function Submit() {
             try {
                 const res = await axios.get('/api/conference/single/' + id)
                 setConfr(res.data)
-                setPub(res.data.publication)
-                if(res.data.status) {
+                const Pub = await axios.get('/api/publication/confr/' + id)
+                setPub(Pub.data)
+                if (res.data.status) {
                     setIsOpen(true)
                 }
             } catch (error) {
@@ -123,7 +128,7 @@ function Submit() {
         getCateCode();
     }, [id])
 
-    if(!isOpen) {
+    if (!isOpen) {
         return <div>งานประชุมนี้ไม่ได้เปิดให้ส่งบทความ</div>
     }
 
@@ -145,75 +150,124 @@ function Submit() {
                         <h1 className='text-white d-block d-md-none mb-4'>ส่งบทความ</h1>
                         <div className='card'>
                             <div className='card-body'>
-                                <div className='row gy-3'>
+                                <div className='row g-3 bg-light'>
                                     <div>
-                                        <label className='form-label'>อาจารย์ประจำวิชา</label>
-                                        <input name='advise' className='form-control' required />
+                                        <label className='form-label'>ชื่อบทความ (ภาษาไทย) <span className="text-danger">*</span></label>
+                                        <input
+                                            className='form-control'
+                                            name='title'
+                                            required
+                                        />
                                     </div>
                                     <div>
-                                        <label className='form-label'>คณะ</label>
-                                        <input name='group' className='form-control' required />
+                                        <label className='form-label'>ชื่อบทความ (ภาษาอังกฤษ) <span className="text-danger">*</span></label>
+                                        <input
+                                            className='form-control'
+                                            name='title_en'
+                                            required
+                                        />
                                     </div>
                                     <div>
-                                        <label className='form-label'>มหาวิทยาลัย</label>
-                                        <input name='university' className='form-control' required />
+                                        <label className='form-label'>ชื่อผู้แต่ง <span className="text-danger">*</span></label>
+                                        <textarea
+                                            className='form-control'
+                                            name='author'
+                                            required
+                                            rows={5}
+                                        />
+                                        <div className="form-text">
+                                            เพิ่มชื่อผู้แต่งโดยการคั่นด้วยเครื่องหมาย , ระหว่างผู้แต่ง เช่น ชื่อ นามสกุล,ชื่อ นามสกุล เป็นต้น <br /> ** ระบุชื่อผู้แต่งทุกท่าน
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className='form-label'>ประเภทบทความ</label>
+                                        <label className="form-label">Abstract <span className="text-danger">*</span></label>
+                                        <textarea
+                                            className='form-control'
+                                            name='abstract'
+                                            required
+                                            rows={10}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className='form-label'>คำสำคัญ <span className="text-danger">*</span></label>
+                                        <textarea
+                                            className='form-control'
+                                            name='keyword'
+                                            required
+                                            rows={5}
+                                        />
+                                        <div className="form-text">
+                                            เพิ่มคำสำคัญโดยการคั่นคำด้วยเครื่องหมาย , ระหว่างคำที่ต้องการเพิ่ม เช่น ส่งบทความ,วิชาการ เป็นต้น
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className='form-label'>หัวข้อ <span className="text-danger">*</span></label>
                                         <select className="form-select" name='cate_paper_code' required disabled={cate.length <= 0}>
-                                            <option defaultChecked>-- เลือกประเภทบทความ</option>
+                                            <option defaultChecked>-- เลือกหัวข้อ</option>
                                             {cate?.map(list => (
                                                 <option key={list._id} value={`${list._id},${list.category_code}`}>{list.name}</option>
                                             ))}
                                         </select>
                                     </div>
                                     <div>
-                                        <label className='form-label'>วารสาร</label>
-                                        <select name='publication' className="form-select" required disabled={pub.length <= 0}>
-                                            <option defaultChecked>-- เลือกวารสาร</option>
-                                            {pub?.map(list => (
-                                                <option key={list._id} value={list._id}>{list.en_name} ({list.th_name})</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className='form-label'>ประเภทการลงทะเบียน</label>
+                                        <label className='form-label'>ประเภทการลงทะเบียน <span className="text-danger">*</span></label>
                                         <select name='regis_type' className="form-select" required>
-                                            <option defaultChecked>-- เลือกประเภทการลงทะเบียน</option>
+                                            <option defaultChecked value=''>-- เลือกประเภทการลงทะเบียน</option>
                                             <option value={true}>Early Bird</option>
                                             <option value={false}>Regular</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label className='form-label'>ชื่อบทความ</label>
-                                        <input className='form-control' name='title' required />
+                                        <label className='form-label'>คณะ <span className="text-danger">*</span></label>
+                                        <input name='group' className='form-control' required />
                                     </div>
                                     <div>
-                                        <label className='form-label'>คำสำคัญ</label>
-                                        <textarea className='form-control' name='keyword' required />
+                                        <label className='form-label'>มหาวิทยาลัย <span className="text-danger">*</span></label>
+                                        <input name='university' className='form-control' required />
+                                    </div>
+                                    {pub.length > 0 &&
+                                        <div>
+                                            <label className='form-label'>วารสาร</label>
+                                            <select name='publication' className="form-select">
+                                                <option defaultChecked value=''>-- ไม่เลือกวารสาร</option>
+                                                {pub?.map(list => (
+                                                    <option key={list._id} value={list._id}>{list.en_name} ({list.th_name})</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    }
+                                    <div>
+                                        <label className='form-label'>ที่อยู่ในการติดต่อ <span className="text-danger">*</span></label>
+                                        <textarea
+                                            name='address'
+                                            className='form-control'
+                                            required
+                                            rows={3}
+                                        />
                                     </div>
                                     <div>
-                                        <label className='form-label'>ชื่อผู้เขียน</label>
-                                        <textarea className='form-control' name='author' required />
-                                    </div>
-                                    <div>
-                                        <label className='form-label'>ที่อยู่ในการติดต่อ</label>
-                                        <textarea name='address' className='form-control' required />
-                                    </div>
-                                    <div>
-                                        <label className='form-label'>เบอร์โทรศัพท์</label>
-                                        <input name='contact' pattern='[0-9]{10}' maxLength={10} className='form-control' required />
+                                        <label className='form-label'>เบอร์โทรศัพท์ <span className="text-danger">*</span></label>
+                                        <input
+                                            name='contact'
+                                            pattern='[0-9]{10}'
+                                            maxLength={10}
+                                            className='form-control'
+                                            required
+                                        />
                                         <div className="form-text">
                                             เฉพาะหมายเลขจำนวน 10 หลักเท่านั้น
                                         </div>
                                     </div>
                                     <div>
-                                        <label className='form-label'>อีเมล</label>
+                                        <label className='form-label'>อีเมล <span className="text-danger">*</span></label>
                                         <input type='email' className='form-control' name='email' required />
+                                        <div className='form-text'>
+                                            ใช้สำหรับรับจดหมายเชิญเข้าร่วมงานประชุม
+                                        </div>
                                     </div>
                                     {paper.map((items, index) => (
                                         <div key={index} className="mb-2">
-                                            <div className="form-text">ไฟล์ที่: {index + 1}</div>
+                                            <div className="form-text">ไฟล์ที่: {index + 1} <span className="text-danger">*</span></div>
                                             <hr />
                                             <div className="mb-3">
                                                 <label className='form-label'>ชื่อไฟล์</label>
@@ -231,7 +285,7 @@ function Submit() {
                                                     <input
                                                         onChange={e => handleChangeFile(e, index)}
                                                         type='file'
-                                                        accept='.doc, .pdf'
+                                                        accept='.docx, .pdf'
                                                         className='form-control'
                                                         required />
                                                     <button type='button' onClick={() => handleDelFile(index)} className="btn btn-outline-danger">
@@ -276,11 +330,15 @@ function Submit() {
                             {err &&
                                 <p className='text-danger fw-bold'>{err}</p>
                             }
-                            <p>
-                                ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม {confr?.title} และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง
-                            </p>
+                            <div className="mb-3">
+                                ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม
+                                <div>
+                                    {confr?.title}
+                                </div>
+                                และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง
+                            </div>
                             <div>
-                                <button type='submit' className='btn btn-light text-dark fw-bold'>ส่งบทความ</button>
+                                <button type='submit' className='btn btn-primary'>ส่งบทความ</button>
                             </div>
                         </div>
                     </div>

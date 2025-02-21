@@ -53,7 +53,7 @@ function Venue() {
                     </div>
                     <div className='card  shadow-sm'>
                         <div className='card-body'>
-                            <div className='d-flex justify-content-between align-items-center mb-3'>
+                            <div className='d-md-flex justify-content-between align-items-center mb-3'>
                                 <h4>รายละเอียดสถานที่จัดงาน</h4>
                                 <div>
                                     <button className='btn btn-outline-dark me-2' onClick={() => setShowModal(true)}>
@@ -71,7 +71,9 @@ function Venue() {
                             <div>
                                 <div>
                                     {data?.venue_image &&
-                                        <img src={'/uploads/' + data?.venue_image} alt={data?.venue.name} className='img-fluid' />
+                                        <div className="mb-5">
+                                            <img src={'/uploads/' + data?.venue_image} alt={data?.venue.name} className='img-fluid' />
+                                        </div>
                                     }
                                 </div>
                                 <div>
@@ -135,7 +137,7 @@ function ModalVenue(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>รายละเอียดบัญชี</Modal.Title>
+                <Modal.Title>แก้ไขรายละเอียดสถานที่</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body className='row g-3'>
@@ -151,16 +153,6 @@ function ModalVenue(props) {
                         <p>
                             รายละเอียดสถานที่จัดงาน:
                         </p>
-                        <div>
-                            <button
-                                className='btn btn-outline-primary btn-sm'
-                                type='button'
-                                onClick={handleAdd}>
-                                <i className='me-2 bi bi-plus'></i>
-                                เพิ่มรายละเอียดสถานที่
-                            </button>
-                        </div>
-
                     </div>
                     <div className="row g-3">
                         {edit?.desc.map((items, index) => (
@@ -171,22 +163,33 @@ function ModalVenue(props) {
                                 <hr />
                                 <div className="mb-3">
                                     <label className='form-label'>รายละเอียดสถานที่</label>
-                                    <button
-                                        onClick={() => handleDelete(index)}
-                                        type='button'
-                                        className="btn btn-outline-danger ms-2"
-                                        >
-                                        ลบย่อหน้านี้
-                                    </button>
                                 </div>
                                 <textarea
-                                    className='form-control'
+                                    className='form-control mb-3'
                                     defaultValue={items}
                                     onChange={e => handleChange(e, index)}
                                     rows={5}
+                                    required
                                 />
+                                <button
+                                    onClick={() => handleDelete(index)}
+                                    type='button'
+                                    className="btn btn-outline-danger"
+                                >
+                                    <i className="bi bi-trash me-1"></i>
+                                    ลบย่อหน้านี้
+                                </button>
                             </div>
                         ))}
+                    </div>
+                    <div>
+                        <button
+                            className='btn btn-outline-primary'
+                            type='button'
+                            onClick={handleAdd}>
+                            <i className='me-2 bi bi-plus'></i>
+                            เพิ่มรายละเอียดสถานที่
+                        </button>
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>Link สำหรับข้อมูลเพิ่มเติม</label>
@@ -230,7 +233,7 @@ function ModalUploadVenue(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>รายละเอียดบัญชี</Modal.Title>
+                <Modal.Title>อัพโหลดรูป</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body>

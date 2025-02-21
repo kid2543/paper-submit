@@ -11,7 +11,8 @@ const Status = {
 const Result = {
     PENDING: 'PENDING',
     ACCEPT: 'ACCEPT',
-    REVISION: 'REVISE',
+    MINOR: 'MINOR',
+    MAJOR: 'MAJOR',
     REJECT: 'REJECT'
 }
 

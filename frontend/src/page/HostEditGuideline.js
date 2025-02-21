@@ -143,7 +143,13 @@ function PresenterModal(props) {
                 ข้อที่: {index + 1}
               </div>
               <hr />
-              <div className="text-end mb-3">
+              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
+              <textarea
+                rows={5}
+                className='form-control'
+                value={items}
+                onChange={e => handleChange(e, index)} />
+              <div className="mt-3">
                 <button
                   type='button'
                   onClick={() => handleDelete(index)}
@@ -153,12 +159,6 @@ function PresenterModal(props) {
                   ลบรายละเอียด
                 </button>
               </div>
-              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
-              <textarea
-                rows={5}
-                className='form-control'
-                value={items}
-                onChange={e => handleChange(e, index)} />
             </div>
           ))}
         </div>
@@ -228,12 +228,6 @@ function ChairModal(props) {
                 ข้อที่: {index + 1}
               </div>
               <hr />
-              <div className="mb-3 text-end">
-                <button type='button' onClick={() => handleDelete(index)} className="btn btn-outline-danger">
-                  <i className="bi bi-trash me-2"></i>
-                  ลบรายละเอียด
-                </button>
-              </div>
               <label className='form-label'>รายละเอียดข้อแนะนำ</label>
               <textarea
                 className='form-control'
@@ -241,6 +235,12 @@ function ChairModal(props) {
                 rows={5}
                 onChange={e => handleChange(e, index)}
               />
+              <div className="mt-3">
+                <button type='button' onClick={() => handleDelete(index)} className="btn btn-outline-danger">
+                  <i className="bi bi-trash me-2"></i>
+                  ลบรายละเอียด
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -310,7 +310,14 @@ function AudienceModal(props) {
                 ข้อที่: {index + 1}
               </div>
               <hr />
-              <div className='text-end mb-3'>
+              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
+              <textarea
+                className='form-control'
+                value={items}
+                onChange={e => handleChange(e, index)}
+                rows={5}
+              />
+              <div className='mt-3'>
                 <button
                   className="btn btn-outline-danger"
                   type='button'
@@ -320,13 +327,6 @@ function AudienceModal(props) {
                   ลบรายละเอียด
                 </button>
               </div>
-              <label className='form-label'>รายละเอียดข้อแนะนำ</label>
-              <textarea
-                className='form-control'
-                value={items}
-                onChange={e => handleChange(e, index)}
-                rows={5}
-              />
             </div>
           ))}
         </div>

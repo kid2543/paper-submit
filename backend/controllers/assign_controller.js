@@ -257,7 +257,7 @@ const editReview = async (req, res) => {
     }
 
     try {
-        const find = await paperAssign.find({ paper_id: id })
+        const find = await paperAssign.find({ paper_id: id, result: {$ne: 'ACCEPT'} })
         if (!find) {
             return res.status(404).json({ error: 'ไม่พบข้อมูลรายการตรวจบทความ' })
         }
@@ -282,7 +282,8 @@ const editReview = async (req, res) => {
             })
             await createNotification(find[i].reviewer, `มีการมอบหมายบทความฉบับแก้ไข`, `บทความ ${paper_code} แก้ไขเรียบร้อยรอการประเมิน`)
         }
-        await Paper.findByIdAndUpdate(id, { status: "REVIEW" })
+        const paper = await Paper.findByIdAndUpdate(id, { status: "REVIEW" }, {new : true})
+        res.status(200).json(paper)
     } catch (error) {
         console.log(error)
         res.status(400).json({ error: error.message })

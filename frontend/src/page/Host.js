@@ -267,18 +267,18 @@ function Host() {
                     type="checkbox"
                     checked={data?.status}
                     onChange={e => handleShowStatus(e.target.checked)}
-                    disabled={data.publication.length <= 0 || Cate.length <= 0}
+                    disabled={Cate.length <= 0}
                   />
                   <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{data?.status ? 'เปิด' : 'ปิด'}</label>
                 </div>
               </div>
               <div className='col-12'>
-                <div className='btn-group'>
-                  <Link className='btn btn-outline-primary' to='/host/edit'>
+                <div className='d-flex'>
+                  <Link className='btn btn-primary me-2' to='/host/edit'>
                     <i className='bi bi-pencil-square me-2'></i>
                     แก้ไขงานประชุม
                   </Link>
-                  <Link className='btn btn-outline-dark' to={`/confr/${id}`}>
+                  <Link className='btn btn-outline-primary me-2' to={`/confr/${id}`}>
                     <i className='bi bi-eye me-2'></i>
                     ดูงานประชุม
                   </Link>
@@ -355,6 +355,9 @@ function Host() {
                         รหัส
                       </th>
                       <th>
+                        หัวข้อ
+                      </th>
+                      <th>
                         สถานะ
                       </th>
                       <th>
@@ -369,7 +372,7 @@ function Host() {
                     {searchPaper.data?.map((items, index) => (
                       <tr key={items._id}>
                         <td>
-                          {index + 1}
+                          {(searchPaper.page - 1) * 10 + (index + 1)}
                         </td>
                         <td>
                           {items.title}
@@ -378,17 +381,20 @@ function Host() {
                           {items.paper_code}
                         </td>
                         <td>
+                          {items.cate_code?.name}
+                        </td>
+                        <td>
                           <PaperStatus status={items.status} />
                         </td>
                         <td>
                           <PaperResult status={items.result} />
                         </td>
                         <td>
-                          <div className="btn-group" role="group" aria-label="Basic example">
-                            <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-outline-primary">
-                              <i className="bi bi-pen"></i>
+                          <div className="btn-group">
+                            <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-light">
+                              <i className="bi bi-pencil-square"></i>
                             </Link>
-                            <Link to={`/host/assign/${items._id}/${items.cate_code}`} type="button" className="btn btn-outline-primary">
+                            <Link to={`/host/assign/${items._id}/${items.cate_code?._id}`} type="button" className="btn btn-light">
                               <i className="bi bi-people"></i>
                             </Link>
                           </div>

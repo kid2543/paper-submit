@@ -1,31 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useFetch from '../hook/useFetch'
 import { Link, useParams } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
+import axios from 'axios'
 
 function ConfrPaperAward() {
 
     const { id } = useParams()
-    const {
-        data,
-        error,
-        status
-    } = useFetch('/api/paper/confr/award/' + id)
 
-    console.log(data)
-
-    const handleSplit = (author) => {
-        const arr = author.split(",")
-        return arr
-    }
-
-    if (status === 'idle' || status === 'loading') {
-        return <LoadingPage />
-    }
-
-    if (error) {
-        return <div>Error...</div>
-    }
+    const topic = useFetch('/api/category/' + id)
 
     return (
         <div>
@@ -35,40 +18,75 @@ function ConfrPaperAward() {
                     <p className='text-muted'>ดูบทความที่ได้รับรางวัลได้ที่นี่</p>
                 </div>
             </section>
-            <section style={{ padding: "64px 0px" }}>
-                {data && 
+            <section style={{ padding: '64px 0px' }}>
+                <div className="container">
                     <div className="row row-cols-1 g-3">
-                        {data.map((items) => (
-                            <div key={items._id} className="card">
+                        {topic.data?.map((items) => (
+                            <div className="card" key={items._id}>
                                 <div className="card-body">
-                                    <h4 className="card-title">
-                                        อันดับที่: {items.award_rate}
-                                    </h4>
-                                    <div className="card-text">
-                                        {items.title}
-                                    </div>
-                                    <div className='row g-3'>
-                                        <div className="">
-                                            {handleSplit(items.author).map((authors,index) => (
-                                                <span key={index} className="badge bg-primary">{authors}</span>
-                                            ) )}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <Link 
-                                        to={'/paper/' + items._id} 
-                                        className="btn btn-outline-dark">
-                                            ดูเพิ่มเติม
-                                        </Link>
-                                    </div>
+                                    <h4>{items.name}</h4>
+                                    <PaperAward id={items._id} />
                                 </div>
                             </div>
                         ))}
                     </div>
-                }
+                </div>
             </section>
         </div>
     )
 }
 
 export default ConfrPaperAward
+
+function PaperAward({ id }) {
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        const fetchPaper = async () => {
+            try {
+                const res = await axios.get('/api/paper/confr/award/' + id)
+                setData(res.data)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        if (id) {
+            fetchPaper()
+        }
+
+    }, [id])
+
+    const handleAuthor = (list) => {
+        let arr = list.split(",")
+        return arr
+    }
+
+    return (
+        <>
+            {data.length > 0 ? (
+                <ul>
+                    {data?.map(items => (
+                        <li key={items._id}>
+                            <div className="fw-bold">อันดับที่ {items.award_rate}</div>
+                            <div>
+                                {items.paper_code}
+                            </div>
+                            <div>
+                                {items.title}
+                            </div>
+                            <div className="mt-3">
+                                ผู้แต่ง:<br />
+                                {handleAuthor(items.author)?.map((authors,index) => (
+                                    <span className="badge text-bg-primary me-2" key={index}>
+                                        {authors}
+                                    </span>
+                                ))}
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            ) : '-'}
+        </>
+    )
+}

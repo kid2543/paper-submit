@@ -19,10 +19,6 @@ const paperFileSchema = mongoose.Schema(
             ref: Paper,
             required: true
         },
-        read_original: {
-            type: Boolean,
-            default: false
-        }
     }, { timestamps: true }
 )
 

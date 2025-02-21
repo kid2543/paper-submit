@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const User = require('./user')
-const Publication = require('./publication')
 const Conferences = require('./conferences')
 const Category = require("./category")
 
@@ -18,7 +17,8 @@ const Status = {
 const Result = {
     PENDING: 'PENDING',
     ACCEPT: 'ACCEPT',
-    REVISE: 'REVISE',
+    MINOR: 'MINOR',
+    MAJOR: 'MAJOR',
     REJECT: 'REJECT'
 }
 
@@ -41,12 +41,15 @@ const paperSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        abstract: {
+            type: String
+        },
         paper_code: {
             type: String,
             required: true,
             unique: true
         },
-        advise: {
+        title_en: {
             type: String,
         },
         group:{
@@ -91,8 +94,7 @@ const paperSchema = mongoose.Schema(
             default: Result.PENDING
         },
         publication: {
-            type:mongoose.Schema.Types.ObjectId,
-            ref: Publication,
+            type: String
         },
         regis_type: {
             type: Boolean,

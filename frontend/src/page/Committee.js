@@ -23,28 +23,28 @@ function Committee() {
     const [show, setShow] = useState(false)
     const [historyData, setHistoryData] = useState({
         id: "",
-        paper_name: ""
+        paper_code: ""
     })
 
     const handleClose = () => {
         setHistoryData({
             id: "",
-            paper_name: ""
+            paper_code: ""
         })
         setShow(false)
     }
-    const handleShow = (id, paper_name) => {
+    const handleShow = (id, paper_code) => {
         setHistoryData({
-            id: id,
-            paper_name: paper_name
+            id,
+            paper_code
         })
         setShow(true)
     }
 
     const reviewStatus = (status) => {
         switch (status) {
-            case "PENDING": return <span className="badge rounded-pill bg-primary">รอดำเนินการ</span>
-            case "SUCCESS": return <span className="badge rounded-pill bg-success">ตรวจแล้ว</span>
+            case "PENDING": return <span className="badge rounded-pill bg-primary">รอการพิจารณา</span>
+            case "SUCCESS": return <span className="badge rounded-pill bg-success">พิจารณาแล้ว</span>
             case "CANCEL": return <span className="badge rounded-pill bg-danger">ยกเลิก</span>
             default: return <span className="badge rounded-pill bg-secondary">ไม่ระบุ</span>
         }
@@ -71,7 +71,7 @@ function Committee() {
     }
 
     return (
-        <div className="bg-light" style={{minHeight: '100vh'}}>
+        <div className="bg-light" style={{ minHeight: '100vh' }}>
             <div className='container py-3'>
                 <div className='card shadow-sm mb-3'>
                     <div className='card-body'>
@@ -114,12 +114,11 @@ function Committee() {
                                                             <td>
                                                                 <Dropdown>
                                                                     <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
-                                                                        เพิ่มเติม
                                                                     </Dropdown.Toggle>
 
                                                                     <Dropdown.Menu>
                                                                         {handleReviewStatus(paperList.status, paperList._id, paperList.paper_id.confr_code)}
-                                                                        <Dropdown.Item onClick={() => handleShow(paperList._id, paperList.paper_id.title)} ><i className="bi bi-clock-history me-2"></i>ดูประวัติ</Dropdown.Item>
+                                                                        <Dropdown.Item onClick={() => handleShow(paperList._id, paperList.paper_id.paper_code)} ><i className="bi bi-clock-history me-2"></i>ดูประวัติ</Dropdown.Item>
                                                                     </Dropdown.Menu>
                                                                 </Dropdown>
 
@@ -128,7 +127,11 @@ function Committee() {
                                                     ))}
                                                 </tbody>
                                             </table>
-                                            <ViewHistory data={historyData} handleClose={handleClose} show={show} />
+                                            <ViewHistory
+                                                data={historyData}
+                                                handleClose={handleClose}
+                                                show={show}
+                                            />
                                         </div>
                                     </div>
                                 ) : "ไม่พบรายการที่ต้องตรวจ"}
@@ -166,10 +169,10 @@ function ViewHistory(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>บทความ: {props.data.paper_name}</Modal.Title>
+                <Modal.Title>ประวัติการตรวจ {props.data.paper_code}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {data &&
+                {data.length > 0 ? (
                     <div>
                         {data.map((items) => (
                             <div key={items._id} className='card mb-3'>
@@ -194,6 +197,7 @@ function ViewHistory(props) {
                             </div>
                         ))}
                     </div>
+                ) : <div className="text-center">ไม่พบข้อมูล</div>
                 }
             </Modal.Body>
             <Modal.Footer>

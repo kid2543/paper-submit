@@ -9,6 +9,7 @@ import PaginationComponent from '../components/Pagination';
 import useSearch from '../hook/useSearch';
 import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
+import PaymentStatus from '../components/PaymentStatus';
 
 function Author() {
 
@@ -26,7 +27,8 @@ function Author() {
     handleLastPage,
     handleNumberPage,
     page,
-    totalPages
+    totalPages,
+    setData
   } = useSearch('/api/paper/author/search')
 
 
@@ -45,14 +47,11 @@ function Author() {
   }
 
 
-  const handleDelPaper = async (paper_id) => {
+  const handleDelPaper = async () => {
     try {
-      await axios.patch('/api/paper/cancel', {
-        _id: paper_id
-      }
-      )
-      toast.success('ลบบทความสำเร็จ')
-      setPaper(paper.filter((items) => items._id !== paper_id))
+      await axios.patch('/api/paper/cancel/' + deleteId)
+      setData(data.filter((items) => items._id !== deleteId))
+      toast.success('ยกเลิกบทความสำเร็จ')
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -96,7 +95,9 @@ function Author() {
         show={showDeleteConfirm}
       />
       <div style={{ minHeight: "600px" }}>
-        {paper.length > 0 ? (
+        {paper.length <= 0 ? (
+          <NavLink to="/confr" className='btn btn-primary btn-lg'>ส่งบทความใหม่ได้ที่นี่!</NavLink>
+        ) : (
           <div>
             <div>
               <div className='d-flex justify-content-between mb-3 align-items-center'>
@@ -159,6 +160,9 @@ function Author() {
                               ผลลัพธ์: <PaperResult status={items.result} />
                             </div>
                             <div className="list-group-item">
+                              สถานะการชำระเงิน: <PaymentStatus status={items.payment_status} />
+                            </div>
+                            <div className="list-group-item">
                               วันที่ส่งบทความ: {dayjs(items.createdAt).format('DD MMM YYYY HH:mm น.')}
                             </div>
                             <div className="list-group-item">
@@ -204,10 +208,8 @@ function Author() {
               </div>
             </div>
           </div>
-        ) : (
-          <NavLink to="/confr" className='btn btn-primary btn-lg'>ส่งบทความเลย!</NavLink>
-        )}
-
+        )
+        }
       </div>
     </div>
   )

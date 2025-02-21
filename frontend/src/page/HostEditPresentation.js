@@ -121,19 +121,19 @@ function GuidelineModal(props) {
                         <div className='col-12' key={index}>
                             <div className='form-text'>ข้อแนะนำ: {index + 1}</div>
                             <hr />
-                            <div className="text-end mb-3">
-                            <button className="btn btn-outline-danger" type='button'>
-                                <i className="bi bi-trash me-2"></i>
-                                ลบข้อแนะนำนี้
-                            </button>
-                            </div>
                             <label className="form-label">ข้อแนะนำ</label>
                             <textarea
                                 className='form-control'
                                 value={items}
                                 onChange={e => handleChange(e, index)}
-                                rows={5}
+                                rows={8}
                             />
+                            <div className="mt-3">
+                                <button className="btn btn-outline-danger" type='button'>
+                                    <i className="bi bi-trash me-2"></i>
+                                    ลบข้อแนะนำนี้
+                                </button>
+                            </div>
                         </div>
                     ))}
                     <div>
@@ -179,13 +179,18 @@ function RemarkModal(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>ข้อแนะนำการนำเสนอ</Modal.Title>
+                <Modal.Title>รายละเอียดเพิ่มเติม</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body className='row'>
                     <div className='col-12'>
                         <label className='form-label'>รายละเอียดเพิ่มเติม</label>
-                        <textarea className='form-control' value={remark} onChange={e => setRemark(e.target.value)} />
+                        <textarea
+                            className='form-control'
+                            value={remark}
+                            onChange={e => setRemark(e.target.value)}
+                            rows={5}
+                        />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

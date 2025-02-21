@@ -170,7 +170,7 @@ const editConference = async (req, res) => {
     }
 
     try {
-        const confr = await Conferences.findByIdAndUpdate(_id, req.body, { new: true }).populate('publication')
+        const confr = await Conferences.findByIdAndUpdate(_id, req.body, { new: true })
         res.status(200).json(confr)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -218,7 +218,7 @@ const singleConference = async (req, res) => {
     }
 
     try {
-        const confr = await Conferences.findOne({ _id: id }).populate("publication")
+        const confr = await Conferences.findOne({ _id: id })
         if (!confr) {
             return res.status(404).json({ error: 'Item not found' })
         }
@@ -237,7 +237,7 @@ const getConferenceHost = async (req, res) => {
     }
 
     try {
-        const confr = await Conferences.findOne({ _id: id }).populate("publication")
+        const confr = await Conferences.findOne({ _id: id })
         if (!confr) {
             return res.status(404).json({ error: 'ไม่พบข้อมูลงานประชุม' })
         }

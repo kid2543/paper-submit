@@ -115,7 +115,7 @@ function EditQuestion() {
                                                             required
                                                             rows={3}
                                                         />
-                                                        <button className='btn btn-danger' type='button' onClick={() => handleDel(index)}>
+                                                        <button className='btn btn-outline-danger' type='button' onClick={() => handleDel(index)}>
                                                             <i className='bi bi-trash'></i>
                                                         </button>
                                                     </div>

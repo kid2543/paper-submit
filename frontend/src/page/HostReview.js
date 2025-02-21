@@ -3,9 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus';
 
-// react bootstrap
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
 
 import PaymentStatus from '../components/PaymentStatus';
 import dayjs from 'dayjs';
@@ -48,30 +45,12 @@ function HostReview() {
     fetchReview()
   }, [id])
 
-  // handle history
-
-  const [show, setShow] = useState(false);
-  const [history, setHistory] = useState({
-    id: '',
-    reviewer: ''
-  })
-
-  const handleClose = () => {
-    setHistory({ id: '', reviewer: '' })
-    setShow(false)
-  }
-
-  const handleShow = (id, reviewer) => {
-    setHistory({ id, reviewer })
-    setShow(true)
-
-  };
 
   // end history
 
   const handleResult = async (e) => {
     e.preventDefault()
-    if (result === 'REVISE') {
+    if (result === 'MAJOR' || result === 'MINOR') {
       try {
         const res = await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
         toast.success('เปลี่ยนสถานะสำเร็จ')
@@ -135,17 +114,42 @@ function HostReview() {
   }
 
   // handleSubmit payment
+  const [paymentStatus, setPaymentStatus] = useState('')
+  const [paymentLoading, setPaymentLoading] = useState(false)
+  const [showPayment, setShowPayment] = useState(false)
+
+  const handleShowPayment = () => {
+    if (!paymentStatus) {
+      toast.warning('กรุณาเลือกสถานะก่อนทำการกดยืนยัน')
+    } else {
+      setPaymentStatus(paymentStatus)
+      setShowPayment(true)
+    }
+  }
+
+  const handleClosePayment = () => {
+    setPaymentStatus('')
+    setShowPayment(false)
+  }
+
   const handleSubmitPayment = async (e) => {
+    setPaymentLoading(true)
     e.preventDefault()
+    if (!paymentStatus) {
+      toast.warning('กรุณาเลือกสถานะ ก่อนทำการกดยืนยัน')
+      return
+    }
     try {
       const res = await axios.patch('/api/paper/check/payment/' + id, {
-        payment_status: e.target.payment_status.value
+        payment_status: paymentStatus
       })
       setPaper(res.data)
       toast.success('ยืนยันสถานะ การชำระเงินเสร็จสิ้น')
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุราลองใหม่อีกครั้ง')
+    } finally {
+      setPaymentLoading(false)
     }
   }
 
@@ -181,6 +185,21 @@ function HostReview() {
     }
   }
 
+  // handleUpdate
+  const UpdateDetail = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await axios.patch('/api/paper/update/' + id, {
+        title: e.target.title.value
+      })
+      console.log(res.data)
+      toast.success('แก้ไขสำเร็จ')
+    } catch (error) {
+      console.log(error)
+      toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    }
+  }
+
   return (
     <div className='bg-light'>
       <ConfirmDeleteDialog
@@ -208,62 +227,149 @@ function HostReview() {
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
             <div className='d-flex justify-content-between align-items-center'>
-              <h5 className='card-title fw-bold'>ดูผลลัพธ์บทความ</h5>
+              <h4 className='card-title fw-bold'>ดูผลลัพธ์บทความ</h4>
               <UserDropdown />
             </div>
           </div>
         </div>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
-            <h6 className='fw-bold mb-3 card-title'>รายละเอียดบทความ</h6>
+            <h4 className='card-title mb-4'>รายละเอียดบทความ</h4>
             {paper &&
               <div>
-                <div className='row g-3'>
-                  <PaperDetailField title='ชื่อบทความ' data={paper.title} />
-                  <PaperDetailField title='รหัสบทความ' data={paper.paper_code} />
-                  <PaperDetailField title='ผู้แต่ง' data={paper.author} />
-                  <PaperDetailField title='ผู้ส่งบทความ' data={`${paper.owner?.name ? paper.owner.name : "-"} (${paper.owner?.username})`} />
-                  <PaperDetailField title='สถานะบทความ' data={<PaperStatus status={paper.status} />} />
-                  {paper.status === 'SUCCESS' && paper.result === 'ACCEPT' && paper.payment_status === 'ACCEPT' &&
-                    <div>
-                      <button type='button' onClick={() => setShowPublic(true)} className="btn btn-primary">
-                        <i className="me-2 bi bi-arrow-bar-up"></i>
-                        เผยแพร่บทความ
-                      </button>
-                    </div>
-                  }
-                  {paper.status === 'PUBLIC' &&
-                    <div>
-                      <button type='button' onClick={() => setShowUnPub(true)} className="btn btn-warning">
-                        <i className='me-2 bi bi-arrow-bar-down'></i>
-                        ยกเลิกการเผยแพร่บทความ
-                      </button>
-                    </div>
-                  }
-                  <PaperDetailField title='ผลลัพธ์บทความ' data={<PaperResult status={paper.result} />} />
-                  <PaperDetailField title='สถานะชำระเงิน' data={<PaymentStatus status={paper.payment_status} />} />
-                  {paper.payment_status === 'CHECKING' &&
-                    <form onSubmit={handleSubmitPayment}>
-                      <label className="form-label">ตรวจสอบความถูกต้อง</label>
-                      <select className="form-select" name='payment_status' required>
-                        <option value=''>-- กรุณาเลือก</option>
-                        <option className="text-success" value='ACCEPT'>ข้อมูลถูกต้อง</option>
-                        <option className="text-danger" value='REJECT'>ข้อมูลไม่ถูกต้อง</option>
-                      </select>
-                      <div className="mt-3">
-                        <button className="btn btn-primary">ยืนยันข้อมูล</button>
-                      </div>
-                    </form>
-                  }
-                  {paper.payment_image &&
-                    <PaperDetailField title='หลักฐานการชำระเงิน' data={<Link to={`/uploads/${paper.payment_image}`}>{paper.payment_image}</Link>} />
-                  }
-                  <PaperDetailField title='ที่อยู่ในการติดต่อ' data={paper.address} />
-                  <PaperDetailField title='อีเมล' data={paper.email} />
-                  <PaperDetailField title='เบอร์โทร' data={paper.contact} />
+
+                <div className="mb-3">
+                  <label className="form-label">รหัสบทความ</label>
+                  <div>
+                    {paper.paper_code}
+                  </div>
                 </div>
+
+                <div className="mb-3">
+                  <label className="form-label">หัวข้อ</label>
+                  <div>
+                    {paper.cate_code?.name}
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">ประเภทการลงทะเบียน</label>
+                  <div>
+                    {paper.regis_type ? 'Early Bird' : 'Regular'}
+                  </div>
+                </div>
+
+                <form onSubmit={UpdateDetail}>
+                  <div className="row row-cols-1 g-3">
+                    <div>
+                      <label className="form-label">ชื่อบทความ (ภาษาไทย)</label>
+                      <input
+                        type='text'
+                        defaultValue={paper.title}
+                        className="form-control"
+                        name='title'
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">ชื่อบทความ (ภาษาอังกฤษ)</label>
+                      <input
+                        type='text'
+                        defaultValue={paper.title_en}
+                        className="form-control"
+                        name='title_en'
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">ชื่อผู้แต่ง</label>
+                      <textarea
+                        defaultValue={paper.author}
+                        className="form-control"
+                        name='author'
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">Abstract</label>
+                      <textarea
+                        defaultValue={paper.abstract}
+                        className="form-control"
+                        rows={10}
+                        name='abstract'
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">คำสำคัญ</label>
+                      <textarea
+                        type='text'
+                        defaultValue={paper.keyword}
+                        className="form-control"
+                        name='keyword'
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">คณะ</label>
+                      <input
+                        type='text'
+                        defaultValue={paper.group}
+                        className="form-control"
+                        name='group'
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">มหาวิทยาลัย</label>
+                      <input
+                        type='text'
+                        defaultValue={paper.university}
+                        className="form-control"
+                        name='university'
+                      />
+                    </div>
+
+                    {paper.publication &&
+                      <div>
+                        <label className="form-label">วารสาร</label>
+                        <input
+                          type='text'
+                          placeholder={`${paper.publication?.th_name}/${paper.publication?.en_name}`}
+                          className="form-control"
+                          readOnly
+                        />
+                      </div>
+                    }
+
+                    <div>
+                      <label className="form-label">ที่อยู่ในการติดต่อ</label>
+                      <textarea
+                        type='text'
+                        defaultValue={paper.address}
+                        className="form-control"
+                        name='address'
+                      />
+                    </div>
+
+                    <div>
+                      <label className="form-label">เบอร์โทรศัพท์</label>
+                      <input
+                        type='text'
+                        defaultValue={paper.contact}
+                        className="form-control"
+                        pattern='[0-9]{10}'
+                        maxLength={10}
+                        name='contact'
+                      />
+                    </div>
+
+                  </div>
+                  <div className="text-end mt-3">
+                    <button type='submit' className="btn btn-success">ยืนยันการแก้ไข</button>
+                  </div>
+                </form>
+
                 {paper.status === 'PENDING' && paper.result === 'PENDING' &&
-                  <div className="mt-3">
+                  <div className="my-3">
                     <div className="text-muted">
                       หากบทความไม่ผ่านเกณฑ์
                     </div>
@@ -273,6 +379,75 @@ function HostReview() {
                     </button>
                   </div>
                 }
+                <div>
+                  <h4 className="mb-4">สถานะบทความ / สถานะการชำระเงิน</h4>
+                  <div className="row row-cols-1 row-cols-md-4 g-3 mb-3">
+                    <div>
+                      <label className="form-label">สถานะบทความ</label>
+                      <div>
+                        <PaperStatus status={paper.status} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">ผลลัพธ์บทความ</label>
+                      <div>
+                        <PaperResult status={paper.result} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">สถานะการชำระเงิน</label>
+                      <div>
+                        <PaymentStatus status={paper.payment_status} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="form-label">หลักฐานการชำระเงิน</label>
+                      <div>
+                        {paper.payment_image ? (
+                          <Link
+                            target='_blank'
+                            rel='noreferrer'
+                            to={`/upload/${paper.payment_image}`}
+                          >
+                            {paper.payment_image}
+                          </Link>
+                        ) : '-'}
+                      </div>
+                    </div>
+                  </div>
+                  {paper.payment_status !== 'ACCEPT' && paper.payment_status !== 'NEW' &&
+                    <div>
+                      <ConfirmDialog
+                        show={showPayment}
+                        handleClose={handleClosePayment}
+                        header='ยืนยันสถานะการชำระเงิน'
+                        text='ต้องการยืนยันสถานะการชำระเงินนี้หรือไม่ ?'
+                        handleSubmit={handleSubmitPayment}
+                        loading={paymentLoading}
+                      />
+                      <label className="form-label">ตรวจสอบหลักฐานการชำระเงิน</label>
+                      <select value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)} className="form-select">
+                        <option value=''>-- โปรดระบุ</option>
+                        <option value='ACCEPT'>
+                          ข้อมูลถูกต้อง
+                        </option>
+                        <option value='REJECT' className="text-danger">
+                          ข้อมูลไม่ถูกต้อง
+                        </option>
+                      </select>
+                      <div className="mt-3 text-end">
+                        <button
+                          className="btn btn-primary"
+                          type='button'
+                          disabled={!paymentStatus}
+                          onClick={handleShowPayment}
+                        >
+                          ยืนยันหลักฐานการชำระเงิน
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
             }
           </div>
@@ -341,45 +516,64 @@ function HostReview() {
         <div>
           <div className='card mb-3'>
             <div className="card-body">
-              <h6 className='fw-bold card-title'>ความคิดเห็นของกรรมการ</h6>
+              <h4 className='card-title'>ความคิดเห็นของกรรมการ</h4>
             </div>
           </div>
           {review.length > 0 ? (
             <div>
-              <div className='row g-3 mb-3'>
-                {review?.map((item, index) => (
-                  <div key={item._id} className='col-12 col-md-6 col-lg-4'>
-                    <div className='card shadow-sm h-100'>
-                      <div className='card-body'>
-                        <div className='d-flex justify-content-between align-items-center'>
-                          <h6 className='fw-bold'>กรรมการท่านที่ {index + 1}</h6>
-                          <div>
-                            <ReviewStatus status={item.status} />
-                            <div className='text-end'>
-                              <Link onClick={() => handleShow(item._id, item.reviewer?.username)} type='button'>ดูประวัติ</Link>
-                            </div>
-                          </div>
+              <div className='row row-cols-1 g-3 mb-3'>
+                {review.map((item) => (
+                  <div key={item._id}>
+                    <div className='card'>
+                      <div className="card-body">
+                        <h6 className="card-title">{item.reviewer?.name} ({item.reviewer?.username})</h6>
+                        <div className="table-responsive">
+                          <table className="table" style={{ minWidth: 1000 }}>
+                            <thead>
+                              <tr>
+                                <th>วันที่ตรวจ</th>
+                                <th>ข้อแนะนำ</th>
+                                <th>คะแนน</th>
+                                <th>สถานะ</th>
+                                <th>ผลลัพธ์</th>
+                                <th>ไฟล์</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <GetCommitteeHistory
+                                id={item._id}
+                              />
+                              <tr>
+                                <td>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</td>
+                                <td>{item.suggestion}</td>
+                                <td>{item.total}</td>
+                                <td>
+                                  <PaperStatus status={item.status} />
+                                </td>
+                                <td>
+                                  <PaperResult status={item.result} />
+                                </td>
+                                <td>
+                                  {item.suggestion_file ? (
+                                    <Link
+                                      to={`/uploads/${item.suggestion_file}`}
+                                      target='_blank'
+                                      rel='noreferrer'
+                                    >
+                                      {item.suggestion_file}
+                                    </Link>
+                                  ) : '-'}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
-                        {item.status === 'SUCCESS' &&
-                          <div>
-                            <p>{item.suggestion}</p>
-                            <p>รวมคะแนน: {item.total}</p>
-                            <p>ผลลัพธ์ <PaperResult status={item.result} /></p>
-                            <div>
-                              <small>{item.reviewer?.name} ({item.reviewer?.username})</small> <br />
-                              {item.updatedAt &&
-                                <small className='text-muted'>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</small>
-                              }
-                            </div>
-                          </div>
-                        }
                       </div>
                     </div>
                   </div>
                 ))}
-                <ReviewHistory show={show} handleClose={handleClose} data={history} />
               </div>
-              {handleStatus(review) && paper.status === 'REVIEW' &&
+              {handleStatus(review) && (paper.status === 'REVIEW' || paper.result === 'MINOR') &&
                 <div className='card shadow-sm'>
                   <div className='card-body'>
                     <h4 className="card-title">เปลี่ยนผลลัพธ์บทความ</h4>
@@ -388,15 +582,16 @@ function HostReview() {
                         <label className='form-label'>ผลลัพธ์บทความ</label>
                         <select name='result' className="form-select" required onChange={e => setResult(e.target.value)}>
                           <option defaultValue value="">--</option>
-                          <option value="ACCEPT">ผ่าน</option>
-                          <option value="REVISE">แก้ไข</option>
-                          <option value="REJECT">ไม่ผ่าน</option>
+                          <option value="ACCEPT">Accept submission</option>
+                          <option value="MINOR">Minor Revision</option>
+                          <option value="MAJOR">Major Revision</option>
+                          <option value="REJECT">Decline submission</option>
                         </select>
                       </div>
-                      {result === "REVISE" &&
+                      {(result === "MINOR" || result === 'MAJOR') &&
                         <div>
                           <div>
-                            <label className='form-label mt-3'>ชื่อการแก้ไข</label>
+                            <label className='form-label mt-3'>เรื่องที่แก้ไข</label>
                             <input name='name' type='text' className='form-control' required />
                           </div>
                           <div>
@@ -428,78 +623,55 @@ function HostReview() {
 
 export default HostReview
 
-function ReviewHistory(props) {
+
+function GetCommitteeHistory({ id }) {
 
   const [data, setData] = useState([])
 
   useEffect(() => {
     const fethHistory = async () => {
       try {
-        const res = await axios.get('/api/history/read/' + props.data.id)
+        const res = await axios.get('/api/history/read/' + id)
         setData(res.data)
       } catch (error) {
         console.log(error)
       }
     }
 
-    if (props.data.id) {
+    if (id) {
       fethHistory()
     }
-  }, [props.data.id])
+
+  }, [id])
+
+  console.log(data)
 
   return (
-    <Modal show={props.show} onHide={props.handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{props.data.reviewer}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {data &&
-          <div>
-            {data.map((items) => (
-              <div key={items._id} className='card mb-3'>
-                <div className='card-body row'>
-                  <div className='col-12 col-md-4'>
-                    <PaperResult status={items.result} />
-                    <div>
-                      <small>
-                        {dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}
-                      </small>
-                    </div>
-                  </div>
-                  <div className='col-12 col-md-8'>
-                    <p>{items.suggestion}</p>
-                    {items.suggestion_file &&
-                      <div>
-                        <Link target='_blank' rel='noreferrer' className='text-decoration-none' to={`/uploads/${items.suggestion_file}`}>ดูไฟล์</Link>
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        }
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="" onClick={props.handleClose}>
-          ปิด
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  )
-}
-
-function PaperDetailField(props) {
-  return (
-    <div className='col-12'>
-      <div className='row'>
-        <div className="col-md-3">
-          <small className='fw-bold'>{props.title}</small>
-        </div>
-        <div className='col-md-8'>
-          <small>{props.data}</small>
-        </div>
-      </div>
-    </div>
+    <>
+      {data?.map((items) => (
+        <tr key={items._id}>
+          <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+          <td>{items.suggestion}</td>
+          <td>{items.total}</td>
+          <td>
+            <PaperStatus status={items.status} />
+          </td>
+          <td>
+            <PaperResult status={items.result} />
+          </td>
+          <td>
+            {items.suggestion_file &&
+              <Link
+                to={`/uploads/${items.suggestion_file}`}
+                target='_blank'
+                rel='noreferrer'
+              >
+                {items.suggestion_file}
+              </Link>
+            }
+          </td>
+        </tr>
+      ))}
+    </>
   )
 }

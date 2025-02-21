@@ -248,6 +248,7 @@ function ModalAcc(props) {
 function ModalRegis(props) {
 
     const [edit, setEdit] = useState(props.data?.regis_type)
+    const [key, setKey] = useState(0)
 
 
     const handleUpdate = async (e) => {
@@ -277,19 +278,20 @@ function ModalRegis(props) {
         setEdit(temp)
     }
 
+    const handleDelete = (index) => {
+        let temp = [...edit]
+        temp = temp.filter((items, idx) => idx !== index)
+        setEdit(temp)
+        setKey(key + 1)
+    }
+
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>รายละเอียดบัญชี</Modal.Title>
+                <Modal.Title>รายละเอียดการลงทะเบียน</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
-                <Modal.Body className='row gy-3'>
-                    <div className='col-12'>
-                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
-                            <i className="me-2 bi bi-plus-lg"></i>
-                            เพิ่มประเภทการลงทะเบียน
-                        </button>
-                    </div>
+                <Modal.Body className='row gy-3' key={key}>
                     {edit?.map((items, index) => (
                         <div key={index} className='row g-3'>
                             <div className='col-12'>
@@ -298,19 +300,56 @@ function ModalRegis(props) {
                                 </div>
                                 <hr />
                                 <label className="form-label">ชื่อประเภท</label>
-                                <input className='form-control' name='name' defaultValue={items.name} onChange={e => handleChange(e, index)} />
+                                <input
+                                    required
+                                    className='form-control'
+                                    name='name'
+                                    placeholder='หากไม่มีให้ใส่ -'
+                                    defaultValue={items.name}
+                                    onChange={e => handleChange(e, index)}
+                                />
                             </div>
                             <div className='col-12'>
                                 <label className='form-label'>Early bird</label>
-                                <input type='number' className='form-control' name='price_1' defaultValue={items.price_1} onChange={e => handleChange(e, index)} />
+                                <input
+                                    type='number'
+                                    className='form-control'
+                                    name='price_1'
+                                    defaultValue={items.price_1}
+                                    onChange={e => handleChange(e, index)}
+                                    required
+                                />
                             </div>
                             <div className='col-12'>
                                 <label className='form-label'>Regular</label>
-                                <input type='number' className='form-control' name='price_2' defaultValue={items.price_2} onChange={e => handleChange(e, index)} />
+                                <input
+                                    type='number'
+                                    className='form-control'
+                                    name='price_2'
+                                    defaultValue={items.price_2}
+                                    onChange={e => handleChange(e, index)}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <button
+                                    type='button'
+                                    onClick={() => handleDelete(index)}
+                                    className="btn btn-outline-danger"
+                                >
+                                    <i className="bi bi-trash me-1"></i>
+                                    ลบประเภทการลงทะเบียน
+                                </button>
                             </div>
                             <hr />
                         </div>
                     ))}
+                    <div className='col-12'>
+                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
+                            <i className="me-2 bi bi-plus-lg"></i>
+                            เพิ่มประเภทการลงทะเบียน
+                        </button>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" type='button' onClick={props.handleClose}>

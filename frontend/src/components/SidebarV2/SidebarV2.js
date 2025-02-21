@@ -31,7 +31,7 @@ function SidebarV2({ children }) {
             <Nav.Link href="/host/edit/category"  >หัวข้องานประชุม</Nav.Link>
             <Nav.Link href="/host/edit/publication"  >วารสาร</Nav.Link>
             <Nav.Link href="/host/edit/submission"  >การส่งบทความ</Nav.Link>
-            <Nav.Link href="/host/edit/invite-speaker"  >พิธีกร</Nav.Link>
+            <Nav.Link href="/host/edit/invite-speaker"  >วิทยากร</Nav.Link>
             <Nav.Link href="/host/edit/award" >รางวัลดีเด่น</Nav.Link>
           </Nav>
           <div className="p-3">
@@ -61,12 +61,12 @@ function SidebarV2({ children }) {
                 <Nav.Link href="/host/edit/category">หัวข้องานประชุม</Nav.Link>
                 <Nav.Link href="/host/edit/publication">วารสาร</Nav.Link>
                 <Nav.Link href="/host/edit/submission">การส่งบทความ</Nav.Link>
-                <Nav.Link href="/host/edit/invite-speaker">พิธีกร</Nav.Link>
+                <Nav.Link href="/host/edit/invite-speaker">วิทยากร</Nav.Link>
                 <Nav.Link href="/host/edit/award">รางวัลดีเด่น</Nav.Link>
               </Nav>
             </Offcanvas.Body>
           </Offcanvas>
-          <div>
+          <div className="px-4">
             {children}
           </div>
         </Col>

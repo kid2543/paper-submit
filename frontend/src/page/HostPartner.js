@@ -95,10 +95,10 @@ function HostPartner() {
               {partnerData?.map((item) => (
                 <div key={item._id} className='col-auto'>
                   <div className="btn-group">
-                    <div>
+                    <div className="border">
                       <img src={`/uploads/${item.image}`} alt={item.desc} height={128} />
                     </div>
-                    <button className='btn btn-danger' onClick={() => handleShow(item._id)} type='button' >
+                    <button className='btn btn-outline-danger' onClick={() => handleShow(item._id)} type='button' >
                       <i className="bi bi-trash"></i>
                     </button>
                   </div>

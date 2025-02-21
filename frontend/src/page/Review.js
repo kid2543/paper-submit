@@ -45,8 +45,10 @@ function Review() {
     const [showConfirm, setShowConfirm] = useState(false)
     const [suggestion, setSuggestion] = useState('')
     const [result, setResult] = useState('')
+    const [loadingRate, setLoadingRate] = useState(false)
 
     const handleRate = async () => {
+        setLoadingRate(true)
         try {
             if (suggestionFile !== null) {
                 const formData = new FormData()
@@ -86,6 +88,7 @@ function Review() {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         } finally {
             setShowConfirm(false)
+            setLoadingRate(false)
         }
     }
 
@@ -124,11 +127,12 @@ function Review() {
                 handleSubmit={handleRate}
                 header='ยืนยันการให้คะแนน'
                 text='ต้องการยืนยันการให้คะแนนหรือไม่เนื่องจากจะไม่สามารถกลับมาแก้ไขได้'
+                loading={loadingRate}
             />
             <div className='card  shadow-sm mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
-                        <h5 className='fw-bold mb-0'>ตรวจบทความ</h5>
+                        <h4 className='fw-bold mb-0'>ตรวจบทความ</h4>
                         <UserDropdown />
                     </div>
                 </div>
@@ -136,27 +140,31 @@ function Review() {
             {paper.data &&
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title mb-3'>รายละเอียดบทความ</h4>
-                        <div className='row g-3'>
-                            <div className='col-12 col-md-6 col-lg-4'>
-                                <p className='fw-bold'>ชื่อบทความ</p>
+                        <h4 className='card-title mb-4'>รายละเอียดบทความ</h4>
+                        <div className='row g-3 row-cols-1'>
+                            <div>
+                                <p className='fw-bold mb-0'>ชื่อบทความ</p>
                                 <p className='text-muted'>{paper.data.paper_id?.title}</p>
                             </div>
-                            <div className='col-12 col-md-6 col-lg-4'>
-                                <p className='fw-bold'>รหัสบทความ</p>
+                            <div>
+                                <p className='fw-bold mb-0'>รหัสบทความ</p>
                                 <p className='text-muted'>{paper.data.paper_id?.paper_code}</p>
+                            </div>
+                            <div>
+                                <div className='fw-bold'>บทคัดย่อ</div>
+                                <div className='text-muted'><span className='ms-3'>{paper.data.paper_id?.abstract}</span></div>
                             </div>
                             <div className='col-12'>
                                 <div>
                                     <p className='fw-bold'>File บทความ</p>
                                 </div>
                                 {PaperFile &&
-                                    <ol className="list-group">
+                                    <ul>
                                         {PaperFile.map((items) => (
-                                            <li key={items._id} className='list-group-item'>
+                                            <li key={items._id}>
                                                 <Link
-                                                    className='btn btn-success'
-                                                    to={items.read_original ? `/uploads/${items.original_file}` : `/uploads/${items.close_name_file}`}
+                                                    className='link-success'
+                                                    to={`/uploads/${items.close_name_file}`}
                                                     target='_blank'
                                                     rel='noreferrer'
                                                 >
@@ -165,16 +173,16 @@ function Review() {
                                                 </Link>
                                             </li>
                                         ))}
-                                    </ol>
+                                    </ul>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
             }
-            <div className='card p-3 mb-3'>
+            <div className='card mb-3'>
                 <div className='card-body'>
-                    <h4 className='fw-bold mb-3'>แบบประเมิน <span className='text-danger'>*</span></h4>
+                    <h4 className='mb-4'>แบบประเมิน <span className='text-danger'>*</span></h4>
                     <form>
                         <div className='table-responsive mb-3'>
                             <table className='table table-hover table-bordered align-middle'>
@@ -248,12 +256,25 @@ function Review() {
                                     className="form-check-input"
                                     type="radio"
                                     name="result"
-                                    value="REVISE"
+                                    value="MINOR"
                                     onChange={e => setResult(e.target.value)}
                                     required
                                 />
                                 <label className="form-check-label">
-                                    Revisions required (ผ่านแบบมีเงื่อนไข)
+                                    Minor Revision (ผ่านแบบมีเงื่อนไข)
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input
+                                    className="form-check-input"
+                                    type="radio"
+                                    name="result"
+                                    value="MAJOR"
+                                    onChange={e => setResult(e.target.value)}
+                                    required
+                                />
+                                <label className="form-check-label">
+                                    Major Revision (แก้ไข)
                                 </label>
                             </div>
                             <div className="form-check">

@@ -27,6 +27,7 @@ function ConfirmDialog(props) {
                     <Button 
                         variant='success'
                         onClick={props.handleSubmit}
+                        disabled={props.loading}
                     >
                         ยืนยัน
                     </Button>

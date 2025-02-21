@@ -1,10 +1,22 @@
 const mongoose = require('mongoose')
+const Conference = require('../models/conferences')
 
 const pubSchema = mongoose.Schema(
     {
-        th_name: String,
-        en_name: String,
+        th_name: {
+            type: String,
+            required: true
+        },
+        en_name: {
+            type: String,
+            required: true
+        },
         desc: [String],
+        confr_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: Conference,
+            required: true
+        }
     }
 )
 

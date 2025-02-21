@@ -148,7 +148,7 @@ function HostEditSubmission() {
                           <Link to={`/uploads/${items.file}`} target='_blank' rel='noopener noreferrer'>{items.name}</Link>
                         </td>
                         <td>
-                          <button type='button' onClick={() => handleConfirm(items._id)} className='btn btn-danger text-white btn-sm'>
+                          <button type='button' onClick={() => handleConfirm(items._id)} className='btn btn-outline-danger'>
                             <i className='bi bi-trash'></i>
                           </button>
                         </td>
@@ -324,16 +324,7 @@ function SubmissionModal(props) {
                   <div className="form-text">
                     ข้อที่ {index + 1}
                   </div>
-                  <hr/>
-                  <div className="text-end">
-                    <button 
-                    type='button' 
-                    onClick={() => handleDelete(index)} 
-                    className='btn btn-outline-danger'>
-                      <i className='bi bi-trash me-2'></i>
-                      ลบรายละเอียด
-                    </button>
-                  </div>
+                  <hr />
                   <label className='form-label'>รายละเอียดข้อแนะนำ</label>
                   <textarea
                     key={key}
@@ -343,6 +334,15 @@ function SubmissionModal(props) {
                     required
                     rows={5}
                   />
+                  <div className="mt-3">
+                    <button
+                      type='button'
+                      onClick={() => handleDelete(index)}
+                      className='btn btn-outline-danger'>
+                      <i className='bi bi-trash me-1'></i>
+                      ลบรายละเอียด
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
