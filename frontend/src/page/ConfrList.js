@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 import LoadingPage from '../components/LoadingPage';
 import useSearch from '../hook/useSearch';
-import ConferenceCategory from '../hook/ConferenceCategory';
 import { Dropdown } from 'react-bootstrap';
 import PaginationComponent from '../components/Pagination';
 
@@ -25,8 +24,6 @@ function ConfrList() {
     handleFirstPage,
     handleNumberPage
   } = useSearch('/api/conference/open/search')
-
-  const { confrCateArray } = ConferenceCategory()
 
   const [selectV, setSelectV] = useState('TITLE')
 
