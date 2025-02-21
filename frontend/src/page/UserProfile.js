@@ -208,7 +208,7 @@ function UserProfile() {
             </div>
           }
           <div>
-            <div className='card text-bg-light'>
+            <div className='card'>
               <div className='card-body'>
                 <h4 className='card-tile fw-bold mb-3'>เปลี่ยนรหัสผ่าน</h4>
                 <form onSubmit={handleChangePassword} className='row g-3'>
