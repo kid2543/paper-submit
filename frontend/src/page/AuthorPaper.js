@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
-import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus'
+import PaperStatus, { PaperResult } from '../components/PaperStatus'
 import PaymentStatus from '../components/PaymentStatus'
 import useFetch from '../hook/useFetch'
 

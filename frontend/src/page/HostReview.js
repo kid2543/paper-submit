@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import PaperStatus, { PaperResult, ReviewStatus } from '../components/PaperStatus';
+import PaperStatus, { PaperResult } from '../components/PaperStatus';
 
 
 import PaymentStatus from '../components/PaymentStatus';

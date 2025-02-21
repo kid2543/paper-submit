@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useFetch from '../hook/useFetch'
-import { Link, useParams } from 'react-router-dom'
-import LoadingPage from '../components/LoadingPage'
+import { useParams } from 'react-router-dom'
 import axios from 'axios'
 
 function ConfrPaperAward() {
