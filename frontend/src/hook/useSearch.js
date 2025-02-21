@@ -63,7 +63,7 @@ const useSearch = (fethapi) => {
     // ค้นหาจากหัวข้อ
     const handleSearchCate = (e) => {
         e.preventDefault()
-        setSearchCate(e.target.value)
+        setSearchCate(e.target.cate.value)
         setSearchQuery('')
         setSearchTag('')
         setPage(1)

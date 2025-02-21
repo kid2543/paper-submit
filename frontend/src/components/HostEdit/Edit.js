@@ -112,9 +112,11 @@ function Edit() {
                                 <h4>หมวดหมู่งานประชุม</h4>
                                 <hr />
                             </div>
-                            <div>
-                                {data.cate}
-                            </div>
+                            <ul>
+                                {data.cate?.map((items,index) => (
+                                    <li key={index}>{items}</li>
+                                ))}
+                            </ul>
                             <div className='position-absolute top-0 end-0 m-2'>
                                 <button type='button' onClick={() => setCateModal(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
                             </div>
@@ -619,10 +621,26 @@ function EditTagModal(props) {
 function EditCateModal(props) {
 
     const [form, setForm] = useState(props.data)
+    const [key, setKey] = useState(0)
 
-    const handleChange = (e) => {
+    const handleAdd = () => {
+        let temp = { ...form }
+        temp.cate.push('')
+        setForm(temp)
+    }
+
+    const handleDelete = (index) => {
+        let temp = {...form}
+        temp.cate = temp.cate.filter((items,idx) => idx !== index)
+        setKey(key + 1)
+        setForm(temp)
+    }
+
+    const handleChange = (e,index) => {
         const { value } = e.target
-        setForm({ ...form, cate: value })
+        let temp = {...form}
+        temp.cate[index] = value
+        setForm(temp)
     }
 
     return (
@@ -631,26 +649,41 @@ function EditCateModal(props) {
                 <Modal.Title>แก้ไขหมวดหมู่งานประชุม</Modal.Title>
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
-                <Modal.Body>
-                    <div>
-                        <p>หมวดหมู่ปัจจุบัน: {props.data.cate}</p>
-                        <label className='form-label'>เลือกหมวดหมู่ที่ต้องการเปลี่ยน</label>
-                        <select className="form-select" onChange={handleChange}>
-                            <option value="">-- เลือกหมวดหมู่</option>
-                            <option value="การประชุมวิชาการระดับชาติ">การประชุมวิชาการระดับชาติ</option>
-                            <option value="การประชุมวิชาการระดับนานาชาติ">การประชุมวิชาการระดับนานาชาติ</option>
-                            <option value="การประชุมวิชาการเฉพาะทาง">การประชุมวิชาการเฉพาะทาง</option>
-                            <option value="การประชุมวิชาการประจำปี">การประชุมวิชาการประจำปี</option>
-                        </select>
+                <Modal.Body className="row g-3" key={key}>
+                    {form.cate?.map((items, index) => (
+                        <div key={index}>
+                            <label className="form-label">หมวดหมู่ที่ {index + 1}</label>
+                            <div className="input-group">
+                                <input
+                                    className="form-control"
+                                    value={items}
+                                    onChange={e => handleChange(e, index)}
+                                />
+                                <button
+                                    className="btn btn-outline-danger"
+                                    type='button'
+                                    onClick={() => handleDelete(index)}
+                                >
+                                    <i className="bi bi-trash me-1"></i>
+                                    ลบ
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    <div className="mt-3">
+                        <button
+                            className="btn btn-outline-primary"
+                            type='button'
+                            onClick={handleAdd}
+                        >
+                            <i className="bi bi-plus me-1"></i>
+                            เพิ่มหมวดหมู่
+                        </button>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="" onClick={props.handleClose}>
-                        ปิด
-                    </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    <Button variant='' onClick={props.handleClose}>ปิด</Button>
+                    <Button type='submit'>อัพเดท</Button>
                 </Modal.Footer>
             </form>
         </Modal>

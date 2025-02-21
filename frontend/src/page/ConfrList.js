@@ -95,17 +95,18 @@ function ConfrList() {
                 </form>
               }
               {selectV === 'CATE' &&
-                <form>
-                  <select onChange={handleSearchCate} className="form-select" name='cate'>
-                    <option value=''>-- เลือกหมวดหมู่</option>
-                    {confrCateArray.map(list => (
-                      <option key={list} value={list}>{list}</option>
-                    ))}
-                  </select>
+                <form onSubmit={handleSearchCate}>
+                  <div className="input-group">
+                    <input
+                      name='cate'
+                      className="form-control"
+                      placeholder='ค้นหางานประชุมด้วยหมวดหมู่'
+                    />
+                  </div>
                 </form>
               }
             </div>
-            {error && 
+            {error &&
               <div className="alert alert-warning">
                 {error}
               </div>
@@ -134,7 +135,9 @@ function ConfrList() {
                                 {items.title}
                               </Link>
                             </td>
-                            <td>{items.cate}</td>
+                            <td>{items.cate?.map((cates, cate_index) => (
+                              <span className="badge text-bg-primary me-2" key={cate_index}>{cates}</span>
+                            ))}</td>
                             <td>{items.tag?.map((tags, tags_index) =>
                               <span key={tags_index} className="badge text-bg-dark me-2">{tags}</span>
                             )}</td>

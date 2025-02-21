@@ -163,10 +163,8 @@ const editConference = async (req, res) => {
     const { _id } = req.body
 
     //check this is a id ?
-    const check = mongoose.Types.ObjectId.isValid(_id)
-
-    if (!check) {
-        return res.status(400).json({ error: "This is not id" })
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+        return res.status(400).json({ error: 'รหัสงานประชุมไม่ถูกต้อง' })
     }
 
     try {

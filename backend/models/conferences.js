@@ -49,12 +49,7 @@ const conferencesSchema = mongoose.Schema({
     required: true,
   },
   tag: [String],
-  cate: {
-    type: String,
-    enum: {
-      values: Object.values(['การประชุมวิชาการระดับชาติ', 'การประชุมวิชาการระดับนานาชาติ', 'การประชุมวิชาการเฉพาะทาง', 'การประชุมวิชาการประจำปี'])
-    }
-  }
+  cate: [String]
 });
 
 conferencesSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
