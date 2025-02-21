@@ -498,6 +498,7 @@ function ConfrDateModal(props) {
 function UploadLogo(props) {
 
     const [file, setFile] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     const closeModal = () => {
         setFile(null)
@@ -505,6 +506,7 @@ function UploadLogo(props) {
     }
 
     const handleUpdate = async (e) => {
+        setLoading(true)
         e.preventDefault()
         try {
             const formData = new FormData()
@@ -516,6 +518,8 @@ function UploadLogo(props) {
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -535,7 +539,7 @@ function UploadLogo(props) {
                     <Button variant="" onClick={closeModal}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!file}>
+                    <Button variant="primary" type='submit' disabled={!file || loading}>
                         อัพโหลด
                     </Button>
                 </Modal.Footer>
