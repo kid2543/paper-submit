@@ -24,7 +24,10 @@ function HostEditCate() {
         handleSearchChange,
         page,
         status,
-        totalPages
+        totalPages,
+        handleFirstPage,
+        handleLastPage,
+        handleNumberPage,
     } = useSearch('/api/user/search/committee')
 
     const handleChangeList = (e, value) => {
@@ -231,6 +234,9 @@ function HostEditCate() {
                                                 onPageNext={handleNextPage}
                                                 onPagePrev={handlePreviousPage}
                                                 totalPages={totalPages}
+                                                onFirstPage={handleFirstPage}
+                                                onLastPage={handleLastPage}
+                                                onSelectPage={handleNumberPage}
                                             />
                                         </div>
                                     }
