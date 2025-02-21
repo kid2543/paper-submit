@@ -17,7 +17,6 @@ const requireAuth = async (req, res, next) => {
                 return res.status(401).json({error : 'Unauthorized'})
             }
             req.user = decoded
-            console.log({user: req.user})
             next()
         })
     } catch (error) {

@@ -71,7 +71,7 @@ const uploadInvImage = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -81,7 +81,7 @@ const uploadInvImage = async (req, res) => {
     if (!req.file) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -95,7 +95,7 @@ const uploadInvImage = async (req, res) => {
     } catch (error) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -109,7 +109,7 @@ const uploadInvCv = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -119,7 +119,7 @@ const uploadInvCv = async (req, res) => {
     if (!req.file) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -133,7 +133,7 @@ const uploadInvCv = async (req, res) => {
     } catch (error) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('Error deleting the file:', err)
+                console.log('Error deleting the file:', err)
             }
             console.log("file is deleted")
         })
@@ -210,7 +210,7 @@ const removeInv = async (req, res) => {
         if (find.img) {
             fs.unlink("public/uploads/" + find.img, (err) => {
                 if (err) {
-                    console.log(err)
+                    console.log('ลบรูป วิทยากรไม่สำเร็จ',err)
                 } else {
                     console.log('ลบไฟล์แล้ว')
                 }
@@ -219,7 +219,7 @@ const removeInv = async (req, res) => {
         if (find.cv) {
             fs.unlink("public/uploads/" + find.cv, (err) => {
                 if (err) {
-                    console.log(err)
+                    console.log('ลบไฟล์ cv ไม่สำเร็จ:', err)
                 } else {
                     console.log('ลบไฟล์แล้ว')
                 }

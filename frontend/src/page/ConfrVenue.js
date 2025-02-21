@@ -8,8 +8,6 @@ function ConfrVenue() {
     const { id } = useParams()
     const { data, loading, error } = useFetch('/api/conference/single/' + id)
 
-    console.log({ data })
-
     if (error) {
         return <div>Error</div>
     }

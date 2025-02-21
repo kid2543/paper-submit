@@ -82,7 +82,7 @@ const deleteTemplate = async (req, res) => {
         }
         fs.unlink('public/uploads/' + find.file, (err) => {
             if(err) {
-                console.log({err})
+                console.log('ลบไฟล์ เทมเพลท ไม่สำเร็จ', err)
             } else {
                 console.log('ไฟล์ลบแล้ว')
             }

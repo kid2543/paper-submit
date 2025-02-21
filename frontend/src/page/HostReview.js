@@ -189,10 +189,9 @@ function HostReview() {
   const UpdateDetail = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.patch('/api/paper/update/' + id, {
+      await axios.patch('/api/paper/update/' + id, {
         title: e.target.title.value
       })
-      console.log(res.data)
       toast.success('แก้ไขสำเร็จ')
     } catch (error) {
       console.log(error)
@@ -643,8 +642,6 @@ function GetCommitteeHistory({ id }) {
     }
 
   }, [id])
-
-  console.log(data)
 
   return (
     <>

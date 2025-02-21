@@ -328,7 +328,6 @@ function UploadImage(props) {
 function UploadCv(props) {
 
     const [cvFile, setCvFile] = useState(null)
-    console.log(props.key)
 
     const closeModal = () => {
         setCvFile(null)

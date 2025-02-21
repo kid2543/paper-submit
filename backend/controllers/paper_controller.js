@@ -166,7 +166,6 @@ const getReviewPaper = async (req, res) => {
 
 // นับรหัสบทความ นำเอา รหัส Category มาใส่
 async function getNextSequenceValue(sequenceId) {
-    console.log(sequenceId)
     const sequenceDocument = await Counters.findOneAndUpdate(
         { _id: sequenceId },
         { $inc: { sequence_value: 1 } },
@@ -194,8 +193,6 @@ const createPaper = async (req, res) => {
         contact,
         address
     } = req.body
-
-    console.log(req.body)
     
     const user_id = req.user._id
 

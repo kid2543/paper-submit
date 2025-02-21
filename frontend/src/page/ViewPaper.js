@@ -15,8 +15,6 @@ function ViewPaper() {
     if(error)
         return <div>Error</div>
 
-    console.log(data)
-
   return (
     <div>
         <h3>รายละเอียดบทความ</h3>

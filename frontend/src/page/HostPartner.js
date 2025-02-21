@@ -118,15 +118,14 @@ function ConfirmDel({ show, handleClose, partnerId, clearPartner }) {
 
   const delPartner = async () => {
     try {
-      const del = await axios.delete(`/api/partner/${partnerId}`)
-      console.log(del)
+      await axios.delete(`/api/partner/${partnerId}`)
+      clearPartner(partnerId)
       toast.success("ลบสำเร็จ")
     } catch (error) {
       toast.error("เกิดข้อผิดพลาด")
       console.log(error)
     } finally {
       handleClose()
-      clearPartner(partnerId)
     }
   }
 
