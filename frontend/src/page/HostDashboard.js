@@ -45,8 +45,9 @@ function HostDashboard() {
         }
     }
 
-    const viewConference = (id) => {
+    const viewConference = (id, confr_code) => {
         sessionStorage.setItem('host_confr', id)
+        sessionStorage.setItem('confr_code', confr_code)
         navigate('/host/confr')
     }
     if (searchConfr.error) {
@@ -170,7 +171,7 @@ function HostDashboard() {
                                                                 {item.title}
                                                             </td>
                                                             <td>
-                                                                <button onClick={() => viewConference(item._id)} type='button' className='btn btn-light' to='#'>
+                                                                <button onClick={() => viewConference(item._id, item.confr_code)} type='button' className='btn btn-light' to='#'>
                                                                     <i className="bi bi-pencil-square"></i>
                                                                 </button>
                                                             </td>

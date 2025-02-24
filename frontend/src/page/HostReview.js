@@ -53,20 +53,24 @@ function HostReview() {
     if (result === 'MAJOR' || result === 'MINOR') {
       try {
         const res = await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
-        toast.success('เปลี่ยนสถานะสำเร็จ')
+        toast.success('เปลี่ยนผลลัพธ์บทความสำเร็จ')
         setPaper(res.data)
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+      } finally {
+        setResult('')
       }
     } else {
       try {
         const res = await axios.patch('/api/paper/result', { _id: id, result: result })
-        toast.success('เปลี่ยนสถานะสำเร็จ')
+        toast.success('เปลี่ยนผลลัพธ์บทความสำเร็จ')
         setPaper(res.data)
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+      } finally {
+        setResult('')
       }
     }
   }
@@ -572,7 +576,7 @@ function HostReview() {
                   </div>
                 ))}
               </div>
-              {handleStatus(review) && (paper.status === 'REVIEW' || paper.result === 'MINOR') &&
+              {((paper.status === 'REVIEW' && paper.result === 'PENDING' &&  handleStatus(review)) || paper.result === 'MINOR' || paper.result === 'MAJOR') &&
                 <div className='card shadow-sm'>
                   <div className='card-body'>
                     <h4 className="card-title">เปลี่ยนผลลัพธ์บทความ</h4>

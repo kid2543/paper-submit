@@ -11,6 +11,8 @@ function SidebarV2({ children }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const confrCode = sessionStorage.getItem('confr_code')
+
   return (
     <Container fluid>
       <Row>
@@ -19,6 +21,7 @@ function SidebarV2({ children }) {
           <Nav variant='pills' className="flex-column p-3" activeKey={window.location.pathname}>
             <Nav.Link href='/' className='p-3'>
               <h4 className='fw-bold'>PAPERSS</h4>
+              <h6 className='text-primary fw-bold'>{confrCode}</h6>
             </Nav.Link>
             <Nav.Link href="/host/confr" >Dashboard</Nav.Link>
             <Nav.Link href="/host/edit" >รายละเอียดทั่วไป</Nav.Link>

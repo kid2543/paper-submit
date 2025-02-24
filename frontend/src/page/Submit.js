@@ -218,11 +218,11 @@ function Submit() {
                                         </select>
                                     </div>
                                     <div>
-                                        <label className='form-label'>คณะ <span className="text-danger">*</span></label>
+                                        <label className='form-label'>คณะ / กลุ่มงาน <span className="text-danger">*</span></label>
                                         <input name='group' className='form-control' required />
                                     </div>
                                     <div>
-                                        <label className='form-label'>มหาวิทยาลัย <span className="text-danger">*</span></label>
+                                        <label className='form-label'>มหาวิทยาลัย / หน่วยงาน <span className="text-danger">*</span></label>
                                         <input name='university' className='form-control' required />
                                     </div>
                                     {pub.length > 0 &&
