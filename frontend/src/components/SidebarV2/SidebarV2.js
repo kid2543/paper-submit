@@ -17,30 +17,30 @@ function SidebarV2({ children }) {
     <Container fluid>
       <Row>
         <Col xs={12} lg={2} className="d-none text-bg-light d-lg-block border-end sidebar">
-        <div className="d-flex flex-column h-100 justify-content-between">
-          <Nav variant='pills' className="flex-column p-3" activeKey={window.location.pathname}>
-            <Nav.Link href='/' className='p-3'>
-              <h4 className='fw-bold'>PAPERSS</h4>
-              <h6 className='text-primary fw-bold'>{confrCode}</h6>
-            </Nav.Link>
-            <Nav.Link href="/host/confr" >Dashboard</Nav.Link>
-            <Nav.Link href="/host/edit" >รายละเอียดทั่วไป</Nav.Link>
-            <Nav.Link href="/host/edit/regis" >ข้อมูลการลงทะเบียน</Nav.Link>
-            <Nav.Link href="/host/edit/venue" >สถานที่จัดงาน</Nav.Link>
-            <Nav.Link href="/host/edit/question" >แบบประเมิน</Nav.Link>
-            <Nav.Link href="/host/edit/present" >การนำเสนอ</Nav.Link>
-            <Nav.Link href="/host/edit/guideline"  >ข้อแนะนำ</Nav.Link>
-            <Nav.Link href="/host/edit/partner"  >ผู้สนับสนุน</Nav.Link>
-            <Nav.Link href="/host/edit/category"  >หัวข้องานประชุม</Nav.Link>
-            <Nav.Link href="/host/edit/publication"  >วารสาร</Nav.Link>
-            <Nav.Link href="/host/edit/submission"  >การส่งบทความ</Nav.Link>
-            <Nav.Link href="/host/edit/invite-speaker"  >วิทยากร</Nav.Link>
-            <Nav.Link href="/host/edit/award" >รางวัลดีเด่น</Nav.Link>
-          </Nav>
-          <div className="p-3">
-            <UserDropdown />
+          <div className="d-flex flex-column h-100 justify-content-between">
+            <Nav variant='pills' className="flex-column p-3" activeKey={window.location.pathname}>
+              <Nav.Link href='/' className='p-3'>
+                <h4 className='fw-bold'>PAPERSS</h4>
+                <h6 className='text-primary fw-bold'>{confrCode}</h6>
+              </Nav.Link>
+              <Nav.Link href="/host/confr" >Dashboard</Nav.Link>
+              <Nav.Link href="/host/edit" >รายละเอียดทั่วไป</Nav.Link>
+              <Nav.Link href="/host/edit/regis" >ข้อมูลการลงทะเบียน</Nav.Link>
+              <Nav.Link href="/host/edit/venue" >สถานที่จัดงาน</Nav.Link>
+              <Nav.Link href="/host/edit/question" >แบบประเมิน</Nav.Link>
+              <Nav.Link href="/host/edit/present" >การนำเสนอ</Nav.Link>
+              <Nav.Link href="/host/edit/guideline"  >ข้อแนะนำ</Nav.Link>
+              <Nav.Link href="/host/edit/partner"  >ผู้สนับสนุน</Nav.Link>
+              <Nav.Link href="/host/edit/category"  >หัวข้องานประชุม</Nav.Link>
+              <Nav.Link href="/host/edit/publication"  >วารสาร</Nav.Link>
+              <Nav.Link href="/host/edit/submission"  >การส่งบทความ</Nav.Link>
+              <Nav.Link href="/host/edit/invite-speaker"  >วิทยากร</Nav.Link>
+              <Nav.Link href="/host/edit/award" >รางวัลดีเด่น</Nav.Link>
+            </Nav>
+            <div className="p-3">
+              <UserDropdown />
+            </div>
           </div>
-        </div>
         </Col>
         <Col xs={12} lg={10} className="content">
           <Navbar bg="dark" variant="dark" expand="lg" className="d-lg-none p-3 rounded mb-3">
@@ -50,7 +50,10 @@ function SidebarV2({ children }) {
           </Navbar>
           <Offcanvas show={show} onHide={handleClose}>
             <Offcanvas.Header closeButton>
-              <Offcanvas.Title>PAPERSS</Offcanvas.Title>
+              <Offcanvas.Title>
+                PAPERSS<br />
+                <h6 className='text-primary fw-bold'>{confrCode}</h6>
+              </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="flex-column">
@@ -69,7 +72,7 @@ function SidebarV2({ children }) {
               </Nav>
             </Offcanvas.Body>
           </Offcanvas>
-          <div className="px-4">
+          <div className="px-lg-4">
             {children}
           </div>
         </Col>

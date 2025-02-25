@@ -190,16 +190,20 @@ function HostReview() {
   }
 
   // handleUpdate
+  const [updateLoading, setUpdateLoading] = useState(false)
   const UpdateDetail = async (e) => {
     e.preventDefault()
+    setUpdateLoading(true)
     try {
-      await axios.patch('/api/paper/update/' + id, {
-        title: e.target.title.value
-      })
+      const formData = new FormData(e.target)
+      const json = Object.fromEntries(formData.entries())
+      await axios.patch('/api/paper/update/' + id, json)
       toast.success('แก้ไขสำเร็จ')
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setUpdateLoading(false)
     }
   }
 
@@ -242,21 +246,21 @@ function HostReview() {
               <div>
 
                 <div className="mb-3">
-                  <label className="form-label">รหัสบทความ</label>
+                  <label className="form-label fw-bold">รหัสบทความ</label>
                   <div>
                     {paper.paper_code}
                   </div>
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">หัวข้อ</label>
+                  <label className="form-label fw-bold">หัวข้อ</label>
                   <div>
                     {paper.cate_code?.name}
                   </div>
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">ประเภทการลงทะเบียน</label>
+                  <label className="form-label fw-bold">ประเภทการลงทะเบียน</label>
                   <div>
                     {paper.regis_type ? 'Early Bird' : 'Regular'}
                   </div>
@@ -265,7 +269,7 @@ function HostReview() {
                 <form onSubmit={UpdateDetail}>
                   <div className="row row-cols-1 g-3">
                     <div>
-                      <label className="form-label">ชื่อบทความ (ภาษาไทย)</label>
+                      <label className="form-label fw-bold">ชื่อบทความ (ภาษาไทย)</label>
                       <input
                         type='text'
                         defaultValue={paper.title}
@@ -274,7 +278,7 @@ function HostReview() {
                       />
                     </div>
                     <div>
-                      <label className="form-label">ชื่อบทความ (ภาษาอังกฤษ)</label>
+                      <label className="form-label fw-bold">ชื่อบทความ (ภาษาอังกฤษ)</label>
                       <input
                         type='text'
                         defaultValue={paper.title_en}
@@ -284,16 +288,20 @@ function HostReview() {
                     </div>
 
                     <div>
-                      <label className="form-label">ชื่อผู้แต่ง</label>
+                      <label className="form-label fw-bold">ชื่อผู้แต่ง</label>
                       <textarea
                         defaultValue={paper.author}
                         className="form-control"
                         name='author'
+                        rows={5}
                       />
+                      <div className='form-text'>
+                        เพิ่มชื่อผู้แต่งด้วยการคั่นเครื่องหมาย , ระหว่างชื่อที่ต้องการเพิ่มเช่น ผู้แต่ง 1, ผู้แต่ง 2
+                      </div>
                     </div>
 
                     <div>
-                      <label className="form-label">Abstract</label>
+                      <label className="form-label fw-bold">Abstract</label>
                       <textarea
                         defaultValue={paper.abstract}
                         className="form-control"
@@ -302,7 +310,7 @@ function HostReview() {
                       />
                     </div>
                     <div>
-                      <label className="form-label">คำสำคัญ</label>
+                      <label className="form-label fw-bold">คำสำคัญ</label>
                       <textarea
                         type='text'
                         defaultValue={paper.keyword}
@@ -312,7 +320,7 @@ function HostReview() {
                     </div>
 
                     <div>
-                      <label className="form-label">คณะ</label>
+                      <label className="form-label fw-bold">คณะ</label>
                       <input
                         type='text'
                         defaultValue={paper.group}
@@ -322,7 +330,7 @@ function HostReview() {
                     </div>
 
                     <div>
-                      <label className="form-label">มหาวิทยาลัย</label>
+                      <label className="form-label fw-bold">มหาวิทยาลัย</label>
                       <input
                         type='text'
                         defaultValue={paper.university}
@@ -330,7 +338,6 @@ function HostReview() {
                         name='university'
                       />
                     </div>
-
                     {paper.publication &&
                       <div>
                         <label className="form-label">วารสาร</label>
@@ -344,7 +351,7 @@ function HostReview() {
                     }
 
                     <div>
-                      <label className="form-label">ที่อยู่ในการติดต่อ</label>
+                      <label className="form-label fw-bold">ที่อยู่ในการติดต่อ</label>
                       <textarea
                         type='text'
                         defaultValue={paper.address}
@@ -354,7 +361,7 @@ function HostReview() {
                     </div>
 
                     <div>
-                      <label className="form-label">เบอร์โทรศัพท์</label>
+                      <label className="form-label fw-bold">เบอร์โทรศัพท์</label>
                       <input
                         type='text'
                         defaultValue={paper.contact}
@@ -363,14 +370,23 @@ function HostReview() {
                         maxLength={10}
                         name='contact'
                       />
+                      <div className="form-text">
+                        เฉพาะตัวเลข 10 หลักเท่านั้น
+                      </div>
                     </div>
 
                   </div>
-                  <div className="text-end mt-3">
-                    <button type='submit' className="btn btn-success">ยืนยันการแก้ไข</button>
+                  <div className="text-end my-3">
+                    {updateLoading ? (
+                      <button className="btn btn-primary" type="button" disabled>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Loading...</span>
+                      </button>
+                    ) : (
+                      <button type='submit' className="btn btn-success">ยืนยันการแก้ไข</button>
+                    )}
                   </div>
                 </form>
-
                 {paper.status === 'PENDING' && paper.result === 'PENDING' &&
                   <div className="my-3">
                     <div className="text-muted">
@@ -386,25 +402,25 @@ function HostReview() {
                   <h4 className="mb-4">สถานะบทความ / สถานะการชำระเงิน</h4>
                   <div className="row row-cols-1 row-cols-md-4 g-3 mb-3">
                     <div>
-                      <label className="form-label">สถานะบทความ</label>
+                      <label className="form-label fw-bold">สถานะบทความ</label>
                       <div>
                         <PaperStatus status={paper.status} />
                       </div>
                     </div>
                     <div>
-                      <label className="form-label">ผลลัพธ์บทความ</label>
+                      <label className="form-label fw-bold">ผลลัพธ์บทความ</label>
                       <div>
                         <PaperResult status={paper.result} />
                       </div>
                     </div>
                     <div>
-                      <label className="form-label">สถานะการชำระเงิน</label>
+                      <label className="form-label fw-bold">สถานะการชำระเงิน</label>
                       <div>
                         <PaymentStatus status={paper.payment_status} />
                       </div>
                     </div>
                     <div>
-                      <label className="form-label">หลักฐานการชำระเงิน</label>
+                      <label className="form-label fw-bold">หลักฐานการชำระเงิน</label>
                       <div>
                         {paper.payment_image ? (
                           <Link
@@ -529,7 +545,7 @@ function HostReview() {
                   <div key={item._id}>
                     <div className='card'>
                       <div className="card-body">
-                        <h6 className="card-title">{item.reviewer?.name} ({item.reviewer?.username})</h6>
+                        <h6 className="card-title text-muted">{item.reviewer?.name} ({item.reviewer?.username})</h6>
                         <div className="table-responsive">
                           <table className="table" style={{ minWidth: 1000 }}>
                             <thead>
@@ -576,7 +592,7 @@ function HostReview() {
                   </div>
                 ))}
               </div>
-              {((paper.status === 'REVIEW' && paper.result === 'PENDING' &&  handleStatus(review)) || paper.result === 'MINOR' || paper.result === 'MAJOR') &&
+              {((paper.status === 'REVIEW' && paper.result === 'PENDING' && handleStatus(review)) || paper.result === 'MINOR' || paper.result === 'MAJOR') &&
                 <div className='card shadow-sm'>
                   <div className='card-body'>
                     <h4 className="card-title">เปลี่ยนผลลัพธ์บทความ</h4>

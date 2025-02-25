@@ -38,8 +38,12 @@ function HostEditCate() {
         }
     }
 
+
+    // update confr topic
+    const [cateLoading, setCateLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setCateLoading(true)
         try {
             const formData = new FormData(e.target)
             const json = Object.fromEntries(formData.entries())
@@ -48,6 +52,8 @@ function HostEditCate() {
             toast.success('แก้ไขสำเร็จ')
         } catch (error) {
             console.log(error)
+        } finally {
+            setCateLoading(false)
         }
     }
 
@@ -114,16 +120,32 @@ function HostEditCate() {
                                 </p>
                                 <div className='col-12'>
                                     <label className='form-label text-muted'>ชื่องานประชุม</label>
-                                    <input name='name' className='form-control' defaultValue={cateData?.name} />
+                                    <input
+                                        name='name'
+                                        className='form-control'
+                                        defaultValue={cateData?.name}
+                                    />
                                 </div>
                                 <div className='col-12'>
                                     <label className='form-label text-muted'>รายละเอียดงานประชุม</label>
-                                    <textarea name='desc' className='form-control' defaultValue={cateData?.desc} />
+                                    <textarea
+                                        name='desc'
+                                        className='form-control'
+                                        defaultValue={cateData?.desc}
+                                        rows={5}
+                                    />
                                 </div>
                                 <div className='text-end'>
-                                    <button type='submit' className='btn btn-primary'>
-                                        <i className='bi bi-floppy me-2'></i>บันทึกข้อมูล
-                                    </button>
+                                    {cateLoading ? (
+                                        <button className="btn btn-primary" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                            <span>Loading...</span>
+                                        </button>
+                                    ) : (
+                                        <button type='submit' className='btn btn-primary'>
+                                            <i className='bi bi-floppy me-2'></i>บันทึกข้อมูล
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </form>
@@ -162,13 +184,13 @@ function HostEditCate() {
                 </div>
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title'>
+                        <h4 className='card-title mb-3'>
                             รายชื่อกรรมการทั้งหมด
                         </h4>
                         <div className='d-flex justify-content-between align-items-center mb-3'>
                             <div>
                                 <form onSubmit={handleSearchChange} className="input-group">
-                                    <input type="text" className="form-control" placeholder="ค้นหา" name='search' />
+                                    <input type="text" className="form-control" placeholder="ค้นหาจากชื่อผู้ใช้งาน" name='search' />
                                     <button type='submit' className="btn btn-primary" id="basic-addon2"><i className="bi bi-search"></i></button>
                                 </form>
                             </div>

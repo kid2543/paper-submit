@@ -207,7 +207,7 @@ function HostAssign() {
         onConfirm={() => handleDelete(deleteId)}
         show={showConfirmDelete}
       />
-      <div className='container py-4'>
+      <div>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
             <div>

@@ -33,7 +33,7 @@ function Home() {
             <div className='row gy-4'>
               <div className='col-12'>
                 <h1 className='display-1 fw-bold'>สร้างงานประชุม และส่งบทความกับ <span className='text-primary'>PAPERSS</span></h1>
-                <h5 className='my-5 fw-normal'>สร้างงานประชุม และส่งบทความวิชาการตามหัวข้อที่สนใจได้ที่ Paper submission</h5>
+                <h5 className='my-5 fw-normal'>สร้างงานประชุม และส่งบทความวิชาการตามหัวข้อที่สนใจได้ที่ Papers Submission</h5>
               </div>
               <div className='col-12 align-middle'>
                 <div className='row gy-3 gx-5 align-items-center'>

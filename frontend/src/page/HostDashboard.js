@@ -103,17 +103,17 @@ function HostDashboard() {
                 </Modal>
                 <div className='card'>
                     <div className='card-body'>
-                        <div className="btn-group mb-3">
-                            <button type='button' onClick={handleShow} className='btn btn-primary'><i className='bi bi-plus-lg me-2'></i>เพิ่มงานประชุม</button>
+                        <div className="d-flex mb-3">
+                            <button type='button' onClick={handleShow} className='btn btn-primary me-2'><i className='bi bi-plus-lg me-2'></i>เพิ่มงานประชุม</button>
                             <Dropdown>
-                                <Dropdown.Toggle variant="light" id="dropdown-basic">
+                                <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
                                     เปลี่ยนเครื่องมือค้นหา
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                    <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ชื่องานประชุม</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ค้นหาจากชื่องานประชุม</Dropdown.Item>
                                     <Dropdown.Item type='button' onClick={() => setSearchInput('tag')}>ค้นหาจาก Tag</Dropdown.Item>
-                                    <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ประเภทงานประชุม</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ค้นหาจากประเภทงานประชุม</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>
@@ -136,13 +136,12 @@ function HostDashboard() {
                                     </form>
                                 }
                                 {searchInput === 'cate' &&
-                                    <select className="form-select" onChange={e => searchConfr.handleSearchCate(e)}>
-                                        <option value=''>--เลือกประเภทงานประชุม</option>
-                                        <option value="การประชุมวิชาการระดับชาติ">การประชุมวิชาการระดับชาติ</option>
-                                        <option value="การประชุมวิชาการระดับนานาชาติ">การประชุมวิชาการระดับนานาชาติ</option>
-                                        <option value="การประชุมวิชาการเฉพาะทาง">การประชุมวิชาการเฉพาะทาง</option>
-                                        <option value="การประชุมวิชาการประจำปี">การประชุมวิชาการประจำปี</option>
-                                    </select>
+                                    <form className='input-group' onSubmit={e => searchConfr.handleSearchCate(e)}>
+                                        <input name='cate' type="search" className="form-control" placeholder="ค้นหาจากหมวดหมู่" />
+                                        <button type='submit' className='btn btn-primary'>
+                                            <i className="bi bi-search"></i>
+                                        </button>
+                                    </form>
                                 }
                             </div>
                         </div>
@@ -158,6 +157,8 @@ function HostDashboard() {
                                                     <th>#</th>
                                                     <th>รหัส</th>
                                                     <th>ชื่อ</th>
+                                                    <th>Tag</th>
+                                                    <th>หมวดหมู่</th>
                                                     <th>เครื่องมือ</th>
                                                 </tr>
                                             </thead>
@@ -165,11 +166,22 @@ function HostDashboard() {
                                                 <tbody>
                                                     {searchConfr.data.map((item, index) => (
                                                         <tr key={item._id}>
-                                                            <td>{(searchConfr.page -1 ) * 10 + (index  + 1)}</td>
+                                                            <td>{(searchConfr.page - 1) * 10 + (index + 1)}</td>
                                                             <td>{item.confr_code}</td>
                                                             <td>
                                                                 {item.title}
                                                             </td>
+                                                            <td>
+                                                                {item.tag?.map((tags, tagsIndex) => (
+                                                                    <span className="badge text-bg-primary me-2" key={tagsIndex}>{tags}</span>
+                                                                ))}
+                                                            </td>
+                                                            <td>
+                                                                {item.cate?.map((cates, catesIndex) => (
+                                                                    <span className="badge text-bg-primary me-2" key={catesIndex}>{cates}</span>
+                                                                ))}
+                                                            </td>
+
                                                             <td>
                                                                 <button onClick={() => viewConference(item._id, item.confr_code)} type='button' className='btn btn-light' to='#'>
                                                                     <i className="bi bi-pencil-square"></i>
@@ -189,7 +201,7 @@ function HostDashboard() {
                                             )
                                             }
                                         </table>
-                                        <PaginationComponent 
+                                        <PaginationComponent
                                             currentPage={searchConfr.page}
                                             onFirstPage={searchConfr.handleFirstPage}
                                             onLastPage={searchConfr.handleLastPage}

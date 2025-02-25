@@ -42,10 +42,11 @@ function HostCateList() {
                 const res = await axios.delete('/api/category/' + cate_id)
                 toast.success(res.data)
                 setSearchData(searchData.filter(items => items._id !== cate_id))
-                handleCloseDelete()
             } catch (error) {
                 console.log(error)
                 toast.error(error.response?.data.error)
+            } finally {
+                handleCloseDelete()
             }
         } else {
             toast.error('กรุณาเลือกหัวข้อที่จะลบ')

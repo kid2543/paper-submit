@@ -327,7 +327,7 @@ function Host() {
               <h4 className='col-12 col-md-8 mb-0'>รายการบทความ</h4>
               <form onSubmit={searchPaper.handleSearchChange} className='col-12 col-md-4'>
                 <div className="input-group">
-                  <input name='search' type="text" className="form-control" placeholder="ค้นหา" />
+                  <input name='search' type="text" className="form-control" placeholder="ค้นหาจากชื่อบทความ" />
                   <button type='submit' className="input-group-text btn btn-primary text-white" id="basic-addon2">
                     <i className="bi bi-search"></i>
                   </button>
