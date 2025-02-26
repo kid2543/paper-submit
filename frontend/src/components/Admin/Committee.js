@@ -3,7 +3,6 @@ import useSearch from '../../hook/useSearch'
 import axios from 'axios'
 
 // hook
-import { useSignup } from '../../hook/useSignup';
 import { Link } from 'react-router-dom';
 
 
@@ -30,7 +29,6 @@ function Committee() {
         handleLastPage,
         handleNumberPage 
     } = useSearch("/api/user/search/committee")
-    const signUp = useSignup()
 
     //modal
     const [show, setShow] = useState(false)
@@ -43,6 +41,8 @@ function Committee() {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
 
+    // create committee
+    const [createError, setCreateError] = useState('')
     const handleCreate = async (e) => {
         e.preventDefault()
         try {
@@ -60,8 +60,8 @@ function Committee() {
             setName('')
             handleClose()
         } catch (error) {
-            console.log(error)
-            toast.error('เกิดข้อผิดพลาด: ' + error.response.data?.error)
+            setCreateError(error.response.data?.error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         }
     }
 
@@ -86,22 +86,27 @@ function Committee() {
                             <input type='email' className='form-control' required value={email} onChange={e => setEmail(e.target.value)} />
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>ชื่อผู้ใช้งาน</label>
+                            <label className='form-label'>ชื่อผู้ใช้งาน (8-20 ตัวอักษร)</label>
                             <input className='form-control' required value={username} onChange={e => setUsername(e.target.value)} />
+                            <div className='form-text'>
+                                สามารถใช้ _ หรือ . ได้
+                            </div>
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>รหัสผ่าน</label>
+                            <label className='form-label'>รหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)</label>
                             <input className='form-control' name='password' type='password' required onChange={e => setPassword(e.target.value)} />
-                            <small className='text-muted'>รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข ขั้นต่ำ 8 ตัวอักษร</small>
+                            <div className='form-text'>
+                                รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลขและอักษรพิเศษอย่างละ 1 ตัวอักษร
+                            </div>
                         </div>
                         <div className='col-12'>
                             <label className='form-label'>ยืนยีนรหัสผ่านอีกครั้ง</label>
                             <input className='form-control' name='confirm_password' type='password' required pattern={password} />
                         </div>
-                        {signUp.error &&
-                            <p className='text-danger'>
-                                {signUp.error}
-                            </p>
+                        {createError &&
+                            <div className='text-danger'>
+                                {createError}
+                            </div>
                         }
                     </Modal.Body>
                     <Modal.Footer>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios';
 // hook
-import { useSignup } from '../../hook/useSignup'
 import useSearch from '../../hook/useSearch'
 // react boostatrap
 import Button from 'react-bootstrap/Button';
@@ -31,10 +30,13 @@ function Host() {
     const [password, setPassword] = useState('')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
-    const signUp = useSignup()
 
+
+    const [createError, setCreateError] = useState('')
+    const [createLoading, setCreateLoading] = useState(false)
     const handleCreate = async (e) => {
         e.preventDefault()
+        setCreateLoading(true)
         try {
             const res = await axios.post('/api/user/host/add', {
                 username,
@@ -50,7 +52,10 @@ function Host() {
             setName('')
             handleClose()
         } catch (error) {
+            setCreateError(error.response.data?.error)
             toast.error(error.response.data?.error)
+        } finally {
+            setCreateLoading(false)
         }
     }
 
@@ -78,29 +83,34 @@ function Host() {
                             <input type='email' className='form-control' required value={email} onChange={e => setEmail(e.target.value)} />
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>ชื่อผู้ใช้งาน</label>
+                            <label className='form-label'>ชื่อผู้ใช้งาน (8-20 ตัวอักษร)</label>
                             <input className='form-control' required value={username} onChange={e => setUsername(e.target.value)} />
+                            <div className='form-text'>
+                                สามารถใช้ _ หรือ . ได้
+                            </div>
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>รหัสผ่าน</label>
+                            <label className='form-label'>รหัสผ่าน (ขั้นต่ำ 8 ตัวอักษร)</label>
                             <input className='form-control' name='password' type='password' required onChange={e => setPassword(e.target.value)} />
-                            <small className='text-muted'>รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข ขั้นต่ำ 8 ตัวอักษร</small>
+                            <div className='form-text'>
+                                รูปแบบรหัสประกอบด้วย พิมพ์เล็ก พิมพ์ใหญ่ ตัวเลขและอักษรพิเศษอย่างละ 1 ตัวอักษร
+                            </div>
                         </div>
                         <div className='col-12'>
-                            <label className='form-label'>ยืนยีนรหัสผ่านอีกครั้ง</label>
+                            <label className='form-label'>ยืนยันรหัสผ่านอีกครั้ง</label>
                             <input className='form-control' name='confirm_password' type='password' required pattern={password} />
                         </div>
-                        {signUp.error &&
-                            <p className='text-danger'>
-                                {signUp.error}
-                            </p>
+                        {createError &&
+                            <div className='text-danger'>
+                                {createError}
+                            </div>
                         }
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="" onClick={handleClose}>
                             ปิด
                         </Button>
-                        <Button variant="primary" type='submit' disabled={signUp.isLoading}>
+                        <Button variant="primary" type='submit' disabled={createLoading}>
                             สร้าง
                         </Button>
                     </Modal.Footer>
@@ -144,7 +154,7 @@ function Host() {
                                 <>
                                     {data?.map((item, index) => (
                                         <tr key={item._id}>
-                                            <td>{(page -1 ) * 10 + (index  + 1)}</td>
+                                            <td>{(page - 1) * 10 + (index + 1)}</td>
                                             <td>{item.name}</td>
                                             <td>{item.username}</td>
                                             <td>
@@ -165,7 +175,7 @@ function Host() {
                 )
                 }
             </div>
-            <PaginationComponent 
+            <PaginationComponent
                 currentPage={page}
                 onFirstPage={handleFirstPage}
                 onLastPage={handleLastPage}

@@ -186,8 +186,10 @@ export default Registration
 
 function ModalAcc(props) {
 
+    const [updateLoading, setUpdateLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setUpdateLoading(true)
         try {
             const formData = new FormData(e.target)
             formData.append('_id', props.data._id)
@@ -199,6 +201,8 @@ function ModalAcc(props) {
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            setUpdateLoading(false)
         }
     }
 
@@ -229,16 +233,23 @@ function ModalAcc(props) {
                             name='acc_no'
                             defaultValue={props.data?.acc_no}
                             pattern='[0-9]{10}' />
-                        <div className="form-text">เฉพาะตัวเลขเท่านั้น</div>
+                        <div className="form-text">เฉพาะตัวเลข 10 หลักเท่านั้น</div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        แก้ไข
-                    </Button>
+                    {updateLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            แก้ไข
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -368,8 +379,10 @@ function ModalRegisDate(props) {
 
     const [editStatus, setEditStatus] = useState(false)
 
+    const [updateLoading, setUpdateLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setUpdateLoading(true)
         try {
             const formData = new FormData(e.target)
             formData.append('_id', props.data?._id)
@@ -381,6 +394,8 @@ function ModalRegisDate(props) {
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setUpdateLoading(false)
         }
     }
 
@@ -399,30 +414,60 @@ function ModalRegisDate(props) {
                     <p className='fw-bold'>Early bird</p>
                     <div className='col-12'>
                         <label className='form-label'>Start</label>
-                        <input type='date' name='regis_eb_start_date' className='form-control' defaultValue={dayjs(props.data?.regis_eb_start_date).format('YYYY-MM-DD')} onChange={() => setEditStatus(true)} />
+                        <input
+                            type='date'
+                            name='regis_eb_start_date'
+                            className='form-control'
+                            defaultValue={dayjs(props.data?.regis_eb_start_date).format('YYYY-MM-DD')}
+                            onChange={() => setEditStatus(true)} />
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>End</label>
-                        <input className='form-control' type='date' name='regis_eb_end_date' defaultValue={dayjs(props.data?.regis_eb_end_date).format('YYYY-MM-DD')} onChange={() => setEditStatus(true)} />
+                        <input
+                            className='form-control'
+                            type='date'
+                            name='regis_eb_end_date'
+                            defaultValue={dayjs(props.data?.regis_eb_end_date).format('YYYY-MM-DD')}
+                            onChange={() => setEditStatus(true)}
+                        />
                     </div>
                     <hr />
                     <p className='fw-bold'>Regular</p>
                     <div className='col-12'>
                         <label className='form-label'>Start</label>
-                        <input className='form-control' type='date' name='regis_rl_start_date' defaultValue={dayjs(props.data?.regis_rl_start_date).format('YYYY-MM-DD')} onChange={() => setEditStatus(true)} />
+                        <input
+                            className='form-control'
+                            type='date'
+                            name='regis_rl_start_date'
+                            defaultValue={dayjs(props.data?.regis_rl_start_date).format('YYYY-MM-DD')}
+                            onChange={() => setEditStatus(true)}
+                        />
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>End</label>
-                        <input className='form-control' type='date' name='regis_rl_end_date' defaultValue={dayjs(props.data?.regis_rl_end_date).format('YYYY-MM-DD')} onChange={() => setEditStatus(true)} />
+                        <input
+                            className='form-control'
+                            type='date'
+                            name='regis_rl_end_date'
+                            defaultValue={dayjs(props.data?.regis_rl_end_date).format('YYYY-MM-DD')}
+                            onChange={() => setEditStatus(true)}
+                        />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={handleCancel}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!editStatus}>
-                        อัพเดท
-                    </Button>
+                    {updateLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!editStatus}>
+                            อัพเดท
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

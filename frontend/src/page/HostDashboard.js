@@ -193,25 +193,25 @@ function HostDashboard() {
                                             ) : (
                                                 <tbody>
                                                     <tr>
-                                                        <td className='p-3' colSpan={4}>
-                                                            <h3 className="fw-bold">ไม่พบข้อมูล</h3>
+                                                        <td className='p-3 text-center' colSpan={6}>
+                                                            ไม่พบข้อมูล
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             )
                                             }
                                         </table>
-                                        <PaginationComponent
-                                            currentPage={searchConfr.page}
-                                            onFirstPage={searchConfr.handleFirstPage}
-                                            onLastPage={searchConfr.handleLastPage}
-                                            onPageNext={searchConfr.handleNextPage}
-                                            onPagePrev={searchConfr.handlePreviousPage}
-                                            onSelectPage={searchConfr.handleNumberPage}
-                                            totalPages={searchConfr.totalPages}
-                                        />
                                     </div >
                                 }
+                                <PaginationComponent
+                                    currentPage={searchConfr.page}
+                                    onFirstPage={searchConfr.handleFirstPage}
+                                    onLastPage={searchConfr.handleLastPage}
+                                    onPageNext={searchConfr.handleNextPage}
+                                    onPagePrev={searchConfr.handlePreviousPage}
+                                    onSelectPage={searchConfr.handleNumberPage}
+                                    totalPages={searchConfr.totalPages}
+                                />
                             </div>
                         )}
                     </div>

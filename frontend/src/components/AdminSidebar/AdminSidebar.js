@@ -19,6 +19,7 @@ function SidebarV2({ children }) {
                     <Nav variant='pills' className="flex-column p-3" activeKey={window.location.pathname}>
                         <Nav.Link href='/' className='p-3'>
                             <h4 className='fw-bold'>PAPERSS</h4>
+                            <h6>Admin</h6>
                         </Nav.Link>
                         <Nav.Link href="/admin">Dashboard</Nav.Link>
                         <Nav.Link href="/admin/conference">งานประชุม</Nav.Link>

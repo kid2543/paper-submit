@@ -75,26 +75,26 @@ userSchema.statics.signup = async function (username, password, role) {
     if (role === 'ADMIN') {
         const admin = await this.findOne({ role })
         if (admin) {
-            throw Error('Already have Admin')
+            throw Error('ผู้ดูแลระบบสามารถมีได้เพียง 1 บัญชี')
         }
     }
 
     if (!username || !password) {
-        throw Error('All fields must be filled')
+        throw Error('กรุณากรอกข้อมูลให้ครบ')
     }
 
     if (!usernameValid) {
-        throw Error('Username is not valid ')
+        throw Error('ชื่อผู้ใช้งานไม่ตรงตามเงื่อนไข')
     }
 
     if (!validator.isStrongPassword(password)) {
-        throw Error('Password not strong enough')
+        throw Error('รหัสผ่านไม่แข็งแรงพอ')
     }
 
     const exists = await this.findOne({ username })
 
     if (exists) {
-        throw Error('Username already in use')
+        throw Error('ชื่อผู้ใช้งานนี้ถูกใช้ไปแล้ว')
     }
 
     const salt = await bcrypt.genSalt(10)

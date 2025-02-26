@@ -89,7 +89,12 @@ function Edit() {
                     </div>
                     <div className='col-12 col-md-6'>
                         <Layout>
-                            <EditTagModal show={tagModal} handleClose={() => setTagModal(false)} data={data} handleUpdate={handleUpdate} />
+                            <EditTagModal
+                                show={tagModal}
+                                handleClose={() => setTagModal(false)}
+                                data={data}
+                                handleUpdate={handleUpdate}
+                            />
                             <div className='py-4'>
                                 <h4>Tag</h4>
                                 <hr />
@@ -113,25 +118,40 @@ function Edit() {
                                 <hr />
                             </div>
                             <ul>
-                                {data.cate?.map((items,index) => (
+                                {data.cate?.map((items, index) => (
                                     <li key={index}>{items}</li>
                                 ))}
                             </ul>
                             <div className='position-absolute top-0 end-0 m-2'>
                                 <button type='button' onClick={() => setCateModal(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
                             </div>
-                            <EditCateModal show={cateModal} handleClose={() => setCateModal(false)} data={data} handleUpdate={handleUpdate} />
+                            <EditCateModal
+                                show={cateModal}
+                                handleClose={() => setCateModal(false)}
+                                data={data}
+                                handleUpdate={handleUpdate}
+                            />
                         </Layout>
                     </div>
                     <div className='col-12 col-md-6'>
                         <Layout>
-                            <ConfrDateModal show={confrModal} handleClose={() => setConfrModal(false)} data={data} setData={setData} />
+                            <ConfrDateModal
+                                show={confrModal}
+                                handleClose={() => setConfrModal(false)}
+                                data={data}
+                                setData={setData}
+                            />
                             <div className='py-4'>
                                 <h4>ระยะเวลาการดำเนินงาน</h4>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
-                                <button type='button' onClick={() => setConfrModal(true)} className='btn'><i className="bi bi-pencil-square"></i></button>
+                                <button
+                                    type='button'
+                                    onClick={() => setConfrModal(true)}
+                                    className='btn'>
+                                    <i className="bi bi-pencil-square"></i>
+                                </button>
                             </div>
                             <p>เริ่มต้น: {data.confr_start_date && dayjs(data.confr_start_date).format('DD MMM YYYY')}</p>
                             <p>สิ้นสุด: {data.confr_end_date && dayjs(data.confr_end_date).format('DD MMM YYYY')}</p>
@@ -139,7 +159,12 @@ function Edit() {
                     </div>
                     <div className='col-12 col-md-6'>
                         <Layout>
-                            <UploadLogo show={logoModal} handleClose={() => setLogoModal(false)} setData={setData} id={confr_id} />
+                            <UploadLogo
+                                show={logoModal}
+                                handleClose={() => setLogoModal(false)}
+                                setData={setData}
+                                id={confr_id}
+                            />
                             <div className='py-4'>
                                 <h4>Logo ประจำงานประชุม</h4>
                                 <hr />
@@ -328,7 +353,7 @@ function EditDescModal(props) {
                         </div>
                     ))}
                     <div>
-                        <button type='button' className='btn btn-primary' onClick={() => setDesc([...desc, ""])}>
+                        <button type='button' className='btn btn-outline-primary' onClick={() => setDesc([...desc, ""])}>
                             <i className="bi bi-plus me-2"></i>
                             เพิ่มรายละเอียด
                         </button>
@@ -420,7 +445,7 @@ function EditImportantDate(props) {
                         </div>
                     ))}
                     <div className='col-12'>
-                        <button className='btn btn-primary' type='button' onClick={handleAdd}>
+                        <button className='btn btn-outline-primary' type='button' onClick={handleAdd}>
                             <i className="bi bi-plus"></i>
                             เพิ่มกำหนดการ
                         </button>
@@ -514,12 +539,12 @@ function UploadLogo(props) {
             const res = await axios.patch('/api/conference/logo/' + props.id, formData)
             props.setData(res.data)
             toast.success('Success')
-            closeModal()
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
         } finally {
             setLoading(false)
+            closeModal()
         }
     }
 
@@ -634,15 +659,15 @@ function EditCateModal(props) {
     }
 
     const handleDelete = (index) => {
-        let temp = {...form}
-        temp.cate = temp.cate.filter((items,idx) => idx !== index)
+        let temp = { ...form }
+        temp.cate = temp.cate.filter((items, idx) => idx !== index)
         setKey(key + 1)
         setForm(temp)
     }
 
-    const handleChange = (e,index) => {
+    const handleChange = (e, index) => {
         const { value } = e.target
-        let temp = {...form}
+        let temp = { ...form }
         temp.cate[index] = value
         setForm(temp)
     }

@@ -59,23 +59,31 @@ function Author() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data.map((items, index) => (
-                                        <tr key={items._id}>
-                                            <td>{(page -1 ) * 10 + (index  + 1)}</td>
-                                            <td>{items.name}</td>
-                                            <td>{items.username}</td>
-                                            <td>{items.email}</td>
-                                            <td>
-                                                <Link className="btn btn-light" to={`/admin/user/${items._id}`}>
-                                                    <i className="bi bi-pencil-square"></i>
-                                                </Link>
-                                            </td>
+                                    {data.lenght > 0 ? (
+                                        <>
+                                            {data.map((items, index) => (
+                                                <tr key={items._id}>
+                                                    <td>{(page - 1) * 10 + (index + 1)}</td>
+                                                    <td>{items.name}</td>
+                                                    <td>{items.username}</td>
+                                                    <td>{items.email}</td>
+                                                    <td>
+                                                        <Link className="btn btn-light" to={`/admin/user/${items._id}`}>
+                                                            <i className="bi bi-pencil-square"></i>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </>
+                                    ) : (
+                                        <tr className="text-center">
+                                            <td colSpan={5} className="p-3">ไม่พบข้อมูล</td>
                                         </tr>
-                                    ))}
+                                    )}
                                 </tbody>
                             </table>
                         )}
-                        <PaginationComponent 
+                        <PaginationComponent
                             currentPage={page}
                             onFirstPage={handleFirstPage}
                             onLastPage={handleLastPage}
