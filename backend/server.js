@@ -40,9 +40,6 @@ app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
 
-
-
-
 //routes
 app.use('/api/user', userRoutes)
 app.use('/api/paper', paperRoutes)

@@ -134,7 +134,7 @@ function Host() {
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>ชื่อ</th>
+                                <th>ชื่อ - นามสกุล</th>
                                 <th>ชื่อผู้ใช้งาน</th>
                                 <th>เครื่องมือ</th>
                             </tr>
@@ -157,7 +157,7 @@ function Host() {
                                 </>
                             ) : (
                                 <tr className='text-center'>
-                                    <td colSpan={4} className='p-3 fw-bold'>ไม่พบรายการ</td>
+                                    <td colSpan={4} className='p-3'>ไม่พบข้อมูล</td>
                                 </tr>
                             )}
                         </tbody>

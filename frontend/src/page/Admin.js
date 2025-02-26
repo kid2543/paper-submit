@@ -61,7 +61,7 @@ function Admin() {
     let comitNumber = user.filter(items => items.role === 'COMMITTEE')
 
     return (
-        <div className='py-4'>
+        <div>
             <div className='card  shadow-sm bg-primary text-white py-3 mb-3'>
                 <div className='card-body'>
                     <h3 className='fw-bold'>Welcome to <br />Admin Dashboard</h3>

@@ -164,7 +164,7 @@ function Committee() {
                                 </>
                             ) : (
                                 <tr className='text-center'>
-                                    <td colSpan={4} className='p-3 fw-bold'>ไม่พบรายการ</td>
+                                    <td colSpan={4} className='p-3'>ไม่พบข้อมูล</td>
                                 </tr>
                             )}
                         </tbody>
