@@ -42,8 +42,10 @@ function Edit() {
     const [tagModal, setTagModal] = useState(false)
     const [cateModal, setCateModal] = useState(false)
 
+    const [loadingButton, setLoadingButton] = useState(false)
     const handleUpdate = async (e, form, modal) => {
         e.preventDefault()
+        setLoadingButton(true)
         try {
             const res = await axios.patch('/api/conference', form)
             toast.success("อัพเดทสำเร็จ")
@@ -55,6 +57,8 @@ function Edit() {
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setLoadingButton(false)
         }
     }
 
@@ -83,6 +87,7 @@ function Edit() {
                                     handleClose={() => setTitleModal(false)}
                                     show={titleModal}
                                     handleUpdate={handleUpdate}
+                                    loading={loadingButton}
                                 />
                             </div>
                         </Layout>
@@ -94,6 +99,7 @@ function Edit() {
                                 handleClose={() => setTagModal(false)}
                                 data={data}
                                 handleUpdate={handleUpdate}
+                                loading={loadingButton}
                             />
                             <div className='py-4'>
                                 <h4>Tag</h4>
@@ -130,6 +136,7 @@ function Edit() {
                                 handleClose={() => setCateModal(false)}
                                 data={data}
                                 handleUpdate={handleUpdate}
+                                loading={loadingButton}
                             />
                         </Layout>
                     </div>
@@ -296,9 +303,16 @@ function EditTitleModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    {props.loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -467,10 +481,10 @@ function EditImportantDate(props) {
 
 function ConfrDateModal(props) {
 
-    const [editState, setEditState] = useState(false)
-
+    const [loading, setLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setLoading(true)
         try {
             const formData = new FormData(e.target)
             formData.append('_id', props.data?._id)
@@ -478,16 +492,13 @@ function ConfrDateModal(props) {
             const update = await axios.patch('/api/conference', json)
             props.setData(update.data)
             toast.success('แก้ไขสำเร็จ')
-            closeModal()
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            props.handleClose()
+            setLoading(false)
         }
-    }
-
-    const closeModal = () => {
-        setEditState(false)
-        props.handleClose()
     }
 
     return (
@@ -499,20 +510,37 @@ function ConfrDateModal(props) {
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
                         <label className='from-label'>เริ่มต้น</label>
-                        <input className='form-control' name='confr_start_date' type='date' defaultValue={dayjs(props.data?.confr_start_date).format('YYYY-MM-DD')} onChange={() => setEditState(true)} />
+                        <input
+                            className='form-control'
+                            name='confr_start_date'
+                            type='date'
+                            defaultValue={dayjs(props.data?.confr_start_date).format('YYYY-MM-DD')}
+                        />
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>สิ้นสุด</label>
-                        <input className='form-control' name='confr_end_date' type='date' defaultValue={dayjs(props.data?.confr_end_date).format('YYYY-MM-DD')} onChange={() => setEditState(true)} />
+                        <input
+                            className='form-control'
+                            name='confr_end_date'
+                            type='date'
+                            defaultValue={dayjs(props.data?.confr_end_date).format('YYYY-MM-DD')}
+                        />
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="" onClick={closeModal}>
+                    <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!editState}>
-                        อัพเดท
-                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -638,9 +666,16 @@ function EditTagModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    {props.loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -712,7 +747,16 @@ function EditCateModal(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant='' onClick={props.handleClose}>ปิด</Button>
-                    <Button type='submit'>อัพเดท</Button>
+                    {props.loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
