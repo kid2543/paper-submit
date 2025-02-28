@@ -230,7 +230,7 @@ function HostReview() {
         text='ต้องการยกเลิกการเผยแพร่บทความหรือไม่ ?'
         handleSubmit={handleUnPublic}
       />
-      <div className='container py-3'>
+      <div>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
             <div className='d-flex justify-content-between align-items-center'>

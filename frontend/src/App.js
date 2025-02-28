@@ -63,6 +63,7 @@ import AwardCateList from './components/HostEdit/AwardCateList';
 import AdminSignUp from './page/AdminSignUp';
 import AuthorLayout from './layout/AuthorLayout';
 import ConfrPaperAward from './page/ConfrPaperAward';
+import HostViewRegis from './page/HostViewRegis';
 
 
 function App() {
@@ -190,6 +191,16 @@ function App() {
             <PrivateRoute api={hostApi}>
               <HostEditLayout>
                 <Host />
+              </HostEditLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/host/confr/registrant'
+          element={
+            <PrivateRoute api={hostApi}>
+              <HostEditLayout>
+                <HostViewRegis />
               </HostEditLayout>
             </PrivateRoute>
           }

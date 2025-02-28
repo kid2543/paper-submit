@@ -426,6 +426,17 @@ function Host() {
           </div>
         </div>
       </section>
+      <section>
+        <div className='card my-3'>
+          <div className='card-body'>
+            <h4 className='card-title'>ดูรายชื่อผู้ลงทะเบียน</h4>
+            <Link to={`/host/confr/registrant`} className='btn btn-primary'>
+              <i className='bi bi-eye me-2'></i>
+              ดูรายชื่อ
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

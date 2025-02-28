@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { replace, useNavigate } from 'react-router-dom'
 import { useLogout } from '../hook/useLogout'
 import { useAuthContext } from '../hook/useAuthContext'
 import axios from 'axios'
@@ -20,6 +20,7 @@ export function UserDropdown() {
     const [notiMessage, setNotiMessage] = useState([])
     const [unreadState, setUnreadState] = useState(0)
     const navigate = useNavigate()
+    const [role, setRole] = useState('')
 
     // read notification
     const handleRead = async () => {
@@ -59,7 +60,8 @@ export function UserDropdown() {
                 setNotiMessage(res.data)
                 const unread = res.data.filter(items => items.status !== true)
                 setUnreadState(unread.length)
-
+                const role = await axios.get('/api/user/role')
+                setRole(role.data)
             } catch (error) {
                 console.log(error)
             }
@@ -73,9 +75,9 @@ export function UserDropdown() {
 
     const handleClose = () => setShow(false)
 
-    const handleLogout = () => {
-        logout()
-        navigate('/')
+    const handleLogout = async () => {
+        await logout()
+        navigate('/', replace)
     }
 
     return (
@@ -89,7 +91,19 @@ export function UserDropdown() {
                     {user}
                 </Dropdown.Header>
                 <Dropdown.Item href="/setting">
-                    แผงควบคุม
+                    {role === 'HOST' &&
+                        'รายการงานประชุม'
+                    }
+                    {role === 'ADMIN' &&
+                        'แผงควบคุม'
+                    }
+                    {
+                        role === 'AUTHOR' &&
+                        'รายการบทความ'
+                    }
+                    {role === 'COMMITTEE' &&
+                        'รายการตรวจบทความ'
+                    }
                 </Dropdown.Item>
                 <Dropdown.Item href="/profile">
                     การตั้งค่า
@@ -117,15 +131,15 @@ export function UserDropdown() {
                     {notiMessage.length > 0 ? (
                         <div>
                             <div className="mb-3">
-                            <button
-                                type='button'
-                                onClick={handleClear}
-                                className='btn btn-outline-dark btn-sm'
-                                disabled={notiMessage.length <= 0}
-                            >
-                                <i className='bi bi-trash me-2'></i>
-                                ลบการแจ้งเตือนทั้งหมด
-                            </button>
+                                <button
+                                    type='button'
+                                    onClick={handleClear}
+                                    className='btn btn-outline-dark btn-sm'
+                                    disabled={notiMessage.length <= 0}
+                                >
+                                    <i className='bi bi-trash me-2'></i>
+                                    ลบการแจ้งเตือนทั้งหมด
+                                </button>
                             </div>
                             <section className="list-group">
                                 {notiMessage.map(items => (

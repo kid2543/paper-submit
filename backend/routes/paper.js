@@ -39,7 +39,8 @@ const {
     rejectPaper,
     uploadPayment,
     checkPayment,
-    getPaperWithAcceptStatus
+    getPaperWithAcceptStatus,
+    getPaperOwnerRegis
 } = require('../controllers/paper_controller')
 const verifyToken = require('../middlewares/VerifyToken')
 const checkRole = require('../middlewares/checkRole')
@@ -75,6 +76,9 @@ router.get('/all', publicPaperAll)
 
 // get for conference
 router.get('/confr/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getPaperForConference)
+
+// get owner paper regis
+router.get('/regis/:id', verifyToken, checkRole(['HOST', 'ADMIN']), getPaperOwnerRegis)
 
 // get by category
 router.get('/category/:id', verifyToken, getPaperByCategory)

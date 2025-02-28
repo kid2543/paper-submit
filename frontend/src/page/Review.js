@@ -227,6 +227,7 @@ function Review() {
                                 name='suggestion'
                                 className='form-control mb-3'
                                 required
+                                rows={5}
                             />
                             <small className='text-muted'>ถ้าไม่มีให้ใส่ -</small>
                         </div>

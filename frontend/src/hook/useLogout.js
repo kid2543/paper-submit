@@ -8,13 +8,13 @@ export const useLogout = () => {
 
     const logout = async () => {
         //remove user from storage
-        try {            
+        try {
             await axios.post('/api/user/logout')
             Cookies.remove('username')
             localStorage.clear()
             sessionStorage.clear()
             // dispatch logout action
-            dispatch({type: 'LOGOUT'})
+            dispatch({ type: 'LOGOUT' })
         } catch (error) {
             console.log(error)
         }

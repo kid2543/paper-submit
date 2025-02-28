@@ -67,10 +67,11 @@ function HostCateList() {
             handleClose()
             setData(prev => [res.data, ...prev])
             setSearchData(prev => [res.data, ...prev])
-            toast.success('เพิ่มงานประชุมสำเร็จ')
+            toast.success('เพิ่มหัวข้อสำเร็จ')
+            setCreateError('')
         } catch (error) {
             console.log(error)
-            toast.error('เกิดข้อผิดพลาด')
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             setCreateError(error.response.data?.error)
         }
     }
@@ -124,7 +125,12 @@ function HostCateList() {
                                 <Modal.Body className='row g-3 align-items-center'>
                                     <div className='col-12'>
                                         <label className='col-form-label'>รหัสหัวข้อ</label>
-                                        <input className='form-control' name='category_code' pattern='([?=.*A-Za-z])(?=.*\d).{4,}' />
+                                        <input
+                                            className='form-control'
+                                            name='category_code'
+                                            pattern='([?=.*A-Za-z])(?=.*\d).{4,}'
+                                            onFocus={() => setCreateError('')}
+                                        />
                                         <div className="form-text">รหัสหัวข้อประกอบด้วย ตัวอักษรภาษาอังกฤษและตัวเลข อย่างน้อย 4 ตัวอักษร</div>
                                     </div>
                                     <div className='col-12'>

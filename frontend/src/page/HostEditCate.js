@@ -66,8 +66,10 @@ function HostEditCate() {
         navigate('/host/committee')
     }
 
+    const [listLoading, setListLoading] = useState(false)
     const handleUpdateList = async (e) => {
         e.preventDefault()
+        setListLoading(true)
         try {
             const res = await axios.patch('/api/category/review', {
                 _id: id,
@@ -75,9 +77,12 @@ function HostEditCate() {
             })
             setCateData(res.data)
             toast.success("เพิ่มกรรมการสำเร็จ")
+            navigate(-1)
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setListLoading(false)
         }
     }
 
@@ -264,9 +269,16 @@ function HostEditCate() {
                                     }
                                 </div>
                                 <div className='col-12 text-end'>
-                                    <button className='btn btn-success' type='submit'>
-                                        <i className='me-2 bi bi-people'></i>ยืนยัน
-                                    </button>
+                                    {listLoading ? (
+                                        <button className="btn btn-success" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                        </button>
+                                    ) : (
+                                        <button className='btn btn-success' type='submit'>
+                                            <i className='me-2 bi bi-people'></i>ยืนยัน
+                                        </button>
+                                    )}
                                 </div>
                             </form>
                         )}

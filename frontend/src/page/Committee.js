@@ -2,21 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import LoadingPage from '../components/LoadingPage'
 import Dropdown from 'react-bootstrap/Dropdown'
-import useSearch from '../hook/useSearch'
 import { PaperResult } from '../components/PaperStatus'
 
 import dayjs from 'dayjs'
 
 
 // react-bootstrap
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
+import {
+    Modal,
+    Button,
+    Tab,
+    Tabs
+} from 'react-bootstrap'
 import axios from 'axios'
-import { UserDropdown } from '../components/UserDropdown'
+import CommitteeNavbar from '../components/CommitteeNavbar'
+import useFetch from '../hook/useFetch'
 
 function Committee() {
-
-    const { data, status, error } = useSearch('/api/assign/reviewer/paper')
+    const { data, status, error } = useFetch('/api/assign/reviewer/paper')
+    console.log(data)
     const navigate = useNavigate()
 
     // view history data
@@ -71,76 +75,143 @@ function Committee() {
     }
 
     return (
-        <div className="bg-light" style={{ minHeight: '100vh' }}>
-            <div className='container py-3'>
-                <div className='card shadow-sm mb-3'>
-                    <div className='card-body'>
-                        <div className='d-flex justify-content-between align-items-center'>
-                            <h4 className='fw-bold mb-0'>
-                                รายการบทความ
-                            </h4>
-                            <UserDropdown />
-                        </div>
-                    </div>
-                </div>
-                <div className='card  shadow-sm'>
-                    <div className='card-body'>
-                        <section>
-                            <div className='mb-5'>
-                                {data ? (
-                                    <div>
-                                        <div className='table-responsive' style={{ minHeight: "500px" }}>
-                                            <table className='table table-hover'>
-                                                <thead className='fw-bold'>
-                                                    <tr>
-                                                        <th>รหัสบทความ</th>
-                                                        <th>ชื่อบทความ</th>
-                                                        <th>สถานะ</th>
-                                                        <th>ผลลัพธ์</th>
-                                                        <th>เครื่องมือ</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {data.map((paperList) => (
-                                                        <tr key={paperList._id}>
-                                                            <td>{paperList.paper_id.paper_code}</td>
-                                                            <td>{paperList.paper_id.title}</td>
-                                                            <td>
-                                                                {reviewStatus(paperList.status)}
-                                                            </td>
-                                                            <td>
-                                                                <PaperResult status={paperList.result} />
-                                                            </td>
-                                                            <td>
-                                                                <Dropdown>
-                                                                    <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
-                                                                    </Dropdown.Toggle>
-
-                                                                    <Dropdown.Menu>
-                                                                        {handleReviewStatus(paperList.status, paperList._id, paperList.paper_id.confr_code)}
-                                                                        <Dropdown.Item onClick={() => handleShow(paperList._id, paperList.paper_id.paper_code)} ><i className="bi bi-clock-history me-2"></i>ดูประวัติ</Dropdown.Item>
-                                                                    </Dropdown.Menu>
-                                                                </Dropdown>
-
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                            <ViewHistory
-                                                data={historyData}
-                                                handleClose={handleClose}
-                                                show={show}
-                                            />
-                                        </div>
-                                    </div>
-                                ) : "ไม่พบรายการที่ต้องตรวจ"}
-
+        <div style={{ minHeight: '100vh' }}>
+            <CommitteeNavbar />
+            <section className='container py-5'>
+                <Tabs
+                    defaultActiveKey="1"
+                    className="mb-3"
+                >
+                    <Tab eventKey="1" title={<span className='text-warning'>รอการพิจารณา</span>}>
+                        <div className='row row-cols-1 g-3'>
+                            <div className='card'>
+                                <div className='card-body'>
+                                    <h4 className='card-title'>
+                                        รายการบทความรอการพิจารณา
+                                    </h4>
+                                </div>
                             </div>
-                        </section>
-                    </div>
-                </div>
-            </div>
+                            <div className='card  shadow-sm'>
+                                <div className='card-body'>
+                                    <section>
+                                        <div className='mb-5'>
+                                            {data ? (
+                                                <div>
+                                                    <div className='table-responsive' style={{ minHeight: "500px" }}>
+                                                        <table className='table table-striped'>
+                                                            <thead className='fw-bold'>
+                                                                <tr>
+                                                                    <th>รหัส</th>
+                                                                    <th>ชื่อ</th>
+                                                                    <th>สถานะ</th>
+                                                                    <th>ผลลัพธ์</th>
+                                                                    <th>เครื่องมือ</th>
+                                                                </tr>
+                                                            </thead>
+                                                            {data?.filter(item => item.status === 'PENDING').length > 0 ? (
+                                                                <tbody>
+                                                                    {data?.filter(item => item.status === 'PENDING').map((paperList) => (
+                                                                        <tr key={paperList._id}>
+                                                                            <td>{paperList.paper_id.paper_code}</td>
+                                                                            <td>{paperList.paper_id.title}</td>
+                                                                            <td>
+                                                                                {reviewStatus(paperList.status)}
+                                                                            </td>
+                                                                            <td>
+                                                                                <PaperResult status={paperList.result} />
+                                                                            </td>
+                                                                            <td>
+                                                                                <Dropdown>
+                                                                                    <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
+                                                                                    </Dropdown.Toggle>
+
+                                                                                    <Dropdown.Menu>
+                                                                                        {handleReviewStatus(paperList.status, paperList._id, paperList.paper_id.confr_code)}
+                                                                                        <Dropdown.Item onClick={() => handleShow(paperList._id, paperList.paper_id.paper_code)} ><i className="bi bi-clock-history me-2"></i>ดูประวัติ</Dropdown.Item>
+                                                                                    </Dropdown.Menu>
+                                                                                </Dropdown>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            ) : (
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td className='p-3 text-center' colSpan={5}>ไม่พบข้อมูลการตรวจบทความ</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            )}
+                                                        </table>
+                                                        <ViewHistory
+                                                            data={historyData}
+                                                            handleClose={handleClose}
+                                                            show={show}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : "ไม่พบรายการที่ต้องตรวจ"}
+
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </Tab>
+                    <Tab eventKey="2" title={<span className='text-success'>พิจารณาแล้ว</span>}>
+                        <div className='row row-cols-1 g-3'>
+                            <div className='card'>
+                                <div className='card-body'>
+                                    <h4 className='card-title'>
+                                        รายการบทความที่พิจารณาแล้ว
+                                    </h4>
+                                </div>
+                            </div>
+                            <div className='card'>
+                                <div className='card-body'>
+                                    <table className='table'>
+                                        <thead>
+                                            <tr>
+                                                <th>รหัส</th>
+                                                <th>ชื่อ</th>
+                                                <th>สถานะ</th>
+                                                <th>ผลลัพธ์</th>
+                                                <th>เครื่องมือ</th>
+                                            </tr>
+                                        </thead>
+                                        {data?.filter(items => items.status !== 'PENDING').length > 0 ? (
+                                            <tbody>
+                                                {data?.filter(items => items.status !== 'PENDING').map(papers => (
+                                                    <tr key={papers._id}>
+                                                        <td>{papers.paper_id?.paper_code}</td>
+                                                        <td>{papers.paper_id?.title}</td>
+                                                        <td>
+                                                            {reviewStatus(papers.status)}
+                                                        </td>
+                                                        <td>
+                                                            <PaperResult status={papers.result} />
+                                                        </td>
+                                                        <td>
+                                                            Dropdown
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        ):(
+                                            <tbody>
+                                                <tr>
+                                                    <td>ไม่พบข้อมูล</td>
+                                                </tr>
+                                            </tbody>
+                                        )}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
+            </section>
+
         </div>
     )
 }

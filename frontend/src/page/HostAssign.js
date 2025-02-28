@@ -145,9 +145,10 @@ function HostAssign() {
 
   // confirm assign
   const [showAssign, setShowAssign] = useState(false)
-
+  const [loadingAssign, setLoadingAssign] = useState(false)
   const handleAssign = async (e) => {
     e.preventDefault()
+    setLoadingAssign(true)
     try {
       for (let i in newList) {
         await axios.post('/api/assign', {
@@ -173,6 +174,7 @@ function HostAssign() {
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     } finally {
       setShowAssign(false)
+      setLoadingAssign(false)
     }
   }
 
@@ -192,6 +194,7 @@ function HostAssign() {
         header='ยืนยันการมอบหมาย'
         text='ต้องการยืนยันการมอบหมายบทความหรือไม่เนื่องจากจะไม่สามารถแก้ไขรายชื่อกรรมเมื่อมอบหมายไปแล้วได้'
         handleSubmit={handleAssign}
+        loading={loadingAssign}
       />
       <ConfirmDialog
         show={showEditConfirm}
@@ -537,8 +540,10 @@ function UploadCloseNameFile(props) {
 
   const [uploadFile, setUploadFile] = useState(null)
 
+  const [loading ,setLoading] = useState(false)
   const handleUpload = async (e) => {
     e.preventDefault()
+    setLoading(true)
     try {
       const formData = new FormData()
       formData.append('_id', props.data.id)
@@ -558,6 +563,8 @@ function UploadCloseNameFile(props) {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setLoading(false)
     }
   }
 

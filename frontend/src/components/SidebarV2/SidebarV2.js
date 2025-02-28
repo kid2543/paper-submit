@@ -23,7 +23,7 @@ function SidebarV2({ children }) {
                 <h4 className='fw-bold'>PAPERSS</h4>
                 <h6 className='text-primary fw-bold'>{confrCode}</h6>
               </Nav.Link>
-              <Nav.Link href="/host/confr" >Dashboard</Nav.Link>
+              <Nav.Link href="/host/confr" >แผงควบคุม</Nav.Link>
               <Nav.Link href="/host/edit" >รายละเอียดทั่วไป</Nav.Link>
               <Nav.Link href="/host/edit/regis" >ข้อมูลการลงทะเบียน</Nav.Link>
               <Nav.Link href="/host/edit/venue" >สถานที่จัดงาน</Nav.Link>

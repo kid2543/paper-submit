@@ -508,6 +508,22 @@ const getPaperForConference = async (req, res) => {
     }
 }
 
+// get paper owner regis
+const getPaperOwnerRegis = async (req, res) => {
+    const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({error : 'รหัสงานประชุมไม่ถูกต้อง'})
+    }
+
+    try {
+        const paper = await Paper.find({confr_code: id, payment_status: 'ACCEPT',status : { $ne: 'CANCEL'} }).populate('owner', '-password')
+        res.status(200).json(paper)
+    } catch (error) {
+        res.status(400).json({error : error.message})
+    }
+}
+
 // get only accept status
 const getPaperWithAcceptStatus = async (req, res) => {
     const { id } = req.params
@@ -999,5 +1015,6 @@ module.exports = {
     rejectPaper,
     uploadPayment,
     checkPayment,
-    getPaperWithAcceptStatus
+    getPaperWithAcceptStatus,
+    getPaperOwnerRegis
 }

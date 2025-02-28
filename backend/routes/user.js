@@ -49,6 +49,11 @@ router.get('/protected', verifyToken, checkRole(['ADMIN']), (req, res) => {
     res.send('This is a admin protected route')
 })
 
+// get role
+router.get('/role', verifyToken, (req, res) => {
+    res.send(req.user.role)
+})
+
 // auth for navigate
 router.get('/navigate', verifyToken, authForNavigate)
 

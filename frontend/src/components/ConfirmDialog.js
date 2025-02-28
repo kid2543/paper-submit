@@ -17,20 +17,26 @@ function ConfirmDialog(props) {
                     {props.text}
                 </div>
                 <div>
-                    <Button 
+                    <Button
                         variant=''
                         onClick={props.handleClose}
                         className="me-2"
                     >
                         ปิด
                     </Button>
-                    <Button 
-                        variant='success'
-                        onClick={props.handleSubmit}
-                        disabled={props.loading}
-                    >
-                        ยืนยัน
-                    </Button>
+                    {props.loading ? (
+                        <button className="btn btn-success" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button
+                            variant='success'
+                            onClick={props.handleSubmit}
+                        >
+                            ยืนยัน
+                        </Button>
+                    )}
                 </div>
             </Modal.Body>
         </Modal>

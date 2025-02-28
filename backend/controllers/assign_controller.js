@@ -197,35 +197,15 @@ const reviewerNumber = async (req, res) => {
 
 // get reviwe for reviewer
 const getReview = async (req, res) => {
-    const { page = 1, limit = 10 } = req.query
     const { _id } = req.user
 
     if (!mongoose.Types.ObjectId.isValid(_id)) {
         return res.status(400).json({ error: 'รหัสกรรมการไม่ถูกต้อง' })
     }
 
-    //     const items = await Paper.find(query)
-    //     .limit(limit * 1)
-    //     .skip((page - 1) * limit)
-    //     .exec()
-    // const count = await Paper.countDocuments(query)
-    // res.status(200).json({
-    //     items,
-    //     totalPages: Math.ceil(count / limit),
-    //     currentPage: page,
-    // })
-
     try {
-        const items = await paperAssign.find({ reviewer: _id })
-            .populate('paper_id')
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-        const count = await paperAssign.countDocuments({ reviewer: _id })
-        res.status(200).json({
-            items,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page
-        })
+        const items = await paperAssign.find({ reviewer: _id }).populate('paper_id')
+        res.status(200).json(items)
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
