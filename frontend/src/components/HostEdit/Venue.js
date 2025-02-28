@@ -99,8 +99,10 @@ function ModalVenue(props) {
 
     const [edit, setEdit] = useState(props.data?.venue)
 
+    const [loading, setLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setLoading(true)
         try {
             const update = await axios.patch('/api/conference', {
                 _id: props.data?._id,
@@ -108,10 +110,12 @@ function ModalVenue(props) {
             })
             props.setData(update.data)
             toast.success('อัพโหลดสำเร็จ')
-            props.handleClose()
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setLoading(false)
+            props.handleClose()
         }
     }
 
@@ -200,9 +204,16 @@ function ModalVenue(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        อัพเดท
-                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -213,8 +224,10 @@ function ModalUploadVenue(props) {
 
     const [newFile, setNewFile] = useState(null)
 
+    const [loading, setLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setLoading(true)
         if (newFile) {
             const formData = new FormData()
             formData.append('image', newFile)
@@ -222,10 +235,12 @@ function ModalUploadVenue(props) {
                 const res = await axios.patch('/api/conference/venue/' + sessionStorage.getItem('host_confr'), formData)
                 props.setData(res.data)
                 toast.success('อัพเดทสำเร็จ')
-                props.handleClose()
             } catch (error) {
                 console.log(error)
                 toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+            } finally {
+                setLoading(false)
+                props.handleClose()
             }
         }
     }
@@ -246,9 +261,17 @@ function ModalUploadVenue(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!newFile}>
-                        อัพเดท
-                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!newFile}>
+                            <i className='me-2 bi bi-upload'></i>
+                            อัพโหลด
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

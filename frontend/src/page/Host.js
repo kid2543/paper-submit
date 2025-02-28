@@ -369,38 +369,46 @@ function Host() {
                     </tr>
                   </thead>
                   <tbody>
-                    {searchPaper.data?.map((items, index) => (
-                      <tr key={items._id}>
-                        <td>
-                          {(searchPaper.page - 1) * 10 + (index + 1)}
-                        </td>
-                        <td>
-                          {items.title}
-                        </td>
-                        <td>
-                          {items.paper_code}
-                        </td>
-                        <td>
-                          {items.cate_code?.name}
-                        </td>
-                        <td>
-                          <PaperStatus status={items.status} />
-                        </td>
-                        <td>
-                          <PaperResult status={items.result} />
-                        </td>
-                        <td>
-                          <div className="btn-group">
-                            <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-light">
-                              <i className="bi bi-pencil-square"></i>
-                            </Link>
-                            <Link to={`/host/assign/${items._id}/${items.cate_code?._id}`} type="button" className="btn btn-light">
-                              <i className="bi bi-people"></i>
-                            </Link>
-                          </div>
-                        </td>
+                    {searchPaper.data?.length > 0 ? (
+                      <>
+                        {searchPaper.data?.map((items, index) => (
+                          <tr key={items._id}>
+                            <td>
+                              {(searchPaper.page - 1) * 10 + (index + 1)}
+                            </td>
+                            <td>
+                              {items.title}
+                            </td>
+                            <td>
+                              {items.paper_code}
+                            </td>
+                            <td>
+                              {items.cate_code?.name}
+                            </td>
+                            <td>
+                              <PaperStatus status={items.status} />
+                            </td>
+                            <td>
+                              <PaperResult status={items.result} />
+                            </td>
+                            <td>
+                              <div className="btn-group">
+                                <Link to={`/host/paper/${items._id}`} type="button" className="btn btn-light">
+                                  <i className="bi bi-pencil-square"></i>
+                                </Link>
+                                <Link to={`/host/assign/${items._id}/${items.cate_code?._id}`} type="button" className="btn btn-light">
+                                  <i className="bi bi-people"></i>
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className='text-center p-3'>ไม่พบข้อมูล</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

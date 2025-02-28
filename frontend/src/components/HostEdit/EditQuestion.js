@@ -36,18 +36,22 @@ function EditQuestion() {
         setQuestion(temp)
     }
 
+    const [saveLoading, setSaveLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setSaveLoading(true)
         try {
             const res = await axios.patch('/api/conference/', {
                 _id: id,
                 question
             })
             setQuestion(res.data.question)
-            toast.success('Success')
+            toast.success('บันทึกแบบประเมินแล้ว')
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setSaveLoading(false)
         }
     }
 
@@ -85,12 +89,19 @@ function EditQuestion() {
                         <form onSubmit={handleUpdate}>
                             <div className='table-responsive' style={{ minHeight: "480px" }}>
                                 <div className='mb-3'>
-                                    <button type='submit' className='btn btn-success text-white'>
-                                        <span className='me-2'>
-                                            <i className='bi bi-floppy'></i>
-                                        </span>
-                                        บันทึก
-                                    </button>
+                                    {saveLoading ? (
+                                        <button className="btn btn-success" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                        </button>
+                                    ) : (
+                                        <button type='submit' className='btn btn-success'>
+                                            <span className='me-2'>
+                                                <i className='bi bi-floppy'></i>
+                                            </span>
+                                            บันทึก
+                                        </button>
+                                    )}
                                 </div>
                                 <table className='table table-hover h-100'>
                                     <thead>

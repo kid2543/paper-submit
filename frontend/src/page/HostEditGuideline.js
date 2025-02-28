@@ -113,8 +113,10 @@ function PresenterModal(props) {
     setList(temp)
   }
 
+  const [updateLoading, setUpdateLoading] = useState(false)
   const handleUpdate = async (e) => {
     e.preventDefault()
+    setUpdateLoading(true)
     const deleteEmpty = list.filter(items => items !== '')
     try {
       const res = await axios.patch('/api/conference', {
@@ -123,10 +125,12 @@ function PresenterModal(props) {
       })
       props.setData(res.data)
       toast.success('แก้ไขสำเร็จ')
-      props.handleClose()
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      props.handleClose()
+      setUpdateLoading(false)
     }
   }
 
@@ -171,9 +175,16 @@ function PresenterModal(props) {
         <Button variant="" onClick={props.handleClose}>
           ปิด
         </Button>
-        <Button variant="primary" onClick={handleUpdate}>
-          ยืนยัน
-        </Button>
+        {updateLoading ? (
+          <button className="btn btn-primary" type="button" disabled>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+          </button>
+        ) : (
+          <Button variant="primary" onClick={handleUpdate}>
+            ยืนยัน
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   )
@@ -198,6 +209,7 @@ function ChairModal(props) {
     setList(temp)
   }
 
+  const [updateLoading, setUpdateLoading] = useState(false)
   const handleUpdate = async (e) => {
     e.preventDefault()
     const filterList = list.filter(items => items !== '')
@@ -208,10 +220,12 @@ function ChairModal(props) {
       })
       props.setData(res.data)
       toast.success('แก้ไขสำเร็จ')
-      props.handleClose()
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+    } finally {
+      props.handleClose()
+      setUpdateLoading(false)
     }
   }
 
@@ -253,9 +267,16 @@ function ChairModal(props) {
         <Button variant="" onClick={props.handleClose}>
           ปิด
         </Button>
-        <Button variant="primary" onClick={handleUpdate}>
-          ยืนยัน
-        </Button>
+        {updateLoading ? (
+          <button className="btn btn-primary" type="button" disabled>
+            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+          </button>
+        ) : (
+          <Button variant="primary" onClick={handleUpdate}>
+            ยืนยัน
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   )

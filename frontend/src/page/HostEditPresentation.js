@@ -86,6 +86,12 @@ function GuidelineModal(props) {
         setGuideline([...guideline, ""])
     }
 
+    const handleDelete = (index) => {
+        let temp = [...guideline]
+        temp = temp.filter((items, idx) => idx !== index)
+        setGuideline(temp)
+    }
+
     const handleChange = (e, index) => {
         const { value } = e.target
         let temp = [...guideline]
@@ -93,8 +99,10 @@ function GuidelineModal(props) {
         setGuideline(temp)
     }
 
+    const [updateLoading, setUpdateLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setUpdateLoading(true)
         try {
             const res = await axios.patch('/api/conference', {
                 _id: props.id,
@@ -102,10 +110,12 @@ function GuidelineModal(props) {
             })
             props.setData(res.data)
             toast.success('แก้ไขสำเร็จ')
-            props.handleClose()
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            props.handleClose()
+            setUpdateLoading(false)
         }
     }
 
@@ -129,7 +139,7 @@ function GuidelineModal(props) {
                                 rows={8}
                             />
                             <div className="mt-3">
-                                <button className="btn btn-outline-danger" type='button'>
+                                <button onClick={() => handleDelete(index)} className="btn btn-outline-danger" type='button'>
                                     <i className="bi bi-trash me-2"></i>
                                     ลบข้อแนะนำนี้
                                 </button>
@@ -147,9 +157,16 @@ function GuidelineModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    {updateLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -160,8 +177,10 @@ function RemarkModal(props) {
 
     const [remark, setRemark] = useState(props.data || "")
 
+    const [updateLoading, setUpdateLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setUpdateLoading(true)
         try {
             const res = await axios.patch('/api/conference', {
                 _id: props.id,
@@ -169,10 +188,12 @@ function RemarkModal(props) {
             })
             props.setData(res.data)
             toast.success('แก้ไขสำเร็จ')
-            props.handleClose()
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            props.handleClose()
+            setUpdateLoading(false)
         }
     }
 
@@ -197,9 +218,16 @@ function RemarkModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    {updateLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

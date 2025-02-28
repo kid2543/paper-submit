@@ -54,8 +54,9 @@ function Conference() {
         }
     }
 
-    const handleEdit = (id) => {
+    const handleEdit = (id, confr_code) => {
         sessionStorage.setItem("host_confr", id)
+        sessionStorage.setItem('confr_code', confr_code)
         navigate("/host/confr/")
     }
 
@@ -187,7 +188,7 @@ function Conference() {
                                                 </td>
                                                 <td>
                                                     <div className="btn-group">
-                                                        <button type="button" className="btn btn-light" onClick={() => handleEdit(item._id)}>
+                                                        <button type="button" className="btn btn-light" onClick={() => handleEdit(item._id, item.confr_code)}>
                                                             <i className="bi bi-pencil-square"></i>
                                                         </button>
                                                         <button className="btn btn-light text-danger" type="button" onClick={() => handleShowDeleteConfr(item._id)}>

@@ -198,6 +198,7 @@ function Edit() {
                                 handleClose={() => setDescModal(false)}
                                 data={data}
                                 handleUpdate={handleUpdate}
+                                loading={loadingButton}
                             />
                             <div>
                                 {data.confr_desc?.map((items, index) => (
@@ -222,6 +223,7 @@ function Edit() {
                                 handleClose={() => setImportantDate(false)}
                                 data={data}
                                 handleUpdate={handleUpdate}
+                                loading={loadingButton}
                             />
                             <div>
                                 {data.important_date?.map((items) => (
@@ -377,9 +379,16 @@ function EditDescModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        ยืนยัน
-                    </Button>
+                    {props.loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -392,7 +401,15 @@ function EditImportantDate(props) {
     const [list, setList] = useState(props.data.important_date)
 
     const handleAdd = () => {
-        setList([...list, { date_name: "", start_date: dayjs(new Date()).format("YYYY-MM-DD"), end_date: dayjs(new Date()).format("YYYY-MM-DD") }])
+        setList(
+            [...list,
+            {
+                date_name: "",
+                start_date: dayjs(new Date()).format("YYYY-MM-DD"),
+                end_date: dayjs(new Date()).format("YYYY-MM-DD")
+            }
+            ]
+        )
     }
 
     const handleChange = (e, index) => {
@@ -469,9 +486,16 @@ function EditImportantDate(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        อัพเดท
-                    </Button>
+                    {props.loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -592,9 +616,17 @@ function UploadLogo(props) {
                     <Button variant="" onClick={closeModal}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!file || loading}>
-                        อัพโหลด
-                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!file}>
+                            <i className='bi bi-upload me-2'></i>
+                            อัพโหลด
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

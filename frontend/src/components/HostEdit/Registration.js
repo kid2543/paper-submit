@@ -247,7 +247,7 @@ function ModalAcc(props) {
                         </button>
                     ) : (
                         <Button variant="primary" type='submit'>
-                            แก้ไข
+                            ยืนยัน
                         </Button>
                     )}
                 </Modal.Footer>
@@ -261,9 +261,10 @@ function ModalRegis(props) {
     const [edit, setEdit] = useState(props.data?.regis_type)
     const [key, setKey] = useState(0)
 
-
+    const [loading, setLoading] = useState(false)
     const handleUpdate = async (e) => {
         e.preventDefault()
+        setLoading(true)
         try {
             const update = await axios.patch('/api/conference', {
                 _id: props.data._id,
@@ -271,10 +272,12 @@ function ModalRegis(props) {
             })
             props.setData(update.data)
             toast.success('แก้ไขสำเร็จ')
-            props.handleClose()
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            props.handleClose()
+            setLoading(false)
         }
     }
 
@@ -366,9 +369,16 @@ function ModalRegis(props) {
                     <Button variant="" type='button' onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        อัพเดท
-                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            ยืนยัน
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -465,7 +475,7 @@ function ModalRegisDate(props) {
                         </button>
                     ) : (
                         <Button variant="primary" type='submit' disabled={!editStatus}>
-                            อัพเดท
+                            ยืนยัน
                         </Button>
                     )}
                 </Modal.Footer>
@@ -478,8 +488,10 @@ function ModalSchedule(props) {
 
     const [scheduleFile, setScheduleFile] = useState(null)
 
+    const [loading, setLoading] = useState(false)
     const handleUpload = async (e) => {
         e.preventDefault()
+        setLoading(true)
         if (!scheduleFile) {
             toast.warning('กรุณาเลือกไฟล์')
             return
@@ -496,6 +508,7 @@ function ModalSchedule(props) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         } finally {
             props.handleClose()
+            setLoading(false)
         }
     }
 
@@ -524,10 +537,17 @@ function ModalSchedule(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
                     <Button variant="primary" type='submit' disabled={!scheduleFile}>
                         <i className="me-2 bi bi-upload"></i>
                         อัพโหลด
                     </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
