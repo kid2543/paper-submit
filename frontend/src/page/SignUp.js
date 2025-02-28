@@ -15,14 +15,14 @@ import Success from '../asset/checked.png'
 const SignUp = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [Name, setName] = useState('')
-    const [Email, setEmail] = useState('')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
     const { signup, error, isLoading, newUser } = useSignup()
 
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        await signup(username, password, '', Name, Email)
+        await signup(username, password, '', name, email)
     }
 
     if (newUser) {
@@ -83,7 +83,7 @@ const SignUp = () => {
                                         className="form-control"
                                         id='floatingEmail'
                                         placeholder='อีเมล'
-                                        value={Email}
+                                        value={email}
                                         onChange={e => setEmail(e.target.value)}
                                         required
                                     />
@@ -95,7 +95,7 @@ const SignUp = () => {
                                         className="form-control"
                                         id='floatingName'
                                         placeholder='ชื่อ - นามสกุล'
-                                        value={Name}
+                                        value={name}
                                         onChange={e => setName(e.target.value)}
                                         required
                                     />

@@ -169,7 +169,7 @@ function Committee() {
                             </div>
                             <div className='card'>
                                 <div className='card-body'>
-                                    <table className='table'>
+                                    <table className='table table-striped'>
                                         <thead>
                                             <tr>
                                                 <th>รหัส</th>
@@ -192,15 +192,23 @@ function Committee() {
                                                             <PaperResult status={papers.result} />
                                                         </td>
                                                         <td>
-                                                            Dropdown
+                                                            <Dropdown>
+                                                                <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
+                                                                </Dropdown.Toggle>
+
+                                                                <Dropdown.Menu>
+                                                                    {handleReviewStatus(papers.status, papers._id, papers.paper_id?.confr_code)}
+                                                                    <Dropdown.Item onClick={() => handleShow(papers._id, papers.paper_id?.paper_code)} ><i className="bi bi-clock-history me-2"></i>ดูประวัติ</Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
                                                         </td>
                                                     </tr>
                                                 ))}
                                             </tbody>
-                                        ):(
+                                        ) : (
                                             <tbody>
                                                 <tr>
-                                                    <td>ไม่พบข้อมูล</td>
+                                                    <td className='p-3 text-center' colSpan={5}>ไม่พบข้อมูล</td>
                                                 </tr>
                                             </tbody>
                                         )}

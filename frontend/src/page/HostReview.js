@@ -564,7 +564,7 @@ function HostReview() {
                               />
                               <tr>
                                 <td>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</td>
-                                <td>{item.suggestion}</td>
+                                <td style={{width: 600}}>{item.suggestion}</td>
                                 <td>{item.total}</td>
                                 <td>
                                   <PaperStatus status={item.status} />

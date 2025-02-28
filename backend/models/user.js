@@ -66,7 +66,7 @@ const userSchema = mongoose.Schema(
 )
 
 //static signup method
-userSchema.statics.signup = async function (username, password, role) {
+userSchema.statics.signup = async function (username, password, role, email, name) {
 
     //validation
     const usernameRegex = /^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$/
@@ -100,7 +100,7 @@ userSchema.statics.signup = async function (username, password, role) {
     const salt = await bcrypt.genSalt(10)
     const hash = await bcrypt.hash(password, salt)
 
-    const user = await this.create({ username, password: hash, role })
+    const user = await this.create({ username, password: hash, role, email, name })
 
 
     return user

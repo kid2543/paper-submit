@@ -269,7 +269,7 @@ function AuthorPaper() {
                                   {items.name}
                                 </td>
                                 <td>
-                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>เพิ่มเติม</Link>
+                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`}>ดูบทความ</Link>
                                 </td>
                                 <td>
                                   <Link onClick={() => handleShowHistory(items._id, items.name)} type='button'>ดูประวัติ</Link>
@@ -297,60 +297,71 @@ function AuthorPaper() {
                 <div>
                   <h4>อัพโหลดบทความฉบับแก้ไข</h4>
                   <hr />
-                  <p>
-                    แก้ไขให้แล้วเสร็จภายใน:
+                  <p className='fw-bold'>
+                    กำหนดการแก้ไข
                   </p>
-                  <ul>
+                  <div>
                     {data.deadline?.map((date, index) => (
-                      <li key={date._id}>
+                      <div key={date._id}>
                         {
                           data.deadline?.length > index + 1 ?
                             <del>{dayjs(date.date).format('DD MMM YYYY')}</del> :
-                            <p>{date.name} <br /> {dayjs(date.date).format('DD MMM YYYY')}</p>
+                            <div>
+                              <p>
+                                <span className='fw-bold'>เรื่อง:</span> {date.name} <br /> <span className='fw-bold'>วันที่:</span> {dayjs(date.date).format('DD MMM YYYY')} <br />
+                              </p>
+                              {dayjs(date.date).format('DD-MM-YYYY') > dayjs(Date.now()).format('DD-MM-YYYY') ? (
+                                <div className='text-danger'>เลยกำหนดการส่งแล้ว</div>
+                              ) : (
+                                <div>
+                                  {paperFile.data &&
+                                    <div>
+                                      {paperFile.data.map((items) => (
+                                        <form onSubmit={e => hanleEditPaper(e, items._id)} key={items._id} className='mb-3'>
+                                          <label className='form-label'>ไฟล์ <span className="fw-bold">{items.name}</span> (ฉบับแก้ไข)</label>
+                                          <div className="input-group">
+                                            <input
+                                              name='edit_file'
+                                              className='form-control'
+                                              type='file'
+                                              accept='.pdf, .doc'
+                                              required
+                                            />
+                                            {uploaded.includes(items._id) &&
+                                              <button className="btn btn-success">
+                                                <i className="bi bi-check-lg"></i>
+                                              </button>
+                                            }
+                                          </div>
+                                          <div className='mt-3'>
+                                            <button disabled={uploaded.includes(items._id)} type='submit' className='btn btn-outline-primary'>
+                                              <i className="bi bi-upload me-2"></i>
+                                              อัพโหลด
+                                            </button>
+                                          </div>
+                                        </form>
+                                      ))}
+                                    </div>
+                                  }
+                                  <div className="text-muted">
+                                    กรุณาอัพโหลดฉบับแก้ไขให้ครบ หรืออัพโหลดเฉพาะที่แก้ไขก่อนทำการกดยืนยัน
+                                  </div>
+                                  <div className='text-end mt-3'>
+                                    <button
+                                      type='button'
+                                      onClick={() => setShowConfirmEdit(true)}
+                                      className='btn btn-primary'
+                                    >
+                                      ยืนยันการแก้ไข
+                                    </button>
+                                  </div>
+                                </div>
+                              )
+                              }
+                            </div>
                         }
-                      </li>
+                      </div>
                     ))}
-                  </ul>
-                  {paperFile.data &&
-                    <div>
-                      {paperFile.data.map((items) => (
-                        <form onSubmit={e => hanleEditPaper(e, items._id)} key={items._id} className='mb-3'>
-                          <label className='form-label'>ไฟล์ <span className="fw-bold">{items.name}</span> (ฉบับแก้ไข)</label>
-                          <div className="input-group">
-                            <input
-                              name='edit_file'
-                              className='form-control'
-                              type='file'
-                              accept='.pdf, .doc'
-                              required
-                            />
-                            {uploaded.includes(items._id) &&
-                              <button className="btn btn-success">
-                                <i className="bi bi-check-lg"></i>
-                              </button>
-                            }
-                          </div>
-                          <div className='mt-3'>
-                            <button disabled={uploaded.includes(items._id)} type='submit' className='btn btn-outline-primary'>
-                              <i className="bi bi-upload me-2"></i>
-                              อัพโหลด
-                            </button>
-                          </div>
-                        </form>
-                      ))}
-                    </div>
-                  }
-                  <div className="text-muted">
-                    กรุณาอัพโหลดฉบับแก้ไขให้ครบ หรืออัพโหลดเฉพาะที่แก้ไขก่อนทำการกดยืนยัน
-                  </div>
-                  <div className='text-end mt-3'>
-                    <button
-                      type='button'
-                      onClick={() => setShowConfirmEdit(true)}
-                      className='btn btn-primary'
-                    >
-                      ยืนยันการแก้ไข
-                    </button>
                   </div>
                 </div>
               </div>
@@ -439,7 +450,7 @@ function AuthorPaper() {
             <h4 className="card-title">ข้อแนะนำของกรรมการ</h4>
             {comment.data?.map((coments, index) => (
               <div key={coments._id} className="table-responsive">
-                <p>กรรมการท่านที่: {index + 1}</p>
+                <p className='fw-bold'>กรรมการท่านที่: {index + 1}</p>
                 <table className="table" style={{ minWidth: 1000 }}>
                   <thead>
                     <tr>
@@ -454,7 +465,17 @@ function AuthorPaper() {
                     <HistoryComent id={coments._id} />
                     <tr>
                       <td>{dayjs(coments.updatedAt).format('DD MMM YYYY HH:mm')}</td>
-                      <td>{coments.suggestion}</td>
+                      <td style={{ width: 600 }}>
+                        {coments.suggestion ? (
+                          <textarea
+                            className='form-control'
+                            value={coments.suggestion}
+                            readOnly
+                            rows={5}
+                          />
+                        ) : '-'
+                        }
+                      </td>
                       <td>
                         <PaperStatus status={coments.status} />
                       </td>
@@ -570,7 +591,17 @@ function HistoryComent({ id }) {
       {data.map((items) => (
         <tr key={items._id}>
           <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
-          <td>{items.suggestion}</td>
+          <td style={{ width: 600 }}>
+            {items.suggestion ? (
+              <textarea
+                className='form-control'
+                value={items.suggestion}
+                rows={5}
+                readOnly
+              />
+            ) : '-'
+            }
+          </td>
           <td>
             <PaperStatus status={items.status} />
           </td>
