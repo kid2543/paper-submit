@@ -540,7 +540,7 @@ function UploadCloseNameFile(props) {
 
   const [uploadFile, setUploadFile] = useState(null)
 
-  const [loading ,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const handleUpload = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -582,10 +582,17 @@ function UploadCloseNameFile(props) {
           <Button variant="" onClick={props.handleClose}>
             ปิด
           </Button>
-          <Button variant="primary" type='submit'>
-            <i className="me-2 bi bi-upload"></i>
-            อัพโหลด
-          </Button>
+          {loading ? (
+            <button className="btn btn-primary" type="button" disabled>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Loading...
+            </button>
+          ) : (
+            <Button variant="primary" type='submit'>
+              <i className="me-2 bi bi-upload"></i>
+              อัพโหลด
+            </Button>
+          )}
         </Modal.Footer>
       </form>
     </Modal>
