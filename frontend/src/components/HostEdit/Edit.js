@@ -75,7 +75,11 @@ function Edit() {
             {data &&
                 <div className='row g-3'>
                     <div className='col-12' >
+
                         <Layout>
+                            <div className='text-center text-muted'>
+                                ชื่องานประชุมและ หัวข้อรองงานประชุม
+                            </div>
                             <div className='py-4'>
                                 <h1 className='text-center'>{data.title}</h1>
                                 <p className='text-center text-muted'>{data.sub_title}</p>
@@ -103,6 +107,9 @@ function Edit() {
                             />
                             <div className='py-4'>
                                 <h4>Tag</h4>
+                                <div className='text-muted'>
+                                    ใช้บอกว่าเนื้อหาของงานประชุมเกี่ยวกับอะไร และสามารถใช้ในการค้นหาได้
+                                </div>
                                 <hr />
                             </div>
                             <ol>
@@ -121,6 +128,9 @@ function Edit() {
                         <Layout>
                             <div className='py-4'>
                                 <h4>หมวดหมู่งานประชุม</h4>
+                                <div className='text-muted'>
+                                    ใช้บอกว่างานประชุมนี้อยู่ในหมวดหมู่ไหน และใช้ในการค้นหาได้
+                                </div>
                                 <hr />
                             </div>
                             <ul>
@@ -150,6 +160,9 @@ function Edit() {
                             />
                             <div className='py-4'>
                                 <h4>ระยะเวลาการดำเนินงาน</h4>
+                                <div className='text-muted'>
+                                    กรอกข้อมูลเพื่อระบุว่างานประชุมจะเปิดรับบทความ และจะสิ้นสุดงานประชุมเมื่อใด
+                                </div>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -173,7 +186,10 @@ function Edit() {
                                 id={confr_id}
                             />
                             <div className='py-4'>
-                                <h4>Logo ประจำงานประชุม</h4>
+                                <h4>โลโก้ประจำงานประชุม</h4>
+                                <div className='text-muted'>
+                                    อัพโหลดโลโก้เพื่อแสดงในหน้าเพจของงานประชุม
+                                </div>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -188,6 +204,9 @@ function Edit() {
                         <Layout>
                             <div className='py-4'>
                                 <h4>รายละเอียดงานประชุม</h4>
+                                <div className='text-muted'>
+                                    กรอกรายละเอียดงานประชุมวิชาการ เพื่อบอกจุดประสงค์ของงานประชุมนี้
+                                </div>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>
@@ -202,9 +221,13 @@ function Edit() {
                             />
                             <div>
                                 {data.confr_desc?.map((items, index) => (
-                                    <p key={index} className='text-muted mb-4' >
-                                        <span className='me-3'></span>{items}
-                                    </p>
+                                    <textarea
+                                        key={index}
+                                        className='form-control mb-5'
+                                        value={items}
+                                        readOnly
+                                        rows={10}
+                                    />
                                 ))}
                             </div>
                         </Layout>
@@ -213,6 +236,9 @@ function Edit() {
                         <Layout>
                             <div className='py-4'>
                                 <h4>แผนและปฏิทินการจัดโครงการ</h4>
+                                <div className='text-muted'>
+                                    ใช้สำหรับให้ผู้ส่งบทความสามารถเข้ามาอ่านและติดตามว่าช่วงเวลานี้มีกิจกรรมใดบ้าง
+                                </div>
                                 <hr />
                             </div>
                             <div className='position-absolute top-0 end-0 m-2'>

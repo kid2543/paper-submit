@@ -6,6 +6,8 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom'
+
 
 function HostEditPresentation() {
 
@@ -15,6 +17,9 @@ function HostEditPresentation() {
     // modal data
     const [showA, setShowA] = useState(false)
     const [showB, setShowB] = useState(false)
+    const [showModalD, setShowModalD] = useState(false)
+
+    console.log(data)
 
 
     if (loading === 'idle' || loading === 'loading') {
@@ -33,10 +38,15 @@ function HostEditPresentation() {
                     <p className='text-muted card-text'>เพิ่มและแก้ไขข้อแนะนำการเสนอสำหรับ ผู้นำเสนอ กรรมการ และผู้ชม ได้ที่นี่</p>
                 </div>
             </div>
-            <div className='card  shadow-sm mb-3'>
+            <div className='card mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <div>
                         <h4>ข้อแนะการนำเสนอบทความ</h4>
+                            <div className='text-muted'>
+                                เพิ่มข้อแนะนำสำหรับผู้นำเสนอ เพื่อให้ผู้นำเสนอเตรียมตัวก่อนทำการนำเสนอได้อย่างถูกต้อง
+                            </div>
+                        </div>
                         <div>
                             <button className='btn' type='button' onClick={() => setShowA((true))}>
                                 <i className='bi bi-pencil-square'></i>
@@ -53,10 +63,15 @@ function HostEditPresentation() {
                     }
                 </div>
             </div>
-            <div className='card shadow-sm'>
+            <div className='card mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center mb-3'>
+                        <div>
                         <h4>รายละเอียดเพิ่มเติม</h4>
+                        <div className='text-muted'>
+                            รายละเอียดเพิ่มเติมเกี่ยวกับการเสนอ เช่นการที่ผู้ส่งบทความไม่มานำเสนอจะมีเงื่อนไขตามที่งานประชุมกำหนด เป็นต้น
+                        </div>
+                        </div>
                         <div>
                             <button className='btn' type='button' onClick={() => setShowB(true)}>
                                 <i className='bi bi-pencil-square'></i>
@@ -71,11 +86,119 @@ function HostEditPresentation() {
                     }
                 </div>
             </div>
+            <div>
+                <ModalSchedule
+                    show={showModalD}
+                    handleClose={() => setShowModalD(false)}
+                    setData={setData}
+                    id={id}
+                />
+                <div className='card'>
+                    <div className="card-body">
+                        <div>
+                            <div className='d-flex justify-content-between align-items-center mb-4'>
+                                <div>
+                                    <h4>กำหนดการงานประชุม / กำหนดการนำเสนอ</h4>
+                                    <div className='text-muted'>
+                                        อัพโหลดกำหนดการนำเสนอ เพื่อให้ผู้เข้าร่วมงานประชุมดูเวลา และสถานที่ในการนำเสนอ หรือเข้าร่วมกิจกรรมต่างๆ ของงานประชุม
+                                    </div>
+                                </div>
+                                <button className='btn' onClick={() => setShowModalD(true)}>
+                                    <i className='bi bi-pencil-square'></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            {data?.schedule ? (
+                                <Link to={`/uploads/${data.schedule}`} target='_blank' rel='noreferrer' className="btn btn-primary">
+                                    <i className="bi bi-file-earmark me-2"></i>
+                                    ดูไฟล์กำหนดการ
+                                </Link>
+
+                            ) : (
+                                <button onClick={() => setShowModalD(true)} type='button' className="btn btn-outline-primary">
+                                    อัพโหลดไฟล์กำหนดการ
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
 
 export default HostEditPresentation
+
+function ModalSchedule(props) {
+
+    const [scheduleFile, setScheduleFile] = useState(null)
+
+    const [loading, setLoading] = useState(false)
+    const handleUpload = async (e) => {
+        e.preventDefault()
+        setLoading(true)
+        if (!scheduleFile) {
+            toast.warning('กรุณาเลือกไฟล์')
+            return
+        }
+
+        try {
+            const formData = new FormData()
+            formData.append('file', scheduleFile)
+            const res = await axios.patch('/api/conference/schedule/' + props.id, formData)
+            props.setData(res.data)
+            toast.success('อัพโหลดไฟล์กำหนดการสำเร็จ')
+        } catch (error) {
+            console.log(error)
+            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
+        } finally {
+            props.handleClose()
+            setLoading(false)
+        }
+    }
+
+    return (
+        <Modal show={props.show} onHide={props.handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>เพิ่ม / แก้ไขกำหนดการ</Modal.Title>
+            </Modal.Header>
+            <form onSubmit={handleUpload}>
+                <Modal.Body>
+                    <label className="form-label">
+                        เลือกไฟล์กำหนดการ
+                    </label>
+                    <input
+                        className="form-control"
+                        type='file'
+                        accept='.pdf'
+                        onChange={e => setScheduleFile(e.target.files[0])}
+                        required
+                    />
+                    <div className="form-text">
+                        เฉพาะ PDF เท่านั้น
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="" onClick={props.handleClose}>
+                        ปิด
+                    </Button>
+                    {loading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!scheduleFile}>
+                            <i className="me-2 bi bi-upload"></i>
+                            อัพโหลด
+                        </Button>
+                    )}
+                </Modal.Footer>
+            </form>
+        </Modal>
+    )
+}
 
 function GuidelineModal(props) {
 

@@ -70,7 +70,6 @@ router.get('/owner', verifyToken, checkRole(['HOST', 'ADMIN']), getConferByUser)
 // get question for committee
 router.get('/question/:id', verifyToken, checkRole(['HOST', 'ADMIN', 'COMMITTEE']), getQuestion)
 
-
 // search conference
 router.get('/search', verifyToken, checkRole(['ADMIN']), searchConference)
 

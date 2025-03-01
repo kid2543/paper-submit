@@ -49,7 +49,7 @@ function AuthorSidebar({ children }) {
               </Nav>
             </Offcanvas.Body>
           </Offcanvas>
-          <div className="px-4">
+          <div className="px-lg-4">
             {children}
           </div>
         </Col>

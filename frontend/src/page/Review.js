@@ -6,38 +6,41 @@ import useFetch from '../hook/useFetch'
 import { toast } from 'react-toastify'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { UserDropdown } from '../components/UserDropdown'
+import dayjs from 'dayjs'
 
 function Review() {
 
     const { id } = useParams()
     const confr_id = sessionStorage.getItem('confr_id')
 
-
-    // fetch data
-    const paper = useFetch('/api/assign/one/' + id)
-    const question = useFetch('/api/conference/question/' + confr_id)
-
-
+    const [paper, setPaper] = useState({})
     const [PaperFile, setPaperFile] = useState([])
     const [suggestionFile, setSuggestionFile] = useState(null)
     const [totalArr, setTotalArr] = useState([])
     const [totalNumber, setTotalNumber] = useState(0)
+    const [status, setStatus] = useState('idle')
 
+    const [question, setQuestion] = useState([])
+    const [confr, setConfr] = useState({})
     useEffect(() => {
         const fethFile = async () => {
             try {
-                const res = await axios.get('/api/paperfile/read/' + paper.data.paper_id._id)
+                const Paper = await axios.get('/api/assign/one/' + id)
+                setPaper(Paper.data.paper_id)
+                setStatus(Paper.data.status)
+                const res = await axios.get('/api/paperfile/read/' + Paper.data.paper_id._id)
                 setPaperFile(res.data)
+                const Confr = await axios.get('/api/conference/single/' + confr_id)
+                setConfr(Confr.data)
+                setQuestion(Confr.data.question)
             } catch (error) {
                 console.log(error)
             }
         }
 
-        if (paper.data) {
-            fethFile()
-        }
-    }, [paper])
+        fethFile()
 
+    }, [id, confr_id])
 
     const navigate = useNavigate()
 
@@ -61,7 +64,7 @@ function Review() {
                 formData.append('total', totalNumber)
                 formData.append('result', result)
                 formData.append('confr_id', confr_id)
-                formData.append('paper_code', paper.data.paper_id?.paper_code)
+                formData.append('paper_code', paper.paper_code)
                 await axios.patch('/api/assign', formData)
                 toast.success('ให้คะแนน และอัพโหลดไฟล์สำเร็จ')
                 setTimeout(
@@ -76,7 +79,7 @@ function Review() {
                     total: totalNumber,
                     result: result,
                     confr_id,
-                    paper_code: paper.data.paper_id?.paper_code
+                    paper_code: paper.paper_code
                 })
                 toast.success('ให้คะแนนสำเร็จ')
                 setTimeout(
@@ -103,21 +106,20 @@ function Review() {
         }
     }
 
-    if (paper.loading === 'idle' || paper.loading === 'loading') {
+    if (status === 'SUCCESS') {
         return (
-            <LoadingPage />
+            <div className='container p-3'>
+                <h2 className='text-success'>
+                    <i className='bi bi-check me-1'></i>
+                    บทความนี้ตรวจเรียบร้อยแล้ว
+                </h2>
+                <Link to='/committee' className='btn btn-primary'>
+                    <i className='bi bi-arrow-left me-2'></i>
+                    ย้อนกลับ
+                </Link>
+            </div>
         )
     }
-
-    if (paper.error) {
-        return <div>Error</div>
-    }
-
-    if (paper.data?.status === 'SUCCESS') {
-        return <div>บทความนี้ตรวจแล้ว</div>
-    }
-
-
 
     return (
         <div className='container my-3'>
@@ -137,27 +139,28 @@ function Review() {
                     </div>
                 </div>
             </div>
-            {paper.data &&
-                <div className='card  shadow-sm mb-3'>
+            {paper &&
+                <div className='card mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title mb-4'>รายละเอียดบทความ</h4>
-                        <div className='row g-3 row-cols-1'>
-                            <div>
-                                <p className='fw-bold mb-0'>ชื่อบทความ</p>
-                                <p className='text-muted'>{paper.data.paper_id?.title}</p>
+                        <h4 className='card-title mb-3'>รายละเอียดบทความ</h4>
+                        <div className='row g-3'>
+                            <div className='col-lg-4 fw-bold'>ชื่อบทความ</div>
+                            <div className='col-lg-8'>{paper.title}</div>
+                            <div className='col-lg-4 fw-bold'>รหัสบทความ</div>
+                            <div className='col-lg-8'>{paper.paper_code}</div>
+                            <div className='col-lg-4 fw-bold'>บทคัดย่อ</div>
+                            <div className='col-lg-8'>
+                                <textarea
+                                    className='form-control'
+                                    value={paper.abstract}
+                                    readOnly
+                                    rows={10}
+                                />
                             </div>
-                            <div>
-                                <p className='fw-bold mb-0'>รหัสบทความ</p>
-                                <p className='text-muted'>{paper.data.paper_id?.paper_code}</p>
+                            <div className='col-lg-4 fw-bold' >
+                                File บทความ
                             </div>
-                            <div>
-                                <div className='fw-bold'>บทคัดย่อ</div>
-                                <div className='text-muted'><span className='ms-3'>{paper.data.paper_id?.abstract}</span></div>
-                            </div>
-                            <div className='col-12'>
-                                <div>
-                                    <p className='fw-bold'>File บทความ</p>
-                                </div>
+                            <div className='col-lg-8'>
                                 {PaperFile &&
                                     <ul>
                                         {PaperFile.map((items) => (
@@ -177,6 +180,60 @@ function Review() {
                                 }
                             </div>
                         </div>
+                    </div>
+                </div>
+            }
+            {confr &&
+                <div className='card mb-3'>
+                    <div className='card-body'>
+                        <h4 className='card-title mb-3'>รายละเอียดงานประชุม</h4>
+                        <div className='card-text row g-3'>
+                            <div className='col-lg-4 fw-bold'>
+                                ชื่องานประชุม
+                            </div>
+                            <div className='col-lg-8'>
+                                {confr.title}
+                            </div>
+                            <div className='col-lg-4 fw-bold'>
+                                รหัสงานประชุม
+                            </div>
+                            <div className='col-lg-8'>
+                                {confr.confr_code}
+                            </div>
+                            <div className='col-lg-4 fw-bold'>
+                                วันที่ดำเนินการ
+                            </div>
+                            <div className='col-lg-8'>
+                                {dayjs(confr.confr_start_date).format('DD MMM YYYY')} - {dayjs(confr.confr_end_date).format('DD MMM YYYY')}
+                            </div>
+                            <div className='col-lg-4 fw-bold'>
+                                รายละเอียดงานประชุม
+                            </div>
+                            <div className='col-lg-8'>
+                                {confr.confr_desc}
+                            </div>
+                            <div className='col-lg-4 fw-bold'>
+                                หมวดหมู่งานประชุม
+                            </div>
+                            <div className='col-lg-8'>
+                                {confr.cate?.map((cates, catesIndex) => (
+                                    <span key={catesIndex} className='badge bg-primary me-2'>
+                                        {cates}
+                                    </span>
+                                ))}
+                            </div>
+                            <div className='col-lg-4 fw-bold'>
+                                Tag
+                            </div>
+                            <div className='col-lg-8'>
+                                {confr.tag?.map((tags, tagIndex) => (
+                                    <span key={tagIndex} className='badge bg-primary me-2'>
+                                        {tags}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             }
@@ -201,10 +258,15 @@ function Review() {
                                         <th className='text-center'>1</th>
                                     </tr>
                                 </thead>
-                                {question.data &&
+                                {question &&
                                     <tbody>
-                                        {question.data.map((item, index) => (
-                                            <QuestionList key={index} title={item} idx={index} handleChnage={handleSetTotal} />
+                                        {question.map((item, index) => (
+                                            <QuestionList
+                                                key={index}
+                                                title={item}
+                                                idx={index}
+                                                handleChnage={handleSetTotal}
+                                            />
                                         ))}
                                         <tr>
                                             <td className='text-center fw-bold'>รวมคะแนน:</td>

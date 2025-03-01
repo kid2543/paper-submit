@@ -9,7 +9,6 @@ import SearchItemNotFound from '../SearchItemNotFound'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast } from 'react-toastify'
-import { Link } from 'react-router-dom'
 
 function Registration() {
 
@@ -20,7 +19,6 @@ function Registration() {
     const [showModalA, setShowModalA] = useState(false)
     const [showModalB, setShowModalB] = useState(false)
     const [showModalC, setShowModalC] = useState(false)
-    const [showModalD, setShowModalD] = useState(false)
 
     if (status === 'idle' || status === 'loading') {
         return <LoadingPage />
@@ -47,10 +45,15 @@ function Registration() {
                     setData={setData}
                 />
                 <div className='col-12 col-lg-6'>
-                    <div className='card shadow-sm h-100'>
+                    <div className='card h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
-                                <h4>รายละเอียดบัญชี</h4>
+                                <div>
+                                    <h4>รายละเอียดบัญชี</h4>
+                                    <div className='text-muted'>
+                                        กรอกรายละเอียดบัญชีเพื่อใช้งานการลงทะเบียนเข้าร่วมงานประชุม
+                                    </div>
+                                </div>
                                 <div>
                                     <button className='btn' onClick={() => setShowModalA(true)}>
                                         <i className='bi bi-pencil-square'></i>
@@ -87,10 +90,15 @@ function Registration() {
                         handleClose={() => setShowModalB(false)}
                         setData={setData}
                     />
-                    <div className='card  shadow-sm h-100'>
+                    <div className='card h-100'>
                         <div className='card-body'>
                             <div className='d-flex justify-content-between align-items-center mb-4'>
-                                <h4>อัตราค่าลงทะเบียน</h4>
+                                <div>
+                                    <h4>อัตราค่าลงทะเบียน</h4>
+                                    <div className='text-muted'>
+                                        เพิ่มอัตราค่าลงทะเบียนเพื่อให้ผู้ส่งบทความสามารถอ่าน และชำระเงินได้ถูกต้อง
+                                    </div>
+                                </div>
                                 <button className='btn' onClick={() => setShowModalB(true)}>
                                     <i className='bi bi-pencil-square'></i>
                                 </button>
@@ -122,8 +130,8 @@ function Registration() {
                         </div>
                     </div>
                 </div>
-                <div className='col-12 col-lg-6'>
-                    <div className='card  shadow-sm h-100'>
+                <div className='col-12'>
+                    <div className='card h-100'>
                         <div className='card-body'>
                             <div>
                                 <ModalRegisDate
@@ -133,46 +141,18 @@ function Registration() {
                                     show={showModalC}
                                 />
                                 <div className='d-flex justify-content-between align-items-center mb-4'>
-                                    <h4>กำหนดการชำระเงิน</h4>
+                                    <div>
+                                        <h4>กำหนดการชำระเงิน</h4>
+                                        <div className='text-muted'>
+                                            เพิ่มข้อมูลเพื่อให้ผู้ส่งบทความสามารถ ดูกำหนดการในการชำระเงินได้
+                                        </div>
+                                    </div>
                                     <button className='btn' onClick={() => setShowModalC(true)}>
                                         <i className='bi bi-pencil-square'></i>
                                     </button>
                                 </div>
                                 <p><b>Early bird</b> : {data?.regis_eb_start_date && dayjs(data?.regis_eb_start_date).format("DD MMM YYYY")} - {data?.regis_eb_end_date && dayjs(data?.regis_eb_end_date).format("DD MMM YYYY")}</p>
                                 <p><b>Regular</b> : {data?.regis_rl_start_date && dayjs(data?.regis_rl_start_date).format("DD MMM YYYY")} - {data?.regis_rl_end_date && dayjs(data?.regis_rl_end_date).format("DD MMM YYYY")}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-lg-6">
-                    <ModalSchedule
-                        show={showModalD}
-                        handleClose={() => setShowModalD(false)}
-                        setData={setData}
-                        id={id}
-                    />
-                    <div className='card h-100'>
-                        <div className="card-body">
-                            <div>
-                                <div className='d-flex justify-content-between align-items-center mb-4'>
-                                    <h4>กำหนดการงานประชุม</h4>
-                                    <button className='btn' onClick={() => setShowModalD(true)}>
-                                        <i className='bi bi-pencil-square'></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div>
-                                {data.schedule ? (
-                                    <Link to={`/uploads/${data.schedule}`} target='_blank' rel='noreferrer' className="btn btn-primary">
-                                        <i className="bi bi-file-earmark me-2"></i>
-                                        ดูไฟล์กำหนดการ
-                                    </Link>
-
-                                ) : (
-                                    <button onClick={() => setShowModalD(true)} type='button' className="btn btn-outline-primary">
-                                        อัพโหลดไฟล์กำหนดการ
-                                    </button>
-                                )}
                             </div>
                         </div>
                     </div>
@@ -484,72 +464,3 @@ function ModalRegisDate(props) {
     )
 }
 
-function ModalSchedule(props) {
-
-    const [scheduleFile, setScheduleFile] = useState(null)
-
-    const [loading, setLoading] = useState(false)
-    const handleUpload = async (e) => {
-        e.preventDefault()
-        setLoading(true)
-        if (!scheduleFile) {
-            toast.warning('กรุณาเลือกไฟล์')
-            return
-        }
-
-        try {
-            const formData = new FormData()
-            formData.append('file', scheduleFile)
-            const res = await axios.patch('/api/conference/schedule/' + props.id, formData)
-            props.setData(res.data)
-            toast.success('อัพโหลดไฟล์กำหนดการสำเร็จ')
-        } catch (error) {
-            console.log(error)
-            toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
-        } finally {
-            props.handleClose()
-            setLoading(false)
-        }
-    }
-
-    return (
-        <Modal show={props.show} onHide={props.handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>เพิ่ม / แก้ไขกำหนดการ</Modal.Title>
-            </Modal.Header>
-            <form onSubmit={handleUpload}>
-                <Modal.Body>
-                    <label className="form-label">
-                        เลือกไฟล์กำหนดการ
-                    </label>
-                    <input
-                        className="form-control"
-                        type='file'
-                        accept='.pdf'
-                        onChange={e => setScheduleFile(e.target.files[0])}
-                        required
-                    />
-                    <div className="form-text">
-                        เฉพาะ PDF เท่านั้น
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="" onClick={props.handleClose}>
-                        ปิด
-                    </Button>
-                    {loading ? (
-                        <button className="btn btn-primary" type="button" disabled>
-                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Loading...
-                        </button>
-                    ) : (
-                    <Button variant="primary" type='submit' disabled={!scheduleFile}>
-                        <i className="me-2 bi bi-upload"></i>
-                        อัพโหลด
-                    </Button>
-                    )}
-                </Modal.Footer>
-            </form>
-        </Modal>
-    )
-}

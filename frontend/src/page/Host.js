@@ -324,8 +324,13 @@ function Host() {
         <div className='card my-3'>
           <div className='card-body'>
             <div className='row align-items-center gy-3 mb-4'>
-              <h4 className='col-12 col-md-8 mb-0'>รายการบทความ</h4>
-              <form onSubmit={searchPaper.handleSearchChange} className='col-12 col-md-4'>
+              <div className='col-lg-8'>
+                <h4 className=''>รายการบทความ</h4>
+                <div className='text-muted'>
+                  แสดงรายการบทความเพื่อใช้ในการตรวจสอบความถูกต้อง แก้ไขและ มอบหมายให้กรรมการตรวจบทความ
+                </div>
+              </div>
+              <form onSubmit={searchPaper.handleSearchChange} className='col-md-4'>
                 <div className="input-group">
                   <input name='search' type="text" className="form-control" placeholder="ค้นหาจากชื่อบทความ" />
                   <button type='submit' className="input-group-text btn btn-primary text-white" id="basic-addon2">
@@ -430,6 +435,9 @@ function Host() {
         <div className='card my-3'>
           <div className='card-body'>
             <h4 className='card-title'>ดูรายชื่อผู้ลงทะเบียน</h4>
+            <div className='text-muted mb-3'>
+              เมื่อผู้ส่งบทความชำระเงินและมอบหลักฐานการชำระเงินให้ผู้จัดงานตรวจสอบความถูกต้องแล้วจะมีรายชื่อผู้เข้าร่วมงานประชุมปรากฏในหน้าด้านล่างนี้
+            </div>
             <Link to={`/host/confr/registrant`} className='btn btn-primary'>
               <i className='bi bi-eye me-2'></i>
               ดูรายชื่อ
