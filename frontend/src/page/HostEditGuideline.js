@@ -28,7 +28,7 @@ function HostEditGuideline() {
       <div className='mb-3 card'>
         <div className='card-body'>
           <h4 className='fw-bold card-title'>ข้อแนะนำ</h4>
-          <p className='text-muted card-text'>เพิ่มและแก้ไขข้อแนะนำสำหรับการส่งบทความได้ที่นี่</p>
+          <p className='text-muted card-text'>เพิ่มและแก้ไขข้อแนะนำสำหรับการเข้าร่วมงานประชุมได้ที่นี่</p>
         </div>
       </div>
       {data &&
@@ -36,7 +36,12 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h4 className='card-title'>ผู้ส่งบทความ</h4>
+                <div>
+                  <h4 className='card-title'>ผู้ส่งบทความ</h4>
+                  <div className='text-muted'>
+                    เพิ่มข้อแนะนำเพื่อแจ้งให้ผู้ส่งบทความทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม
+                  </div>
+                </div>
                 <div>
                   <button className='btn' type='button' onClick={() => setShowPresenter(true)}>
                     <i className='bi bi-pencil-square'></i>
@@ -55,7 +60,12 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h4 className='card-title'>กรรมการ</h4>
+                <div>
+                  <h4 className='card-title'>กรรมการ</h4>
+                  <div className='text-muted'>
+                    เพิ่มข้อแนะนำเพื่อแจ้งให้กรรมการทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม
+                  </div>
+                </div>
                 <button className='btn' type='button' onClick={() => setShowChair(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>
@@ -71,7 +81,12 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <h4 className='card-title'>ผู้เข้าชม</h4>
+                <div>
+                  <h4 className='card-title'>ผู้เข้าชม</h4>
+                  <div className='text-muted'>
+                    เพิ่มข้อแนะนำเพื่อแจ้งให้ผู้เข้าชมทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม
+                  </div>
+                </div>
                 <button className='btn' type='button' onClick={() => setShowAudience(true)}>
                   <i className='bi bi-pencil-square'></i>
                 </button>

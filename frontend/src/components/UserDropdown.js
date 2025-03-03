@@ -84,7 +84,7 @@ export function UserDropdown() {
         <Dropdown>
             <Dropdown.Toggle className=" align-items-center d-flex" variant="light" id="dropdown-basic">
                 <i className="bi bi-person-fill fs-3 me-2"></i>
-                <span className="me-2">{user}</span>
+                <span className="me-2 d-none d-md-flex">{user}</span>
             </Dropdown.Toggle>
             <Dropdown.Menu>
                 <Dropdown.Header>

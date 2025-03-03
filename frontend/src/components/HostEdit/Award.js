@@ -58,7 +58,10 @@ function Award() {
                     />
                     <div className='card'>
                         <div className="card-body">
-                            <h6 className='fw-bold card-title'>รายการบทความในหัวข้อนี้</h6>
+                            <h4 className='card-title'>รายการบทความในหัวข้อนี้</h4>
+                            <div className='text-muted'>
+                                เลือกอันดับรางวัลดีเด่นที่ต้องการเพื่อนำไปแสดงบทเว็บไซต์ของงานประชุม
+                            </div>
                             <div className='table-responsive'>
                                 <table className='table' style={{ minWidth: '1000px' }}>
                                     <thead>

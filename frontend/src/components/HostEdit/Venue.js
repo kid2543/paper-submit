@@ -54,7 +54,12 @@ function Venue() {
                     <div className='card  shadow-sm'>
                         <div className='card-body'>
                             <div className='d-md-flex justify-content-between align-items-center mb-3'>
+                                <div>
                                 <h4>รายละเอียดสถานที่จัดงาน</h4>
+                                <div className='text-muted'>
+                                    กรอกรายละเอียด เพิ่มลิ้งค์ และอัพโหลดรูปสถานที่จัดงานเพื่อให้ผู้ส่งบทความสามารถเข้ามาอ่านได้
+                                </div>
+                                </div>
                                 <div>
                                     <button className='btn btn-outline-dark me-2' onClick={() => setShowModal(true)}>
                                         <i className='bi bi-pencil-square me-2'></i>

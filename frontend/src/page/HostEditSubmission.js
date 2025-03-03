@@ -111,7 +111,12 @@ function HostEditSubmission() {
       <div className='card  shadow-sm mb-3'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
+            <div>
             <h4 className='card-title'>รายการเทมเพลต</h4>
+              <div className='text-muted'>
+                  อัพโหลดเทมเพลตเพื่อให้ ผู้ส่งบทความสามารถโหลด และนำไปปรับใช้กับบทความเพื่อให้รูปแบบของบทความเป็นไปตามที่งานประชุมกำหนด
+              </div>
+            </div>
             <button className='btn btn-primary' onClick={() => setTemplateModal(true)}>
               <i className='bi bi-plus-lg me-2'></i>
               เพิ่มเทมเพลต
@@ -165,7 +170,12 @@ function HostEditSubmission() {
       <div className='card  shadow-sm'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
+            <div>
             <h4 className='card-title'>ข้อแนะนำการส่งบทความ</h4>
+            <div className='text-muted'>
+              เพิ่มข้อแนะนำการส่งบทความ เพื่อให้ผู้ส่งบทความสามารถปฏิบัติตามเงื่อนไขของงานประชุมได้อย่างถูกต้อง
+            </div>
+            </div>
             <button className='btn btn-outline-dark' onClick={handleShow}>
               <i className='bi bi-pencil-square me-2'></i>
               แก้ไข

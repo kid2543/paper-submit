@@ -31,7 +31,10 @@ function AwardCateList() {
                 <div>
                     <div className='card shadow-sm'>
                         <div className='card-body'>
-                            <h6 className='fw-bold card-title'>รายชื่อหัวข้องานประชุม</h6>
+                            <h4 className='card-title'>รายชื่อหัวข้องานประชุม</h4>
+                            <div className='text-muted'>
+                                เลือกข้อที่ต้องการเพื่อเพิ่ม รางวัลดีเด่น ประจำหัวข้อนั้นๆ
+                            </div>
                             <div className='table-responsive'>
                                 <table className='table' style={{ minWidth: "1000px" }}>
                                     <thead>

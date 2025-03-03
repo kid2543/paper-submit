@@ -115,7 +115,17 @@ function HostCateList() {
             <div className='card  shadow-sm'>
                 <div className='card-body'>
                     <div className='d-md-flex justify-content-between mb-3 align-items-center'>
-                        <h4 className='card-title'>รายการหัวข้องานประชุม</h4>
+                        <div>
+                            <h4 className='card-title'>รายการหัวข้องานประชุม</h4>
+                            <div className='text-muted'>
+                                เพิ่มหัวข้องานประชุมเพื่อใช้สำหรับการส่งบทความ กรอกรายละเอียด และชื่อหัวข้อรวมถึงรหัสหัวข้อเพื่อใช้ตั้ง รหัสบทความที่ส่งเข้ามา
+                                {data.length <= 0 &&
+                                    <div className='text-warning'>
+                                        หากไม่เพิ่มหัวข้องานประชุมอย่างน้อย 1 หัวข้อจะไม่สามารถเปิดงานประชุมได้
+                                    </div>
+                                }
+                            </div>
+                        </div>
                         <button type='button' onClick={handleShow} className='btn btn-primary'><i className="bi bi-plus-lg me-2"></i>เพิ่มหัวข้องานประชุม</button>
                         <Modal show={show} onHide={handleClose}>
                             <Modal.Header closeButton>

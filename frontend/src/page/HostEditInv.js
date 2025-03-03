@@ -115,7 +115,12 @@ function HostEditInv() {
             <div className='card shadow-sm  mb-3'>
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
+                        <div>
                         <h4 className='card-title'>รายการวิทยากร</h4>
+                        <div className='text-muted'>
+                            เพิ่มรายละเอียดและอัพโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
+                        </div>
+                        </div>
                         <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
                             <i className='me-2 bi bi-plus-lg'></i>
                             เพิ่มวิทยากร

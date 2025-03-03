@@ -85,7 +85,12 @@ function HostPartner() {
       <div className='card shadow-sm'>
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center'>
-            <h4 className='card-title'>รายการผู้สนับสนุน</h4>
+            <div>
+              <h4 className='card-title'>รายการผู้สนับสนุน</h4>
+              <div className='text-muted'>
+                อัพโหลดรูปภาพและกรอกชื่อผู้สนับสนุน
+              </div>
+            </div>
             <button className='btn btn-primary' type='button' onClick={handleShowCreate}>
               <i className='bi bi-plus-lg me-2'></i>เพิ่มรูปผู้สนับสนุน
             </button>

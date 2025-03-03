@@ -241,7 +241,12 @@ function HostReview() {
         </div>
         <div className='card shadow-sm mb-3'>
           <div className='card-body'>
-            <h4 className='card-title mb-4'>รายละเอียดบทความ</h4>
+            <div className='mb-3'>
+              <h4 className='card-title'>รายละเอียดบทความ</h4>
+              <div className='text-muted'>
+                ผู้จัดงานสามารถแก้ไขรายละเอียดบทความได้หากข้อมูลไม่ถูกต้อง
+              </div>
+            </div>
             {paper &&
               <div>
 
@@ -316,6 +321,7 @@ function HostReview() {
                         defaultValue={paper.keyword}
                         className="form-control"
                         name='keyword'
+                        rows={5}
                       />
                     </div>
 
@@ -357,6 +363,7 @@ function HostReview() {
                         defaultValue={paper.address}
                         className="form-control"
                         name='address'
+                        rows={5}
                       />
                     </div>
 
@@ -477,31 +484,56 @@ function HostReview() {
               <div className='card shadow-sm'>
                 {paper.letter ? (
                   <div className='card-body'>
-                    <h6 className='fw-bold mb-0'>
+                    <h4 className='card-title'>
                       ส่งจดหมายเชิญเข้าร่วมงานประชุมแล้ว
                       <span className='ms-2 badge bg-success'>
                         <i className='bi bi-check-lg'></i>
                       </span>
-                    </h6>
+                    </h4>
                   </div>
                 ) : (
                   <div className='card-body'>
-                    <h4 className='card-title'>
-                      ส่งจดหมายเข้าร่วมงานประชุม
-                    </h4>
+                    <div className='mb-3'>
+                      <h4 className='card-title'>
+                        ส่งจดหมายเข้าร่วมงานประชุม
+                      </h4>
+                      <div className='text-muted'>
+                        ส่งจดหมายเชิญเพื่อให้ผู้ส่งบทความ เตรียมพร้อมสำหรับการลงทะเบียนเพื่อเข้าร่วมงานประชุม
+                      </div>
+                    </div>
                     <form onSubmit={e => sendMail(e, '/api/paper/send/email', sendMailFile)} className='row row-cols-1 g-3 mb-3'>
-                      <div>
-                        <label className='form-label fw-bold'>อีเมล</label>
-                        <input name='recipient' className='form-control-plaintext' readOnly value={paper.email} />
+                      <div className='row mb-3'>
+                        <label className='col-sm-3 fw-bold col-form-label'>อีเมล</label>
+                        <div className='col-sm-9'>
+                          <input
+                            name='recipient'
+                            className='form-control-plaintext'
+                            readOnly
+                            value={paper.email}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label className='form-label fw-bold'>ชื่องานประชุม</label>
-                        <input name='confr_title' className='form-control-plaintext' readOnly value={paper.confr_code?.title} />
+                      <div className='row mb-3'>
+                        <label className='col-sm-3 fw-bold col-form-label'>ชื่องานประชุม</label>
+                        <div className='col-sm-9'>
+                          <input
+                            name='confr_title'
+                            className='form-control-plaintext'
+                            readOnly
+                            value={paper.confr_code?.title}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <label className='form-label fw-bold'>ชื่อบทความ</label>
-                        <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
-                        <input className='form-control-plaintext' readOnly value={paper.title} />
+                      <div className='row mb-3'>
+                        <label className='col-sm-3 fw-bold col-form-label'>ชื่อบทความ</label>
+                        <div className='col-sm-9'>
+                          <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
+                          <input
+                            className='form-control-plaintext'
+                            readOnly
+                            value={paper.title}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className='form-label fw-bold'>ผู้ส่งบทความ</label>
@@ -564,7 +596,7 @@ function HostReview() {
                               />
                               <tr>
                                 <td>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</td>
-                                <td style={{width: 600}}>{item.suggestion}</td>
+                                <td style={{ width: 600 }}>{item.suggestion}</td>
                                 <td>{item.total}</td>
                                 <td>
                                   <PaperStatus status={item.status} />

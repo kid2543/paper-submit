@@ -90,9 +90,17 @@ function HostEditPub() {
                 <div className="card">
                     <div className="card-body">
                         <div className="d-md-flex justify-content-between mb-3">
-                            <h4 className="card-title">รายการวารสาร</h4>
                             <div>
-                                <button className="btn btn-primary" type='button' onClick={() => setShowCreate(true)}>เพิ่มวารสาร</button>
+                                <h4 className="card-title">รายการวารสาร</h4>
+                                <div className='text-muted'>
+                                    หากมีวารสารที่เข้าร่วม สามารถเพิ่มรายละเอียดได้ที่นี่ และจะไปแสดงในหน้าการส่งบทความของผู้ส่งบทความเพื่อให้สามารถเลือกได้ว่าจะส่งมายังวารสารหรือไม่
+                                </div>
+                            </div>
+                            <div>
+                                <button className="btn btn-primary" type='button' onClick={() => setShowCreate(true)}>
+                                    <i className='bi bi-plus-lg me-2'></i>
+                                    เพิ่มวารสาร
+                                </button>
                                 <CreatePublicationModal
                                     show={showCreate}
                                     handleClose={() => setShowCreate(false)}
