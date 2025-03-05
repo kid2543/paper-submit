@@ -913,7 +913,6 @@ const sendEmailPdf = async (req, res) => {
 
     const { recipient, confr_title, owner, paper_id } = req.body
 
-
     if (!req.file) {
         return res.status(400).json({ error: 'เกิดข้อผิดพลาดเกี่ยวกับการ upload file' })
     }
@@ -921,7 +920,7 @@ const sendEmailPdf = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(paper_id)) {
         fs.unlink(req.file.path, (err) => {
             if (err) {
-                console.error('ไม่สามารถลบไฟล์ได้: ', err)
+                console.log('ไม่สามารถลบไฟล์ได้: ', err)
             } else {
                 console.log('ลบไฟล์สำเร็จ')
             }
@@ -955,7 +954,7 @@ const sendEmailPdf = async (req, res) => {
         if (error) {
             fs.unlink(req.file.path, (unlinkError) => {
                 if (unlinkError) {
-                    console.error('ลบไฟล์ล้มเหลว: ', unlinkError)
+                    console.log('ลบไฟล์ล้มเหลว: ', unlinkError)
                 } else {
                     console.log('ลบไฟล์สำเร็จ')
                 }

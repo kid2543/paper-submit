@@ -197,8 +197,10 @@ function CreatePublicationModal({ show, handleClose, setData, data }) {
         setDesc(temp)
     }
 
+    const [createLoading, setCreateLoading] = useState(false)
     const handleCreate = async (e) => {
         e.preventDefault()
+        setCreateLoading(true)
         try {
             const res = await axios.post('/api/publication', {
                 th_name,
@@ -216,6 +218,7 @@ function CreatePublicationModal({ show, handleClose, setData, data }) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
         } finally {
             handleClose()
+            setCreateLoading(false)
         }
     }
 
@@ -296,9 +299,16 @@ function CreatePublicationModal({ show, handleClose, setData, data }) {
                     <Button variant="" onClick={handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        สร้าง
-                    </Button>
+                    {createLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            สร้าง
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

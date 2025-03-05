@@ -18,7 +18,7 @@ import UnAuthorized from './UnAuthorized'
 function Confr() {
 
     const [data, setData] = useState({})
-    const [pub,setPub] = useState([])
+    const [pub, setPub] = useState([])
     const [topic, setTopic] = useState([])
     const [inv, setInv] = useState([])
     const [partner, setPartner] = useState([])
@@ -83,13 +83,19 @@ function Confr() {
                             }
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
                             <h5 className='text-muted mb-3'>{data.sub_title} <br /> {data.confr_code} </h5>
-                            {topic && dayjs(data.confr_end_date).format('YYYY-MM-DD') > today &&
+                            {dayjs(Date.now()).format('DD MMM YYYY') > dayjs(data.confr_end_date).format('DD MMM YYYY') && data.confr_end_date &&
+                                <div className='text-warning'>
+                                    เลยกำหนดการส่งแล้ว
+                                </div>
+                            }
+                            {topic && dayjs(Date.now()).format('DD MMM YYYY') <= dayjs(data.confr_end_date).format('DD MMM YYYY') &&
                                 <div>
                                     <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
                                         <i className="bi bi-send me-2"></i>
                                         ส่งบทความเลย!
                                     </button>
-                                    <div className="text-muted mt-3">
+
+                                    <div className="text-info fw-bold mt-3">
                                         ส่งได้ถึงวันที่ {dayjs(data.confr_end_date).format('DD MMM YYYY')}
                                     </div>
                                 </div>
@@ -231,17 +237,17 @@ function Confr() {
                                         </div>
                                     </section>
 
-                                    {data.schedule && 
-                                        <section id='6' style={{padding: '64px 0px'}}>
+                                    {data.schedule &&
+                                        <section id='6' style={{ padding: '64px 0px' }}>
                                             <div className="mb-4">
                                                 <h4 className="fw-bold">กำหนดการงานประชุม</h4>
                                             </div>
                                             <div>
                                                 <Link
-                                                target='_blank'
-                                                rel='noreferrer' 
-                                                to={`/uploads/${data.schedule}`} 
-                                                className="btn btn-primary">ดูกำหนดการงานประชุมได้ที่นี่</Link>
+                                                    target='_blank'
+                                                    rel='noreferrer'
+                                                    to={`/uploads/${data.schedule}`}
+                                                    className="btn btn-primary">ดูกำหนดการงานประชุมได้ที่นี่</Link>
                                             </div>
                                         </section>
                                     }

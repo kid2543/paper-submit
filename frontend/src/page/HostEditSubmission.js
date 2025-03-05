@@ -112,9 +112,9 @@ function HostEditSubmission() {
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
             <div>
-            <h4 className='card-title'>รายการเทมเพลต</h4>
+              <h4 className='card-title'>รายการเทมเพลต</h4>
               <div className='text-muted'>
-                  อัพโหลดเทมเพลตเพื่อให้ ผู้ส่งบทความสามารถโหลด และนำไปปรับใช้กับบทความเพื่อให้รูปแบบของบทความเป็นไปตามที่งานประชุมกำหนด
+                อัพโหลดเทมเพลตเพื่อให้ ผู้ส่งบทความสามารถโหลด และนำไปปรับใช้กับบทความเพื่อให้รูปแบบของบทความเป็นไปตามที่งานประชุมกำหนด
               </div>
             </div>
             <button className='btn btn-primary' onClick={() => setTemplateModal(true)}>
@@ -171,10 +171,10 @@ function HostEditSubmission() {
         <div className='card-body'>
           <div className='d-flex justify-content-between align-items-center mb-3'>
             <div>
-            <h4 className='card-title'>ข้อแนะนำการส่งบทความ</h4>
-            <div className='text-muted'>
-              เพิ่มข้อแนะนำการส่งบทความ เพื่อให้ผู้ส่งบทความสามารถปฏิบัติตามเงื่อนไขของงานประชุมได้อย่างถูกต้อง
-            </div>
+              <h4 className='card-title'>ข้อแนะนำการส่งบทความ</h4>
+              <div className='text-muted'>
+                เพิ่มข้อแนะนำการส่งบทความ เพื่อให้ผู้ส่งบทความสามารถปฏิบัติตามเงื่อนไขของงานประชุมได้อย่างถูกต้อง
+              </div>
             </div>
             <button className='btn btn-outline-dark' onClick={handleShow}>
               <i className='bi bi-pencil-square me-2'></i>
@@ -222,8 +222,11 @@ function TemplateModal(props) {
     props.handleClose()
   }
 
+
+  const [uploadLoading, setUploadLoading] = useState(false)
   const handleUpdate = async (e) => {
     e.preventDefault()
+    setUploadLoading(true)
     try {
       const formData = new FormData()
       formData.append('name', templateName)
@@ -236,6 +239,8 @@ function TemplateModal(props) {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด')
+    } finally {
+      setUploadLoading(false)
     }
   }
 
@@ -259,10 +264,17 @@ function TemplateModal(props) {
           <Button variant="" onClick={closeModal}>
             ปิด
           </Button>
-          <Button variant="primary" disabled={!templateFile || !templateName} type='submit'>
-            <i className='bi bi-upload me-2'></i>
-            อัพโหลด
-          </Button>
+          {uploadLoading ? (
+            <button className="btn btn-primary" type="button" disabled>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Loading...
+            </button>
+          ) : (
+            <Button variant="primary" disabled={!templateFile || !templateName} type='submit'>
+              <i className='bi bi-upload me-2'></i>
+              อัพโหลด
+            </Button>
+          )}
         </Modal.Footer>
       </form>
     </Modal>
@@ -285,8 +297,10 @@ function SubmissionModal(props) {
     setData([...data, ''])
   }
 
+  const [updateLoading, setUpdateLoading] = useState(false)
   const handleUpdate = async (e) => {
     e.preventDefault()
+    setUpdateLoading(true)
     try {
       const res = await axios.patch('/api/conference', {
         _id,
@@ -298,6 +312,8 @@ function SubmissionModal(props) {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด')
+    } finally {
+      setUpdateLoading(false)
     }
   }
 
@@ -368,9 +384,16 @@ function SubmissionModal(props) {
           <Button variant="" onClick={closeModal}>
             ปิด
           </Button>
-          <Button variant="primary" type='submit'>
-            ยืนยัน
-          </Button>
+          {updateLoading ? (
+            <button className="btn btn-primary" type="button" disabled>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Loading...
+            </button>
+          ) : (
+            <Button variant="primary" type='submit'>
+              ยืนยัน
+            </Button>
+          )}
         </Modal.Footer>
       </form>
     </Modal>

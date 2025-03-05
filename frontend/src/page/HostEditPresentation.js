@@ -40,9 +40,9 @@ function HostEditPresentation() {
             </div>
             <div className='card mb-3'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <div>
-                        <h4>ข้อแนะการนำเสนอบทความ</h4>
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <div className='mb-3'>
+                            <h4>ข้อแนะการนำเสนอบทความ</h4>
                             <div className='text-muted'>
                                 เพิ่มข้อแนะนำสำหรับผู้นำเสนอ เพื่อให้ผู้นำเสนอเตรียมตัวก่อนทำการนำเสนอได้อย่างถูกต้อง
                             </div>
@@ -65,12 +65,12 @@ function HostEditPresentation() {
             </div>
             <div className='card mb-3'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center mb-3'>
-                        <div>
-                        <h4>รายละเอียดเพิ่มเติม</h4>
-                        <div className='text-muted'>
-                            รายละเอียดเพิ่มเติมเกี่ยวกับการเสนอ เช่นการที่ผู้ส่งบทความไม่มานำเสนอจะมีเงื่อนไขตามที่งานประชุมกำหนด เป็นต้น
-                        </div>
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <div className='mb-3'>
+                            <h4>รายละเอียดเพิ่มเติม</h4>
+                            <div className='text-muted'>
+                                รายละเอียดเพิ่มเติมเกี่ยวกับการเสนอ เช่นการที่ผู้ส่งบทความไม่มานำเสนอจะมีเงื่อนไขตามที่งานประชุมกำหนด เป็นต้น
+                            </div>
                         </div>
                         <div>
                             <button className='btn' type='button' onClick={() => setShowB(true)}>
@@ -96,8 +96,8 @@ function HostEditPresentation() {
                 <div className='card'>
                     <div className="card-body">
                         <div>
-                            <div className='d-flex justify-content-between align-items-center mb-4'>
-                                <div>
+                            <div className='d-flex justify-content-between align-items-center'>
+                                <div className='mb-3'>
                                     <h4>กำหนดการงานประชุม / กำหนดการนำเสนอ</h4>
                                     <div className='text-muted'>
                                         อัพโหลดกำหนดการนำเสนอ เพื่อให้ผู้เข้าร่วมงานประชุมดูเวลา และสถานที่ในการนำเสนอ หรือเข้าร่วมกิจกรรมต่างๆ ของงานประชุม

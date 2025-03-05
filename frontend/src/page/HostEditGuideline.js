@@ -36,7 +36,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <div>
+                <div className='mb-3'>
                   <h4 className='card-title'>ผู้ส่งบทความ</h4>
                   <div className='text-muted'>
                     เพิ่มข้อแนะนำเพื่อแจ้งให้ผู้ส่งบทความทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม
@@ -60,7 +60,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <div>
+                <div className='mb-3'>
                   <h4 className='card-title'>กรรมการ</h4>
                   <div className='text-muted'>
                     เพิ่มข้อแนะนำเพื่อแจ้งให้กรรมการทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม
@@ -81,7 +81,7 @@ function HostEditGuideline() {
           <div className='card  shadow-sm mb-3'>
             <div className='card-body'>
               <div className='d-flex justify-content-between align-items-center'>
-                <div>
+                <div className='mb-3'>
                   <h4 className='card-title'>ผู้เข้าชม</h4>
                   <div className='text-muted'>
                     เพิ่มข้อแนะนำเพื่อแจ้งให้ผู้เข้าชมทราบถึงขั้นตอนต่างๆ ในการเข้าร่วมงานประชุม

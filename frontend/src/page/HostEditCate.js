@@ -114,6 +114,9 @@ function HostEditCate() {
                             </Breadcrumb.Item>
                         </Breadcrumb>
                         <h4 className='fw-bold card-title'>แก้ไขข้อมูลหัวข้องานประชุม</h4>
+                        <div className='text-muted'>
+                            แก้ไขรายละเอียดหัวข้องานประชุมได้ที่นี่เพียงกรอกข้อมูลและกดปุ่ม บันทึกข้อมูล เมื่อต้องการแก้ไข
+                        </div>
                     </div>
                 </div>
                 <div className='card  mb-3'>
@@ -158,7 +161,12 @@ function HostEditCate() {
                 </div>
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title'>รายชื่อกรรมการประจำหัวข้อ</h4>
+                        <div className='mb-3'>
+                            <h4 className='card-title'>รายชื่อกรรมการประจำหัวข้อ</h4>
+                            <div className='text-muted'>
+                                รายชื่อกรรมการที่เลือกจะแสดงด้านล่างนี้
+                            </div>
+                        </div>
                         {commitDetail.length > 0 ? (
                             <div className='table-responsive'>
                                 <table className='table table-hover'>
@@ -189,9 +197,14 @@ function HostEditCate() {
                 </div>
                 <div className='card  shadow-sm mb-3'>
                     <div className='card-body'>
-                        <h4 className='card-title mb-3'>
+                        <div className='mb-3'>
+                        <h4 className='card-title'>
                             รายชื่อกรรมการทั้งหมด
                         </h4>
+                        <div className='text-muted'>
+                            เลือกรายชื่อกรรมการที่ต้องการ และกดปุ่ม ยืนยันด้านล่างเพื่อบันทึกรายชื่อกรรมการ
+                        </div>
+                        </div>
                         <div className='d-flex justify-content-between align-items-center mb-3'>
                             <div>
                                 <form onSubmit={handleSearchChange} className="input-group">

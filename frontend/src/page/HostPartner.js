@@ -23,8 +23,13 @@ function HostPartner() {
   const handleCloseCreate = () => setShowCreate(false);
   const handleShowCreate = () => setShowCreate(true);
 
+  const [createLoading, setCreateLoading] = useState(false)
+
+  const [hiddenDel, setHiddenDel] = useState(null)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setCreateLoading(true)
     const formData = new FormData()
     formData.append("image", partnerUpload)
     formData.append("confr_id", id)
@@ -40,6 +45,7 @@ function HostPartner() {
     } finally {
       e.target.partner.value = ""
       e.target.desc.value = null
+      setCreateLoading(false)
     }
   }
 
@@ -75,6 +81,7 @@ function HostPartner() {
         handleSubmit={handleSubmit}
         setPartnerUpload={setPartnerUpload}
         partnerUpload={partnerUpload}
+        loading={createLoading}
       />
       <ConfirmDel
         show={show}
@@ -99,13 +106,24 @@ function HostPartner() {
             <div className='row g-3 mt-3'>
               {partnerData?.map((item) => (
                 <div key={item._id} className='col-auto'>
-                  <div className="btn-group">
-                    <div className="border">
+
+                  <div
+                    className="bg-light shadow-sm position-relative"
+                    onMouseEnter={() => setHiddenDel(item._id)}
+                    onMouseLeave={() => setHiddenDel(null)}
+                  >
+                    {hiddenDel === item._id &&
+                      <div className='position-absolute top-50 start-50 translate-middle'>
+                        <button className='btn btn-danger' onClick={() => handleShow(item._id)} type='button' >
+                          <i className="bi bi-trash me-2"></i>
+                          ลบรูปผู้สนันสนุน
+                        </button>
+                      </div>
+                    }
+                    <div className='p-3'>
                       <img src={`/uploads/${item.image}`} alt={item.desc} height={128} />
                     </div>
-                    <button className='btn btn-outline-danger' onClick={() => handleShow(item._id)} type='button' >
-                      <i className="bi bi-trash"></i>
-                    </button>
+
                   </div>
                 </div>
               ))}
@@ -150,7 +168,7 @@ function ConfirmDel({ show, handleClose, partnerId, clearPartner }) {
   )
 }
 
-function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload, handleSubmit }) {
+function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload, handleSubmit, loading }) {
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -171,10 +189,17 @@ function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload
           <Button variant="" onClick={handleClose}>
             ปิด
           </Button>
-          <Button variant="primary" type="submit" disabled={!partnerUpload}>
-            <i className="bi bi-upload me-2"></i>
-            อัพโหลด
-          </Button>
+          {loading ? (
+            <button className="btn btn-primary" type="button" disabled>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Loading...
+            </button>
+          ) : (
+            <Button variant="primary" type="submit" disabled={!partnerUpload}>
+              <i className="bi bi-upload me-2"></i>
+              อัพโหลด
+            </Button>
+          )}
         </Modal.Footer>
       </form>
     </Modal>

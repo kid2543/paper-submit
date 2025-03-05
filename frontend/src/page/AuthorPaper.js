@@ -464,7 +464,7 @@ function AuthorPaper() {
                   <tbody>
                     <HistoryComent id={coments._id} />
                     <tr>
-                      <td>{dayjs(coments.updatedAt).format('DD MMM YYYY HH:mm')}</td>
+                      <td style={{ width: 200 }}>{dayjs(coments.updatedAt).format('DD MMM YYYY HH:mm')}</td>
                       <td style={{ width: 600 }}>
                         {coments.suggestion ? (
                           <textarea
@@ -590,7 +590,7 @@ function HistoryComent({ id }) {
     <>
       {data.map((items) => (
         <tr key={items._id}>
-          <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+          <td style={{ width: 200 }}>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
           <td style={{ width: 600 }}>
             {items.suggestion ? (
               <textarea

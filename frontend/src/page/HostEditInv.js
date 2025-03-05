@@ -81,7 +81,7 @@ function HostEditInv() {
             const res = await axios.patch('/api/inv/update/' + inv_id, json)
             let temp = [...data]
             let newData = temp.map(items => {
-                if(items._id === inv_id) {
+                if (items._id === inv_id) {
                     return res.data
                 } else {
                     return items
@@ -116,10 +116,10 @@ function HostEditInv() {
                 <div className='card-body'>
                     <div className='d-flex justify-content-between align-items-center'>
                         <div>
-                        <h4 className='card-title'>รายการวิทยากร</h4>
-                        <div className='text-muted'>
-                            เพิ่มรายละเอียดและอัพโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
-                        </div>
+                            <h4 className='card-title'>รายการวิทยากร</h4>
+                            <div className='text-muted'>
+                                เพิ่มรายละเอียดและอัพโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
+                            </div>
                         </div>
                         <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
                             <i className='me-2 bi bi-plus-lg'></i>
@@ -206,7 +206,7 @@ function HostEditInv() {
                                                 <i className="bi bi-upload me-2"></i>
                                                 อัพโหลด CV
                                             </button>
-                                                <button type='submit' className='btn btn-primary'>ยืนยันการแก้ไข</button>
+                                            <button type='submit' className='btn btn-primary'>ยืนยันการแก้ไข</button>
 
                                         </form>
                                     </div>
@@ -224,8 +224,10 @@ export default HostEditInv
 
 function CreateInvModal(props) {
 
+    const [createLoading, setCreateLoading] = useState(false)
     const handleCreate = async (e) => {
         e.preventDefault()
+        setCreateLoading(true)
         try {
             const formData = new FormData(e.target)
             formData.append('confr_id', props.id)
@@ -237,6 +239,8 @@ function CreateInvModal(props) {
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
+        } finally {
+            setCreateLoading(false)
         }
     }
 
@@ -264,9 +268,16 @@ function CreateInvModal(props) {
                     <Button variant="" onClick={props.handleClose}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit'>
-                        เพิ่ม
-                    </Button>
+                    {createLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit'>
+                            เพิ่ม
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -282,8 +293,10 @@ function UploadImage(props) {
         props.handleClose()
     }
 
+    const [uploadLoading, setUploadLoading] = useState(false)
     const handleUpload = async (e) => {
         e.preventDefault()
+        setUploadLoading(true)
         try {
             const formData = new FormData()
             formData.append('image', imageFile)
@@ -302,6 +315,8 @@ function UploadImage(props) {
         } catch (error) {
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            setUploadLoading(false)
         }
     }
 
@@ -321,9 +336,17 @@ function UploadImage(props) {
                     <Button variant="" onClick={closeModal}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!imageFile} >
-                        อัพโหลด
-                    </Button>
+                    {uploadLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!imageFile} >
+                            <i className='bi bi-upload me-2'></i>
+                            อัพโหลด
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>
@@ -340,26 +363,30 @@ function UploadCv(props) {
         props.clearData()
     }
 
+    const [uploadLoading, setUploadLoading] = useState(false)
     const handleUpload = async (e) => {
         e.preventDefault()
+        setUploadLoading(true)
         try {
             const formData = new FormData()
             formData.append('file', cvFile)
             const res = await axios.patch('/api/inv/cv/' + props.id, formData)
             let temp = [...props.data]
             let newData = temp.map((items) => {
-                if(items._id === props.id) {
+                if (items._id === props.id) {
                     return res.data
                 } else {
                     return items
                 }
-            }) 
+            })
             props.setData(newData)
             toast.success('อัพโหลดสำเร็จ')
             closeModal()
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             console.log(error)
+        } finally {
+            setUploadLoading(false)
         }
     }
 
@@ -379,9 +406,17 @@ function UploadCv(props) {
                     <Button variant="" onClick={closeModal}>
                         ปิด
                     </Button>
-                    <Button variant="primary" type='submit' disabled={!cvFile} >
-                        อัพโหลด
-                    </Button>
+                    {uploadLoading ? (
+                        <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                        </button>
+                    ) : (
+                        <Button variant="primary" type='submit' disabled={!cvFile} >
+                            <i className='bi bi-upload me-2'></i>
+                            อัพโหลด
+                        </Button>
+                    )}
                 </Modal.Footer>
             </form>
         </Modal>

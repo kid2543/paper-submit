@@ -84,8 +84,10 @@ function HostReview() {
   }
 
   // ส่งจดหมายเชิญ
+  const [sendLoading, setSendLoading] = useState(false)
   const sendMail = async (e, api, file) => {
     e.preventDefault()
+    setSendLoading(true)
     const { recipient, confr_title, owner, paper_id } = e.target
     const formData = new FormData()
     formData.append('file', file)
@@ -100,6 +102,8 @@ function HostReview() {
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
+    } finally {
+      setSendLoading(false)
     }
   }
 
@@ -493,7 +497,7 @@ function HostReview() {
                   </div>
                 ) : (
                   <div className='card-body'>
-                    <div className='mb-3'>
+                    <div className='mb-5'>
                       <h4 className='card-title'>
                         ส่งจดหมายเข้าร่วมงานประชุม
                       </h4>
@@ -502,7 +506,7 @@ function HostReview() {
                       </div>
                     </div>
                     <form onSubmit={e => sendMail(e, '/api/paper/send/email', sendMailFile)} className='row row-cols-1 g-3 mb-3'>
-                      <div className='row mb-3'>
+                      <div className='row'>
                         <label className='col-sm-3 fw-bold col-form-label'>อีเมล</label>
                         <div className='col-sm-9'>
                           <input
@@ -513,7 +517,7 @@ function HostReview() {
                           />
                         </div>
                       </div>
-                      <div className='row mb-3'>
+                      <div className='row'>
                         <label className='col-sm-3 fw-bold col-form-label'>ชื่องานประชุม</label>
                         <div className='col-sm-9'>
                           <input
@@ -524,7 +528,7 @@ function HostReview() {
                           />
                         </div>
                       </div>
-                      <div className='row mb-3'>
+                      <div className='row'>
                         <label className='col-sm-3 fw-bold col-form-label'>ชื่อบทความ</label>
                         <div className='col-sm-9'>
                           <input name='paper_id' className='form-control-plaintext d-none' readOnly value={paper._id} />
@@ -535,10 +539,12 @@ function HostReview() {
                           />
                         </div>
                       </div>
-                      <div>
-                        <label className='form-label fw-bold'>ผู้ส่งบทความ</label>
-                        <input name='owner' className='form-control-plaintext d-none' readOnly value={paper.owner?._id} />
-                        <input className='form-control-plaintext' readOnly value={paper.owner?.username} />
+                      <div className='row'>
+                        <label className='col-sm-3 fw-bold col-form-label'>ผู้ส่งบทความ</label>
+                        <div className='col-sm-9'>
+                          <input name='owner' className='form-control-plaintext d-none' readOnly value={paper.owner?._id} />
+                          <input className='form-control-plaintext' readOnly value={paper.owner?.username} />
+                        </div>
                       </div>
                       <div className='col-12'>
                         <label className='form-label fw-bold'>เลือกไฟล์จดหมาย</label>
@@ -550,12 +556,21 @@ function HostReview() {
                           accept='.pdf, .doc'
                         />
                       </div>
-                      <div className='text-end'>
-                        <button className='btn btn-primary' type='submit' disabled={!sendMailFile}>
-                          <i className='me-2 bi bi-send'></i>
-                          ส่งจดหมายเชิญ
-                        </button>
-                      </div>
+                      {sendLoading ? (
+                        <div className='text-end'>
+                          <button className="btn btn-primary" type="button" disabled>
+                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Loading...
+                          </button>
+                        </div>
+                      ) : (
+                        <div className='text-end'>
+                          <button className='btn btn-primary' type='submit' disabled={!sendMailFile}>
+                            <i className='me-2 bi bi-send'></i>
+                            ส่งจดหมายเชิญ
+                          </button>
+                        </div>
+                      )}
                     </form>
                   </div>
                 )}
@@ -595,8 +610,15 @@ function HostReview() {
                                 id={item._id}
                               />
                               <tr>
-                                <td>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</td>
-                                <td style={{ width: 600 }}>{item.suggestion}</td>
+                                <td style={{ width: 200 }}>{dayjs(item.updatedAt).format('DD MMM YYYY HH:mm')}</td>
+                                <td style={{ width: 600 }}>
+                                  <textarea
+                                    value={item.suggestion}
+                                    readOnly
+                                    className='form-control'
+                                    rows={5}
+                                  />
+                                </td>
                                 <td>{item.total}</td>
                                 <td>
                                   <PaperStatus status={item.status} />
@@ -699,8 +721,15 @@ function GetCommitteeHistory({ id }) {
     <>
       {data?.map((items) => (
         <tr key={items._id}>
-          <td>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
-          <td>{items.suggestion}</td>
+          <td style={{width: 200}}>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+          <td style={{width: 600}}>
+            <textarea
+              value={items.suggestion}
+              readOnly
+              className='form-control'
+              rows={5}
+            />
+          </td>
           <td>{items.total}</td>
           <td>
             <PaperStatus status={items.status} />
@@ -709,7 +738,7 @@ function GetCommitteeHistory({ id }) {
             <PaperResult status={items.result} />
           </td>
           <td>
-            {items.suggestion_file &&
+            {items.suggestion_file ? (
               <Link
                 to={`/uploads/${items.suggestion_file}`}
                 target='_blank'
@@ -717,6 +746,9 @@ function GetCommitteeHistory({ id }) {
               >
                 {items.suggestion_file}
               </Link>
+            ) : (
+              '-'
+            )
             }
           </td>
         </tr>

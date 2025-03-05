@@ -3,7 +3,6 @@ import axios from 'axios'
 import {
     Modal,
 } from 'react-bootstrap';
-import ConfirmModal from '../components/ConfirmModal';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
@@ -14,7 +13,6 @@ function HostCateList() {
     const [data, setData] = useState([])
     const [searchData, setSearchData] = useState([])
     const [show, setShow] = useState(false)
-    const [showCM, setShowCM] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [deleteId, setDeleteId] = useState('')
     const [createError, setCreateError] = useState(null)
@@ -53,8 +51,10 @@ function HostCateList() {
         }
     }
 
+    const [loadingCreate, setLoadingCreate] = useState(false)
     const handleCreate = async (e) => {
         e.preventDefault()
+        setLoadingCreate(true)
         try {
             const { category_code, name, desc } = e.target
             const res = await axios.post('/api/category', {
@@ -63,7 +63,6 @@ function HostCateList() {
                 desc: desc.value,
                 confr_id: id
             })
-            setShowCM(true)
             handleClose()
             setData(prev => [res.data, ...prev])
             setSearchData(prev => [res.data, ...prev])
@@ -73,6 +72,8 @@ function HostCateList() {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
             setCreateError(error.response.data?.error)
+        } finally {
+            setLoadingCreate(false)
         }
     }
 
@@ -94,11 +95,6 @@ function HostCateList() {
 
     return (
         <div>
-            <ConfirmModal
-                show={showCM}
-                setShow={setShowCM}
-                noReturn={true}
-            />
             <ConfirmDeleteDialog
                 header='ยืนยันการลบหัวข้องานประชุม'
                 message='ต้องการลบหัวข้องานประชุมนี้หรือไม่'
@@ -152,9 +148,16 @@ function HostCateList() {
                                     <button className="btn" onClick={handleClose}>
                                         ปิด
                                     </button>
-                                    <button type='submit' className="btn btn-primary">
-                                        สร้าง
-                                    </button>
+                                    {loadingCreate ? (
+                                        <button className="btn btn-primary" type="button" disabled>
+                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Loading...
+                                        </button>
+                                    ) : (
+                                        <button type='submit' className="btn btn-primary">
+                                            สร้าง
+                                        </button>
+                                    )}
                                 </Modal.Footer>
                             </form>
                         </Modal>
