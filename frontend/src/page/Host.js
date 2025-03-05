@@ -271,6 +271,12 @@ function Host() {
                   />
                   <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{data?.status ? 'เปิด' : 'ปิด'}</label>
                 </div>
+
+                {Cate.length <= 0 &&
+                  <div className='text-warning'>
+                    ผู้จัดงานต้องทำการเพิ่มหัวข้องานประชุมอย่างน้อย 1 หัวข้อจึงจะสามารถเปิดงานประชุมได้
+                  </div>
+                }
               </div>
               <div className='col-12'>
                 <div className='d-flex'>
@@ -282,7 +288,7 @@ function Host() {
                     <i className='bi bi-eye me-2'></i>
                     ดูงานประชุม
                   </Link>
-                  {Paper.length <= 0 &&
+                  {Paper.length <= 0 && data?.status === false &&
                     <button type='button' onClick={() => setShowDelete(true)} className='btn btn-danger'>
                       <i className='bi bi-trash me-2'></i>
                       ลบงานประชุม
@@ -430,7 +436,7 @@ function Host() {
             />
           </div>
         </div>
-      </section>
+      </section >
       <section>
         <div className='card my-3'>
           <div className='card-body'>
@@ -445,7 +451,7 @@ function Host() {
           </div>
         </div>
       </section>
-    </div>
+    </div >
   )
 }
 

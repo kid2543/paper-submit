@@ -155,8 +155,8 @@ function Conference() {
                     {status === 'idle' || status === 'loading' ? (
                         <LoadingPage />
                     ) : (
-                        <div className="table-responsive">
-                            <table className='table' style={{ minWidth: "1000px", minHeight: '400px' }}>
+                        <div className="table-responsive" style={{minHeight: '600px'}}>
+                            <table className='table' style={{ minWidth: "1000px" }}>
                                 <thead>
                                     <tr>
                                         <th>#</th>

@@ -226,7 +226,7 @@ function Edit() {
                                         className='form-control mb-5'
                                         value={items}
                                         readOnly
-                                        rows={10}
+                                        rows={5}
                                     />
                                 ))}
                             </div>
@@ -455,7 +455,7 @@ function EditImportantDate(props) {
 
     return (
         <Modal show={props.show} onHide={props.handleClose}>
-            <Modal.Header closeButton>
+            <Modal.Header>
                 <Modal.Title>แก้ไขแผนการจัดโครงการ</Modal.Title>
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
@@ -692,13 +692,6 @@ function EditTagModal(props) {
             </Modal.Header>
             <form onSubmit={e => props.handleUpdate(e, form, props.handleClose)}>
                 <Modal.Body>
-                    <div className='mb-3 d-flex justify-content-between align-items-center'>
-                        <h6 className="fw-bold">รายการ Tags</h6>
-                        <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>
-                            <i className="bi bi-plus-lg me-2"></i>
-                            เพิ่ม
-                        </button>
-                    </div>
                     {data &&
                         <div key={key} className="row g-3">
                             {data.map((items, index) => (
@@ -711,7 +704,7 @@ function EditTagModal(props) {
                                             defaultValue={items}
                                             onChange={e => handleChange(e, index)}
                                             required />
-                                        <button type='button' onClick={() => deleteTag(index)} className='btn btn-danger btn-sm'>
+                                        <button type='button' onClick={() => deleteTag(index)} className='btn btn-outline-danger'>
                                             <i className='bi bi-trash'></i>
                                         </button>
                                     </div>
@@ -719,6 +712,12 @@ function EditTagModal(props) {
                             ))}
                         </div>
                     }
+                    <div className='mt-3'>
+                        <button type='button' onClick={handleAdd} className='btn btn-outline-primary'>
+                            <i className="bi bi-plus-lg me-2"></i>
+                            เพิ่ม Tags
+                        </button>
+                    </div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="" onClick={props.handleClose}>
@@ -787,7 +786,6 @@ function EditCateModal(props) {
                                     onClick={() => handleDelete(index)}
                                 >
                                     <i className="bi bi-trash me-1"></i>
-                                    ลบ
                                 </button>
                             </div>
                         </div>
