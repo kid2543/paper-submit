@@ -79,13 +79,26 @@ function Home() {
                         <p>{items.title}</p>
                         {items.cate &&
                           <div className='mt-5'>
-                            <small className='btn btn-light fw-bold text-primary btn-sm rounded-pill'>{items.cate}</small>
+                            <p>
+                              หมวดหมู่:
+                            </p>
+                            {items.cate.map((cates, cates_index) => (
+                              <small
+                                key={cates_index}
+                                className='btn btn-light fw-bold text-primary btn-sm rounded-pill me-2 mb-2'
+                              >
+                                {cates}
+                              </small>
+                            ))}
                           </div>
                         }
                         {items.tag &&
                           <div className='mt-5'>
-                            {items.tag.map((tags, index) => (
-                              <small key={index} className='badge bg-light text-dark me-2 mb-2'>{tags}</small>
+                            <p>
+                              Tags:
+                            </p>
+                            {items.tag.map((tags, tags_index) => (
+                              <small key={tags_index} className='badge bg-light text-dark me-2 mb-2'>{tags}</small>
                             ))}
                           </div>
                         }
@@ -110,7 +123,7 @@ function Home() {
                   </div>
                   <div>
                     <h4 className='fw-bold mt-2'>ค้นหาง่าย</h4>
-                    <p className='mb-0'>ค้นหางานประชุมและบทความได้ในที่เดียว</p>
+                    <p className='mb-0'>เพียงพิมชื่องานประชุม หรือ หมวดหมู่ ไปที่ช่องค้นหางานประชุม</p>
                   </div>
                 </div>
               </div>

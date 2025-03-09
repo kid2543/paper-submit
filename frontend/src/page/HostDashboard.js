@@ -77,7 +77,17 @@ function HostDashboard() {
                             </div>
                             <div className='col-12'>
                                 <label className='form-label'>รหัสงานประชุม</label>
-                                <input className='form-control' name='confr_code' required onFocus={() => setErrorText('')} />
+                                <input
+                                    className='form-control'
+                                    name='confr_code'
+                                    required
+                                    onFocus={() => setErrorText('')}
+                                    pattern='[A-Za-z0-9]{4,10}'
+                                    maxLength={10}
+                                />
+                                <div className='form-text'>
+                                    เฉพาะตัวอักษรภาษาอังกฤษหรือตัวเลขจำนวน (4 ถึง 10) ตัวอักษร
+                                </div>
                             </div>
                             <div className='col-12'>
                                 <label className='form-label'>เริ่ม</label>
@@ -111,9 +121,9 @@ function HostDashboard() {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                    <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ค้นหาจากชื่องานประชุม</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('search')}>ค้นหาจากชื่อ</Dropdown.Item>
                                     <Dropdown.Item type='button' onClick={() => setSearchInput('tag')}>ค้นหาจาก Tag</Dropdown.Item>
-                                    <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ค้นหาจากประเภทงานประชุม</Dropdown.Item>
+                                    <Dropdown.Item type='button' onClick={() => setSearchInput('cate')}>ค้นหาจากหมวดหมู่</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </div>

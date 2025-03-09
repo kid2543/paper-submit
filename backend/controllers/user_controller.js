@@ -273,7 +273,7 @@ const changePassword = async (req, res) => {
     const { _id } = req.user
 
     if (!validator.isStrongPassword(new_password)) {
-            return res.status(400).json({error: 'Password not strong enough'})
+            return res.status(400).json({error: 'รหัสผ่านไม่แข็งแรงพอ'})
         }
 
     try {

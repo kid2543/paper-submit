@@ -13,17 +13,22 @@ function UserProfile() {
   const { data, status, error } = useFetch('/api/user/profile')
   const { user } = useAuthContext()
 
+  const [updateLoading, setUpdateLoading] = useState(false)
   // handle update user profile
   const handleUpdate = async (e) => {
     e.preventDefault()
+    setUpdateLoading(true)
     const formData = new FormData(e.target)
     const json = Object.fromEntries(formData.entries())
     try {
       await axios.patch('/api/user/detail/update', json)
       toast.success('อัพเดทข้อมูลสำเร็จ')
+      setIsChange(false)
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองอีกครั้ง')
+    } finally {
+      setUpdateLoading(false)
     }
   }
 
@@ -31,6 +36,7 @@ function UserProfile() {
   const [oldPassword, setOldPassword] = useState('')
   const [conNewPassword, setConNewPassword] = useState('')
   const [errorChangePassword, setErrorChangePassword] = useState('')
+  const [isChange, setIsChange] = useState(false)
 
   // handle change password
   const handleChangePassword = async (e) => {
@@ -51,6 +57,7 @@ function UserProfile() {
         toast.success('เปลี่ยนรหัสผ่านแล้ว')
         setNewPassword('')
         setOldPassword('')
+        setConNewPassword('')
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -95,6 +102,7 @@ function UserProfile() {
                           defaultValue={data.name}
                           name='name'
                           className='form-control'
+                          onChange={() => setIsChange(true)}
                         />
                       </div>
                     </div>
@@ -105,7 +113,9 @@ function UserProfile() {
                           defaultValue={data.username}
                           name='username'
                           readOnly
-                          className='form-control-plaintext' />
+                          className='form-control-plaintext'
+                          onChange={() => setIsChange(true)}
+                        />
                       </div>
                     </div>
                     <div className='row mb-3'>
@@ -115,13 +125,21 @@ function UserProfile() {
                           defaultValue={data.email}
                           name='email'
                           className='form-control'
+                          onChange={() => setIsChange(true)}
                         />
                       </div>
                     </div>
                     <div className='row mb-3'>
                       <label className='col-sm-2 col-form-label'>เบอร์โทร</label>
                       <div className="col-sm-10">
-                        <input maxLength={10} pattern='[0-9]{10}' defaultValue={data.phone} name='phone' className='form-control' />
+                        <input
+                          maxLength={10}
+                          pattern='[0-9]{10}'
+                          defaultValue={data.phone}
+                          name='phone'
+                          className='form-control'
+                          onChange={() => setIsChange(true)}
+                        />
                         <div className="form-text">
                           ตัวเลข 10 หลัก
                         </div>
@@ -130,13 +148,23 @@ function UserProfile() {
                     <div className='row mb-3'>
                       <label className='col-sm-2 col-form-label'>มหาวิทยาลัย</label>
                       <div className="col-sm-10">
-                        <input defaultValue={data.university} name='university' className='form-control' />
+                        <input
+                          defaultValue={data.university}
+                          name='university'
+                          className='form-control'
+                          onChange={() => setIsChange(true)}
+                        />
                       </div>
                     </div>
                     <div className='row mb-3'>
                       <label className='col-sm-2 col-form-label'>คณะ</label>
                       <div className="col-sm-10">
-                        <input defaultValue={data.department} name='department' className='form-control' />
+                        <input
+                          defaultValue={data.department}
+                          name='department'
+                          className='form-control'
+                          onChange={() => setIsChange(true)}
+                        />
                       </div>
                     </div>
                     <div className='mt-5'>
@@ -151,6 +179,7 @@ function UserProfile() {
                           name='address'
                           className='form-control'
                           rows={3}
+                          onChange={() => setIsChange(true)}
                         />
                       </div>
                     </div>
@@ -160,6 +189,7 @@ function UserProfile() {
                         <input
                           defaultValue={data.sub_district}
                           name='sub_district'
+                          onChange={() => setIsChange(true)}
                           className='form-control'
                         />
                       </div>
@@ -171,6 +201,7 @@ function UserProfile() {
                           defaultValue={data.district}
                           name='district'
                           className='form-control'
+                          onChange={() => setIsChange(true)}
                         />
                       </div>
                     </div>
@@ -181,27 +212,41 @@ function UserProfile() {
                           defaultValue={data.province}
                           name='province'
                           className='form-control'
+                          onChange={() => setIsChange(true)}
                         />
                       </div>
                     </div>
                     <div className='row mb-3'>
                       <label className='col-sm-2 col-form-label'>รหัสไปรษณี</label>
                       <div className="col-sm-10">
-                        <input 
-                        maxLength={5} 
-                        pattern='[0-9]{5}' 
-                        defaultValue={data.zip_code} name='zip_code' className='form-control' />
+                        <input
+                          maxLength={5}
+                          pattern='[0-9]{5}'
+                          defaultValue={data.zip_code}
+                          name='zip_code'
+                          className='form-control'
+                          onChange={() => setIsChange(true)}
+                        />
                         <div className="form-text">
                           จำกัด 5 ตัวเลข
                         </div>
                       </div>
                     </div>
-                    <div className="text-end">
-                      <button className='btn btn-primary text-white'>
-                        <i className="me-2 bi bi-floppy"></i>
-                        บันทึก
-                      </button>
-                    </div>
+                    {updateLoading ? (
+                      <div className='text-end'>
+                        <button className="btn btn-primary" type="button" disabled>
+                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          Loading...
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-end">
+                        <button disabled={!isChange} className='btn btn-primary text-white'>
+                          <i className="me-2 bi bi-floppy"></i>
+                          บันทึก
+                        </button>
+                      </div>
+                    )}
                   </form>
                 </div>
               </div>
@@ -233,6 +278,9 @@ function UserProfile() {
                       required
                       onFocus={() => setErrorChangePassword('')}
                     />
+                    <div className='form-text'>
+                      รหัสผ่านประกอบด้วยตัวอักษรและตัวเลขอย่างน้อย 8 ตัวอักษร และจะต้องมี พิมพ์ใหญ่ พิมพ์เล็ก และ อักษรพิเศษ อย่างละ 1 ตัว
+                    </div>
                   </div>
                   <div className='col-12'>
                     <label className='form-label'>ยืนยันรหัสผ่านใหม่</label>

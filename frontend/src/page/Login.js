@@ -16,7 +16,7 @@ const Login = () => {
     return (
         <section className='vh-100 bg-primary bg-gradient'>
             <div className="d-flex h-100 align-items-center">
-                <div className="card col-11 col-md-6 col-lg-4 mx-auto my-3 p-3">
+                <div className="card col-10 col-md-6 col-lg-4 mx-auto my-3 p-3">
                     <div className="card-body">
                         <div className="text-center mb-5">
                             <h1 className="card-title fw-bold">เข้าสู่ระบบ</h1>

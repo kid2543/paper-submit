@@ -60,9 +60,9 @@ const SignUp = () => {
     }
 
     return (
-        <section className='bg-primary bg-gradient'>
+        <section className='bg-primary bg-gradient' style={{minHeight: '100vh'}}>
             <div className="d-flex h-100 align-items-center py-4">
-                <div className="card col-md-6 col-lg-4 mx-auto p-3">
+                <div className="card col-10 col-lg-6 mx-auto p-3">
                     <div className="card-body">
                         <div className="text-center mb-5">
                             <h1 className="card-title fw-bold">ลงทะเบียน</h1>

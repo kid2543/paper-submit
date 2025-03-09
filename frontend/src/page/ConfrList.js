@@ -88,6 +88,9 @@ function ConfrList() {
                       className="form-control"
                       placeholder='ค้นหางานประชุมด้วย tag'
                     />
+                    <button className="btn btn-primary">
+                      <i className="bi bi-search"></i>
+                    </button>
                   </div>
                 </form>
               }
@@ -99,6 +102,9 @@ function ConfrList() {
                       className="form-control"
                       placeholder='ค้นหางานประชุมด้วยหมวดหมู่'
                     />
+                    <button className="btn btn-primary">
+                      <i className="bi bi-search"></i>
+                    </button>
                   </div>
                 </form>
               }

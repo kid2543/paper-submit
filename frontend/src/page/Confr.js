@@ -25,9 +25,6 @@ function Confr() {
     const [err, setErr] = useState('')
     const [isOpen, setIsOpen] = useState(true)
 
-    // get current date
-    const today = dayjs(new Date()).format('YYYY-MM-DD')
-
     const { id } = useParams()
     const host_confr = sessionStorage.getItem('host_confr')
 
@@ -85,7 +82,7 @@ function Confr() {
                             <h5 className='text-muted mb-3'>{data.sub_title} <br /> {data.confr_code} </h5>
                             {dayjs(Date.now()).format('DD MMM YYYY') > dayjs(data.confr_end_date).format('DD MMM YYYY') && data.confr_end_date &&
                                 <div className='text-warning'>
-                                    เลยกำหนดการส่งแล้ว
+                                    กรุณาตรวจสอบกำหนดการ
                                 </div>
                             }
                             {topic && dayjs(Date.now()).format('DD MMM YYYY') <= dayjs(data.confr_end_date).format('DD MMM YYYY') &&
@@ -102,22 +99,24 @@ function Confr() {
                             }
                         </div>
                     </section>
-                    <section className="text-bg-secondary">
-                        <div id='2' className='container' style={{ padding: "64px 0px" }}>
-                            <div className='text-center'>
-                                <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
+                    {partner?.length > 0 &&
+                        <section className="text-bg-secondary">
+                            <div id='2' className='container' style={{ padding: "64px 0px" }}>
+                                <div className='text-center'>
+                                    <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
+                                </div>
+                                <div className='row g-3'>
+                                    {partner?.map((items) => (
+                                        <div className='col-auto' key={items._id}>
+                                            <TriggerExample name={items.desc}>
+                                                <img src={`/uploads/${items.image}`} alt={items.desc} height={128} />
+                                            </TriggerExample>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div className='row g-3'>
-                                {partner?.map((items) => (
-                                    <div className='col-auto' key={items._id}>
-                                        <TriggerExample name={items.desc}>
-                                            <img src={`/uploads/${items.image}`} alt={items.desc} height={128} />
-                                        </TriggerExample>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
+                        </section>
+                    }
                     <div className='bg-white' style={{ padding: '180px 0px 64px 0px' }}>
                         <section id='3' className='container'>
                             <div className='row gy-5'>
@@ -194,27 +193,28 @@ function Confr() {
                                         <div className='mb-4'>
                                             <h4 className='fw-bold'>กำหนดการส่งบทความ</h4>
                                         </div>
-                                        <div className="card" >
-                                            <div className="card-body">
-                                                <div className='table-responsive'>
-                                                    <table className='table' style={{ width: '800px' }}>
-                                                        <thead>
-                                                            <tr>
-                                                                <th>วันที่</th>
-                                                                <th>รายละเอียด</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {data.important_date?.map((items) => (
-                                                                <tr key={items._id}>
-                                                                    <td>{dayjs(items.start_date).format('DD MMM YYYY')} {items.end_date &&
-                                                                        <>
-                                                                            - {dayjs(items.end_date).format('DD MMM YYYY')}
-                                                                        </>
-                                                                    }
-                                                                    </td>
-                                                                    <td>{items.date_name}</td>
-                                                                    {/* <div className='card  shadow'>
+                                        {data.important_date?.length > 0 ? (
+                                            <div className="card" >
+                                                <div className="card-body">
+                                                    <div className='table-responsive'>
+                                                        <table className='table' style={{ width: '800px' }}>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>วันที่</th>
+                                                                    <th>รายละเอียด</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {data.important_date?.map((items) => (
+                                                                    <tr key={items._id}>
+                                                                        <td>{dayjs(items.start_date).format('DD MMM YYYY')} {items.end_date &&
+                                                                            <>
+                                                                                - {dayjs(items.end_date).format('DD MMM YYYY')}
+                                                                            </>
+                                                                        }
+                                                                        </td>
+                                                                        <td>{items.date_name}</td>
+                                                                        {/* <div className='card  shadow'>
                                                                 <div className='card-body'>
                                                                     <div className='row g-3'>
                                                                         <div className='col-12 col-md-4 border-end border-3 border-primary'>
@@ -228,13 +228,15 @@ function Confr() {
                                                                 </div>
                                                             </div> */}
 
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        ) : <p>ยังไม่มีกำหนดการส่งบทความ</p>}
+
                                     </section>
 
                                     {data.schedule &&
@@ -274,7 +276,7 @@ function Confr() {
                                         </section>
                                     }
 
-                                    {inv &&
+                                    {inv.length > 0 &&
                                         <section id='8' style={{ padding: "64px 0px" }}>
                                             <div className='mb-4'>
                                                 <h4 className='fw-bold mb-3'>วิทยากรประจำงานประชุม</h4>
