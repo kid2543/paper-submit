@@ -79,7 +79,7 @@ const SignUp = () => {
                                 }
                                 <div className="form-floating text-muted mb-3">
                                     <input
-                                        type="text"
+                                        type="email"
                                         className="form-control"
                                         id='floatingEmail'
                                         placeholder='อีเมล'

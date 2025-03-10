@@ -153,7 +153,10 @@ function ConfrList() {
               </div>
             ) : (
               <div className="text-center">
-                <h3 className="fw-bold">ไม่พบข้อมูล</h3>
+                <h4 className="fw-bold py-3">
+                  ไม่พบข้อมูล
+                </h4>
+                <div className='text-muted'>ลบคำค้นหาและกด Enter เพื่อแสดงรายการอีกครั้ง</div>
               </div>
             )}
             <PaginationComponent
