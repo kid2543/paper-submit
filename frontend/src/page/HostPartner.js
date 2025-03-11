@@ -115,8 +115,7 @@ function HostPartner() {
                     {hiddenDel === item._id &&
                       <div className='position-absolute top-50 start-50 translate-middle'>
                         <button className='btn btn-danger' onClick={() => handleShow(item._id)} type='button' >
-                          <i className="bi bi-trash me-2"></i>
-                          ลบรูปผู้สนันสนุน
+                          <i className="bi bi-trash"></i>
                         </button>
                       </div>
                     }

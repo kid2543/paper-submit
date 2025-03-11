@@ -79,7 +79,10 @@ function Confr() {
                                 </div>
                             }
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
-                            <h5 className='text-muted mb-3'>{data.sub_title} <br /> {data.confr_code} </h5>
+                            <h5 className='text-muted'>{data.sub_title}</h5>
+                            <p className="badge text-bg-secondary">
+                                {data.confr_code}
+                            </p>
                             {dayjs(Date.now()).format('DD MMM YYYY') > dayjs(data.confr_end_date).format('DD MMM YYYY') && data.confr_end_date &&
                                 <div className='text-warning'>
                                     กรุณาตรวจสอบกำหนดการ
@@ -101,7 +104,7 @@ function Confr() {
                     </section>
                     {partner?.length > 0 &&
                         <section className="text-bg-secondary">
-                            <div id='2' className='container' style={{ padding: "64px 0px" }}>
+                            <div id='2' className='container' style={{ padding: "128px 0px" }}>
                                 <div className='text-center'>
                                     <h4 className='fw-bold mb-3'>รายชื่อผู้สนับสนุน</h4>
                                 </div>

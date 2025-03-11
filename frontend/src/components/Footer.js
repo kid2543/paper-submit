@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Footer() {
   return (
@@ -6,16 +7,16 @@ function Footer() {
       <footer className='py-3 my-4'>
         <ul className='nav justify-content-center border-bottom mb-3'>
           <li className='nav-item'>
-            <a href="/" className='nav-link px-2 text-muted'>หน้าแรก</a>
+            <Link to="/" className='nav-link'>หน้าแรก</Link>
           </li>
           <li className='nav-item'>
-          <a href="/confr" className='nav-link px-2 text-muted'>งานประชุม</a>
-          </li>
-          <li className='nav-item'>
-          <a href="/paper" className='nav-link px-2 text-muted'>บทความ</a>
+            <Link to="/confr" className='nav-link'>งานประชุม</Link>
           </li>
         </ul>
-        <p className='text-center text-muted'>@ 2024 Company, Inc</p>
+        <div className='text-center text-muted'>
+          <div>ระบบรับ-ส่งบทความสำหรับงานประชุมวิชการ</div>
+          <div>Paper submission for academic confernce</div>
+        </div>
       </footer>
     </div>
 
