@@ -34,38 +34,38 @@ function ConfrRegistration() {
                     <section className='bg-white' style={{ padding: "64px 0px" }}>
                         <div className='container'>
                             <h4 className='fw-bold mb-4'>ข้อมูลบัญชี</h4>
-                            <div className='card  bg-gradient text-bg-dark p-2'>
+                            <div className='card bg-gradient text-bg-dark p-3'>
                                 <div className='card-body'>
-                                    <div className='row g-3'>
+                                    <div className='row g-4'>
                                         <div className='col-12 col-md-6'>
-                                            <div className='card bg-white'>
+                                            <div className='card bg-white h-100 py-3'>
                                                 <div className='card-body'>
-                                                    <p className='fw-bold'>เลขบัญชี</p>
-                                                    <small>{data.acc_no}</small>
+                                                    <div className='text-muted'>เลขบัญชี</div>
+                                                    <h4>{data.acc_no}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='col-12 col-md-6'>
-                                            <div className='card bg-white'>
+                                            <div className='card bg-white h-100 py-3'>
                                                 <div className='card-body'>
-                                                    <p className='fw-bold'>ชื่อบัญชี</p>
-                                                    <small>{data.acc_name}</small>
+                                                    <div className='text-muted'>ชื่อบัญชี</div>
+                                                    <h4>{data.acc_name}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='col-12 col-md-6'>
-                                            <div className='card bg-white'>
+                                            <div className='card bg-white h-100 py-3'>
                                                 <div className='card-body'>
-                                                    <p className='fw-bold'>ประเภทบัญชี</p>
-                                                    <small>{data.bank_type}</small>
+                                                    <div className='text-muted'>ประเภทบัญชี</div>
+                                                    <h4>{data.bank_type}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className='col-12 col-md-6'>
-                                            <div className='card bg-white'>
+                                            <div className='card bg-white h-100 py-3'>
                                                 <div className='card-body'>
-                                                    <p className='fw-bold'>ชื่อธนาคาร</p>
-                                                    <small>{data.bank_name}</small>
+                                                    <div className='text-muted'>ชื่อธนาคาร</div>
+                                                    <h3>{data.bank_name}</h3>
                                                 </div>
                                             </div>
                                         </div>

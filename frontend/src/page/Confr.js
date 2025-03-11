@@ -80,7 +80,8 @@ function Confr() {
                             }
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
                             <h5 className='text-muted'>{data.sub_title}</h5>
-                            <p className="badge text-bg-secondary">
+                            <p className="text-muted fw-bold">
+                                รหัสงานประชุม <br/>
                                 {data.confr_code}
                             </p>
                             {dayjs(Date.now()).format('DD MMM YYYY') > dayjs(data.confr_end_date).format('DD MMM YYYY') && data.confr_end_date &&

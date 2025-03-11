@@ -35,8 +35,8 @@ function ConfrVenue() {
                     <div className='container'>
                         <h1 className='fw-bold mb-4 text-center'>{data.venue.name}</h1>
                         {data.venue_image &&
-                            <div className='my-5 text-center rounded p-3 mx-auto' style={{ maxWidth: "600px" }}>
-                                <img src={`/uploads/${data.venue_image}`} alt={data.venue_image} className="img-fluid" />
+                            <div className='my-5 text-center mx-auto' style={{ maxWidth: "600px" }}>
+                                <img src={`/uploads/${data.venue_image}`} alt={data.venue_image} className="img-fluid rounded" />
                             </div>
                         }
                         <div>

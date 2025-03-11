@@ -145,21 +145,30 @@ function HostEditSubmission() {
                       <th>ลบ</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {templateList.map((items, index) => (
-                      <tr key={items._id}>
-                        <td>{index + 1}</td>
-                        <td>
-                          <Link to={`/uploads/${items.file}`} target='_blank' rel='noopener noreferrer'>{items.name}</Link>
-                        </td>
-                        <td>
-                          <button type='button' onClick={() => handleConfirm(items._id)} className='btn btn-outline-danger'>
-                            <i className='bi bi-trash'></i>
-                          </button>
-                        </td>
+                  {templateList?.length > 0 ? (
+                    <tbody>
+                      {templateList?.map((items, index) => (
+                        <tr key={items._id}>
+                          <td>{index + 1}</td>
+                          <td>
+                            <Link to={`/uploads/${items.file}`} target='_blank' rel='noopener noreferrer'>{items.name}</Link>
+                          </td>
+                          <td>
+                            <button type='button' onClick={() => handleConfirm(items._id)} className='btn btn-outline-danger'>
+                              <i className='bi bi-trash'></i>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+
+                  ) : (
+                    <tbody>
+                      <tr>
+                        <td colSpan={3} className="p-3 text-center">ไม่พบข้อมูล</td>
                       </tr>
-                    ))}
-                  </tbody>
+                    </tbody>
+                  )}
                 </table>
 
               </div>

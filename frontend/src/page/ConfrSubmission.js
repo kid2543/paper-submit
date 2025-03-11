@@ -29,7 +29,7 @@ function ConfrSubmission() {
           {template.data?.length > 0 &&
             <section className='bg-white' style={{ padding: "64px 0px" }}>
               <div className='container'>
-                <h4 className='fw-bold mb-4'>Template</h4>
+                <h4 className='fw-bold mb-4'>เทมเพลต</h4>
                 <div className='row g-3'>
                   {template.data.map(items => (
                     <div key={items._id} className='col-auto'>

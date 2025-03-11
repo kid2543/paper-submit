@@ -25,14 +25,14 @@ function ConfrGuideline() {
             <section style={{ padding: "180px 0px" }}>
                 <div className='container text-center'>
                     <h1 className='display-1 fw-bold'>ข้อแนะนำการเข้าร่วมงานประชุม</h1>
-                    <p className='text-muted'>อ่านข้อแนะนำการเข้าร่วมงานประชุมได้ที่นี่!</p>
+                    <p className='text-muted'>อ่านข้อแนะนำการเข้าร่วมงานประชุม และข้อแนะนำการนำเสนอได้ที่นี่!</p>
                 </div>
             </section>
             {data &&
                 <section className='bg-white' style={{ padding: "64px 0px" }}>
                     <div className='container py-3'>
                         <h4 className='fw-bold mb-4'>
-                            ข้อแนะนำ
+                            ข้อแนะนำการเข้าร่วม
                         </h4>
                         <Accordion>
                             <Accordion.Item eventKey='1'>
