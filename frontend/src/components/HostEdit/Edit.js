@@ -159,9 +159,9 @@ function Edit() {
                                 setData={setData}
                             />
                             <div className='py-4'>
-                                <h4>ระยะเวลาการดำเนินงาน</h4>
+                                <h4>กำหนดการส่งบทความ</h4>
                                 <div className='text-muted'>
-                                    กรอกข้อมูลเพื่อระบุว่างานประชุมจะเปิดรับบทความ และจะสิ้นสุดงานประชุมเมื่อใด
+                                    กรอกข้อมูลเพื่อระบุว่างานประชุมจะเปิดรับบทความ และปิดรับบทความเมื่อใด
                                 </div>
                                 <hr />
                             </div>
@@ -554,18 +554,21 @@ function ConfrDateModal(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>ระยะเวลาการดำเนินงาน</Modal.Title>
+                <Modal.Title>กำหนดการส่งบทความ</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body className='row gy-3'>
                     <div className='col-12'>
-                        <label className='from-label'>เริ่มต้น</label>
+                        <label className='form-label'>เริ่มต้น</label>
                         <input
                             className='form-control'
                             name='confr_start_date'
                             type='date'
                             defaultValue={dayjs(props.data?.confr_start_date).format('YYYY-MM-DD')}
                         />
+                        <div className='form-text'>
+                            วันที่เปิดรับบทความ
+                        </div>
                     </div>
                     <div className='col-12'>
                         <label className='form-label'>สิ้นสุด</label>
@@ -575,6 +578,9 @@ function ConfrDateModal(props) {
                             type='date'
                             defaultValue={dayjs(props.data?.confr_end_date).format('YYYY-MM-DD')}
                         />
+                        <div className='form-text'>
+                            วันที่ปิดรับบทความ หากเลยกำหนดการระบบจะไม่แสดงปุ่มให้ผู้ส่งบทความ ส่งบทความ
+                        </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

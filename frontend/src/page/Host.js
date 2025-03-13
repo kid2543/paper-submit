@@ -157,7 +157,7 @@ function Host() {
     }
     try {
       await axios.delete('/api/conference/delete/' + data._id)
-      toast.success(`ลบงานประชุม ${data._id} แล้ว`)
+      toast.success(`ลบงานประชุมสำเร็จ`)
       navigate('/setting')
     } catch (error) {
       console.log(error)

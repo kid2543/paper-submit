@@ -65,6 +65,43 @@ function Confr() {
         return <UnAuthorized />
     }
 
+    const checkDate = (startDate, endDate) => {
+        const today = dayjs(Date.now()).format('YYYY-MM-DD')
+        const end = dayjs(endDate).format('YYYY-MM-DD')
+        const start = dayjs(startDate).format('YYYY-MM-DD')
+        if (today < start) {
+            return (
+                <div className='text-success'>
+                    จะเปิดให้ส่งบทความวันที่ {dayjs(start).format('DD MMM YYYY')}
+                </div>
+            )
+        } else if (today > end) {
+            return (
+                <div className='text-warning'>
+                    ปิดการส่งบทความเมื่อวันที่ {dayjs(end).format('DD MMM YYYY')}
+                </div>
+            )
+        } else if (today <= end) {
+            return (
+                <div>
+                    <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
+                        <i className="bi bi-send me-2"></i>
+                        ส่งบทความเลย!
+                    </button>
+
+                    <div className="text-info fw-bold mt-3">
+                        ส่งได้ถึงวันที่ {dayjs(end).format('DD MMM YYYY')}
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    Loading...
+                </div>
+            )
+        }
+    }
 
     return (
         <div>
@@ -81,26 +118,10 @@ function Confr() {
                             <h1 className='display-1 fw-bold'>{data.title}</h1>
                             <h5 className='text-muted'>{data.sub_title}</h5>
                             <p className="text-muted fw-bold">
-                                รหัสงานประชุม <br/>
+                                รหัสงานประชุม <br />
                                 {data.confr_code}
                             </p>
-                            {dayjs(Date.now()).format('DD MMM YYYY') > dayjs(data.confr_end_date).format('DD MMM YYYY') && data.confr_end_date &&
-                                <div className='text-warning'>
-                                    กรุณาตรวจสอบกำหนดการ
-                                </div>
-                            }
-                            {topic && dayjs(Date.now()).format('DD MMM YYYY') <= dayjs(data.confr_end_date).format('DD MMM YYYY') &&
-                                <div>
-                                    <button className='btn btn-primary' onClick={() => handleSendPaper(id)}>
-                                        <i className="bi bi-send me-2"></i>
-                                        ส่งบทความเลย!
-                                    </button>
-
-                                    <div className="text-info fw-bold mt-3">
-                                        ส่งได้ถึงวันที่ {dayjs(data.confr_end_date).format('DD MMM YYYY')}
-                                    </div>
-                                </div>
-                            }
+                            {checkDate(data.confr_start_date, data.confr_end_date)}
                         </div>
                     </section>
                     {partner?.length > 0 &&

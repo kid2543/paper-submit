@@ -5,7 +5,7 @@ import { useAuthContext } from '../hook/useAuthContext'
 import UnAuthorized from '../page/UnAuthorized'
 import { Navigate } from 'react-router-dom'
 
-const PrivateRoute = ({children, api}) => {
+const PrivateRoute = ({ children, api }) => {
     const [loading, setLoading] = useState(true)
     const { user } = useAuthContext()
     const [Forbiden, setForbiden] = useState(false)
@@ -20,21 +20,25 @@ const PrivateRoute = ({children, api}) => {
                 setLoading(false)
             }
         }
-        if(user) {
+        if (user) {
             checkAuth()
         }
 
-    },[api, user])
+    }, [api, user])
 
-    if(!user) {
+    if (!user) {
         return <Navigate to='/login' replace />
     }
 
-    if(loading) {
-        return <LoadingPage />
+    if (loading) {
+        return (
+            <div className='text-center py-5'>
+                กำลังตรวจสอบสิทธิ์การใช้งาน...
+            </div>
+        )
     }
 
-    if(Forbiden) {
+    if (Forbiden) {
         return <UnAuthorized replace />
     }
 

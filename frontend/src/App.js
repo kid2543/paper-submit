@@ -70,7 +70,11 @@ function App() {
   const { user, loading } = useAuthContext()
 
   if (loading) {
-    return <LoadingPage />
+    return (
+      <div className='text-center py-5'>
+        <LoadingPage />
+      </div>
+    )
   }
 
   const hostApi = '/api/user/protected/host'
