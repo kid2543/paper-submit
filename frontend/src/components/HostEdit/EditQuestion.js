@@ -37,9 +37,10 @@ function EditQuestion() {
     }
 
     const [saveLoading, setSaveLoading] = useState(false)
+
     const handleUpdate = async (e) => {
-        e.preventDefault()
         setSaveLoading(true)
+        e.preventDefault()
         try {
             const res = await axios.patch('/api/conference/', {
                 _id: id,
@@ -95,7 +96,7 @@ function EditQuestion() {
                                             Loading...
                                         </button>
                                     ) : (
-                                        <button type='submit' className='btn btn-success'>
+                                        <button type='submit' className='btn btn-success' disabled={saveLoading}>
                                             <span className='me-2'>
                                                 <i className='bi bi-floppy'></i>
                                             </span>
@@ -110,30 +111,38 @@ function EditQuestion() {
                                             <th>คำถาม</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {question.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>
-                                                    {index + 1}
-                                                </td>
-                                                <td>
-                                                    <div className="input-group">
-                                                        <textarea
-                                                            key={key}
-                                                            defaultValue={item}
-                                                            onChange={e => handleChange(e, index)}
-                                                            className='form-control'
-                                                            required
-                                                            rows={3}
-                                                        />
-                                                        <button className='btn btn-outline-danger' type='button' onClick={() => handleDel(index)}>
-                                                            <i className='bi bi-trash'></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                    {question.length > 0 ? (
+                                        <tbody>
+                                            {question.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>
+                                                        {index + 1}
+                                                    </td>
+                                                    <td>
+                                                        <div className="input-group">
+                                                            <textarea
+                                                                key={key}
+                                                                defaultValue={item}
+                                                                onChange={e => handleChange(e, index)}
+                                                                className='form-control'
+                                                                required
+                                                                rows={3}
+                                                            />
+                                                            <button className='btn btn-outline-danger' type='button' onClick={() => handleDel(index)}>
+                                                                <i className='bi bi-trash'></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    ) : (
+                                        <tbody>
+                                            <tr>
+                                                <td className='text-center' colSpan={2}>ไม่พบแบบประเมิน</td>
                                             </tr>
-                                        ))}
-                                    </tbody>
+                                        </tbody>
+                                    )}
                                 </table>
                             </div >
                         </form>

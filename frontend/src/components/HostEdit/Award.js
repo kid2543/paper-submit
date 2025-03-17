@@ -72,20 +72,28 @@ function Award() {
                                             <th>เครื่องมือ</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {paper.data.map(papers => (
-                                            <tr key={papers._id}>
-                                                <td>{papers.award_rate}</td>
-                                                <td>{papers.paper_code}</td>
-                                                <td>{papers.title}</td>
-                                                <td>
-                                                    <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
-                                                        <i className='bi bi-pencil-square'></i>
-                                                    </button>
-                                                </td>
+                                    {paper.data?.lenght > 0 ? (
+                                        <tbody>
+                                            {paper.data.map(papers => (
+                                                <tr key={papers._id}>
+                                                    <td>{papers.award_rate}</td>
+                                                    <td>{papers.paper_code}</td>
+                                                    <td>{papers.title}</td>
+                                                    <td>
+                                                        <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
+                                                            <i className='bi bi-pencil-square'></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    ) : (
+                                        <tbody>
+                                            <tr>
+                                                <td className='text-center p-3' colSpan={4}>ไม่พบข้อมูลบทความ</td>
                                             </tr>
-                                        ))}
-                                    </tbody>
+                                        </tbody>
+                                    )}
                                 </table>
                             </div>
                         </div>

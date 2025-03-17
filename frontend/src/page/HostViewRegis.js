@@ -27,7 +27,7 @@ function HostViewRegis() {
     }, [id])
 
     return (
-        <div>
+        <div className='container-fluid'>
             <Breadcrumb>
                 <Breadcrumb.Item href="/host/confr">แผงควบคุม</Breadcrumb.Item>
                 <Breadcrumb.Item active>

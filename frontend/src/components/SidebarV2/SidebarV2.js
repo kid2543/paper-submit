@@ -57,6 +57,7 @@ function SidebarV2({ children }) {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="flex-column">
+                <Nav.Link href="/host/confr" >แผงควบคุม</Nav.Link>
                 <Nav.Link href="/host/edit" >รายละเอียดทั่วไป</Nav.Link>
                 <Nav.Link href="/host/edit/regis">ข้อมูลการลงทะเบียน</Nav.Link>
                 <Nav.Link href="/host/edit/venue">สถานที่จัดงาน</Nav.Link>

@@ -114,17 +114,19 @@ function HostEditInv() {
             </div>
             <div className='card shadow-sm  mb-3'>
                 <div className='card-body'>
-                    <div className='d-flex justify-content-between align-items-center'>
-                        <div>
+                    <div className='d-lg-flex justify-content-between align-items-center'>
+                        <div className='mb-3 mb-lg-0'>
                             <h4 className='card-title'>รายการวิทยากร</h4>
                             <div className='text-muted'>
                                 เพิ่มรายละเอียดและอัพโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
                             </div>
                         </div>
-                        <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
-                            <i className='me-2 bi bi-plus-lg'></i>
-                            เพิ่มวิทยากร
-                        </button>
+                        <div className='mb-3 mb-lg-0'>
+                            <button className='btn btn-primary' type='button' onClick={() => setShowCreateModal(true)}>
+                                <i className='me-2 bi bi-plus-lg'></i>
+                                เพิ่มวิทยากร
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -245,7 +247,7 @@ function CreateInvModal(props) {
     }
 
     return (
-        <Modal show={props.show} onHide={props.handleClose}>
+        <Modal show={props.show} onHide={() => props.handleClose()}>
             <Modal.Header closeButton>
                 <Modal.Title>เพิ่มวิทยากร</Modal.Title>
             </Modal.Header>
@@ -265,7 +267,7 @@ function CreateInvModal(props) {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="" onClick={props.handleClose}>
+                    <Button variant="" onClick={() => props.handleClose()}>
                         ปิด
                     </Button>
                     {createLoading ? (

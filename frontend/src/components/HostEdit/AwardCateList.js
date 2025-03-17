@@ -44,21 +44,29 @@ function AwardCateList() {
                                             <th>เครื่องมือ</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {cate.map((cates, index) => (
-                                            <tr key={cates._id} className='col-12 col-md-4'>
-                                                <td>
-                                                    {index + 1}
-                                                </td>
-                                                <td>{cates.name}</td>
-                                                <td>
-                                                    <Link to={`/host/edit/award/${cates._id}`} className='btn btn-primary'>
-                                                        <i className='bi bi-pencil-square'></i>
-                                                    </Link>
-                                                </td>
+                                    {cate.length > 0 ? (
+                                        <tbody>
+                                            {cate.map((cates, index) => (
+                                                <tr key={cates._id} className='col-12 col-md-4'>
+                                                    <td>
+                                                        {index + 1}
+                                                    </td>
+                                                    <td>{cates.name}</td>
+                                                    <td>
+                                                        <Link to={`/host/edit/award/${cates._id}`} className='btn btn-primary'>
+                                                            <i className='bi bi-pencil-square'></i>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    ) : (
+                                        <tbody>
+                                            <tr>
+                                                <td className='p-3 text-center' colSpan={3}>ไม่พบข้อมูล</td>
                                             </tr>
-                                        ))}
-                                    </tbody>
+                                        </tbody>
+                                    )}
                                 </table>
                             </div>
                         </div>

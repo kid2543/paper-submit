@@ -103,9 +103,13 @@ function HostEditPresentation() {
                                         อัพโหลดกำหนดการนำเสนอ เพื่อให้ผู้เข้าร่วมงานประชุมดูเวลา และสถานที่ในการนำเสนอ หรือเข้าร่วมกิจกรรมต่างๆ ของงานประชุม
                                     </div>
                                 </div>
-                                <button className='btn' onClick={() => setShowModalD(true)}>
-                                    <i className='bi bi-pencil-square'></i>
-                                </button>
+                                {data?.schedule ? (
+
+                                    <button className='btn' onClick={() => setShowModalD(true)}>
+                                        <i className='bi bi-pencil-square'></i>
+                                    </button>
+                                ) : null
+                                }
                             </div>
                         </div>
                         <div>
