@@ -520,8 +520,7 @@ function HostReview() {
                       <div className='row'>
                         <label className='col-sm-3 fw-bold col-form-label'>ชื่องานประชุม</label>
                         <div className='col-sm-9'>
-                          <input
-                            name='confr_title'
+                        <input
                             className='form-control-plaintext'
                             readOnly
                             value={paper.confr_code?.title}
@@ -721,8 +720,8 @@ function GetCommitteeHistory({ id }) {
     <>
       {data?.map((items) => (
         <tr key={items._id}>
-          <td style={{width: 200}}>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
-          <td style={{width: 600}}>
+          <td style={{ width: 200 }}>{dayjs(items.createdAt).format('DD MMM YYYY HH:mm')}</td>
+          <td style={{ width: 600 }}>
             <textarea
               value={items.suggestion}
               readOnly

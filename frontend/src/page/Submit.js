@@ -146,11 +146,14 @@ function Submit() {
             </div>
             <form className='container my-5' onSubmit={handleForm}>
                 <div className='row'>
-                    <div className='col-md-6'>
+                    <div className='col-12 col-lg-6'>
                         <h1 className='text-white d-block d-md-none mb-4'>ส่งบทความ</h1>
                         <div className='card'>
-                            <div className='card-body'>
-                                <div className='row g-3 bg-light'>
+                            <div className='card-body bg-light'>
+                                {err &&
+                                    <p className='text-danger fw-bold'>{err}</p>
+                                }
+                                <div className='row gy-3'>
                                     <div>
                                         <label className='form-label'>ชื่อบทความ (ภาษาไทย) <span className="text-danger">*</span></label>
                                         <input
@@ -311,31 +314,37 @@ function Submit() {
                                             เพิ่มไฟล์
                                         </button>
                                     </div>
-                                </div>
-                                <div className="form-text">
-                                    กรุณาตรวจสอบรายละเอียดให้ครบถ้วนก่อนทำการกดส่งบทความด้านบน
+                                    <div className="form-text">
+                                        กรุณาตรวจสอบรายละเอียดให้ครบถ้วนก่อนทำการกดส่งบทความด้านบน
+                                    </div>
+                                    <div className='text-center my-4 d-block d-lg-none'>
+                                        <div className='form-check'>
+                                            <input required className='form-check-input' type='checkbox' />
+                                            <small className='form-check-label'>ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม <span className='fw-bold'>{confr?.title}</span> และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง</small>
+                                        </div>
+                                        <div className='mt-3'>
+                                            <button className='btn btn-primary fw-bold'>ส่งบทความ</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
-                        <div className='text-center my-4 d-block d-md-none'>
-                            <small>ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม {confr?.title} และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง</small>
-                            <div className='mt-3'>
-                                <button className='btn btn-light text-dark fw-bold'>ส่งบทความ</button>
-                            </div>
-                        </div>
+
                     </div>
-                    <div className='col-md-6 d-none d-md-block'>
+                    <div className='col-lg-6 d-none d-lg-block'>
                         <div className='text-center text-white'>
                             <h1 className='mb-3'>ส่งบทความ</h1>
-                            {err &&
-                                <p className='text-danger fw-bold'>{err}</p>
-                            }
-                            <div className="mb-3">
-                                ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม
-                                <div>
-                                    {confr?.title}
+                            <div className="form-check">
+                                <input type='checkbox' className='form-check-input' required />
+                                <div className='form-check-label'>
+                                    ข้าพเจ้าขอรับรองว่า บทความนี้ไม่เคยถูกตีพิมพ์ที่ใดมาก่อน ไม่อยู่ระหว่างการเสนอเพื่อพิจารณาตีพิมพ์ในวารสารหรือสื่อพิมพ์อื่น นับจากวันที่ข้าพเจ้าได้ส่งบทความฉบับนี้มายัง งานประชุม
+                                    <div className='fw-bold'>
+                                        {confr?.title}
+                                    </div>
+                                    และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง
                                 </div>
-                                และข้าพเจ้า (และคณะ) เป็นผู้เขียนบทความจริง
+
                             </div>
                             <div>
                                 <button type='submit' className='btn btn-primary'>ส่งบทความ</button>

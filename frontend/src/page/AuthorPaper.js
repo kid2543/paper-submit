@@ -310,7 +310,7 @@ function AuthorPaper() {
                               <p>
                                 <span className='fw-bold'>เรื่อง:</span> {date.name} <br /> <span className='fw-bold'>วันที่:</span> {dayjs(date.date).format('DD MMM YYYY')} <br />
                               </p>
-                              {dayjs(date.date).format('DD-MM-YYYY') > dayjs(Date.now()).format('DD-MM-YYYY') ? (
+                              {dayjs(Date.now()).format('YYYY-MM-DD') > dayjs(date.date).format('YYYY-MM-DD') ? (
                                 <div className='text-danger'>เลยกำหนดการส่งแล้ว</div>
                               ) : (
                                 <div>

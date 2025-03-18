@@ -59,6 +59,7 @@ function HostAssign() {
       })
       toast.success('ยืนยันการแก้ไขสำเร็จ')
       setPaper(res.data)
+      window.location.reload()
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -406,37 +407,45 @@ function HostAssign() {
                         <th>ลบ</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {oldList.map((items, index) => (
-                        <tr key={items._id}>
-                          <td>
-                            {index + 1}
-                          </td>
-                          <td>
-                            {items.reviewer.name}
-                          </td>
-                          <td>
-                            {items.reviewer.username}
-                          </td>
-                          <td>
-                            <ReviewStatus status={items.status} />
-                          </td>
-                          <td>
-                            <PaperResult status={items.result} />
-                          </td>
-                          <td>
-                            {items.status === 'PENDING' &&
-                              <button
-                                onClick={() => handleShowDelete(items._id)}
-                                type='button'
-                                className="btn btn-light text-danger">
-                                <i className="bi bi-trash"></i>
-                              </button>
-                            }
-                          </td>
+                    {oldList.length > 0 ? (
+                      <tbody>
+                        {oldList.map((items, index) => (
+                          <tr key={items._id}>
+                            <td>
+                              {index + 1}
+                            </td>
+                            <td>
+                              {items.reviewer.name}
+                            </td>
+                            <td>
+                              {items.reviewer.username}
+                            </td>
+                            <td>
+                              <ReviewStatus status={items.status} />
+                            </td>
+                            <td>
+                              <PaperResult status={items.result} />
+                            </td>
+                            <td>
+                              {items.status === 'PENDING' &&
+                                <button
+                                  onClick={() => handleShowDelete(items._id)}
+                                  type='button'
+                                  className="btn btn-light text-danger">
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              }
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    ) : (
+                      <tbody>
+                        <tr>
+                          <td className='text-center p-3' colSpan={6}>ไม่พบข้อมูล</td>
                         </tr>
-                      ))}
-                    </tbody>
+                      </tbody>
+                    )}
                   </table>
                 </div>
               </div>
