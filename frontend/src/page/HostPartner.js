@@ -36,7 +36,7 @@ function HostPartner() {
     formData.append("desc", e.target.desc.value)
     try {
       const res = await axios.post('/api/partner', formData)
-      toast.success("อัพโหลดข้อมูลสำเร็จ")
+      toast.success("อัปโหลดข้อมูลสำเร็จ")
       setPartnerData([...partnerData, res.data])
       handleCloseCreate()
     } catch (error) {
@@ -95,7 +95,7 @@ function HostPartner() {
             <div>
               <h4 className='card-title'>รายการผู้สนับสนุน</h4>
               <div className='text-muted'>
-                อัพโหลดรูปภาพและกรอกชื่อผู้สนับสนุน
+                อัปโหลดรูปภาพและกรอกชื่อผู้สนับสนุน
               </div>
             </div>
             <button className='btn btn-primary' type='button' onClick={handleShowCreate}>
@@ -196,7 +196,7 @@ function CreatePartnerModal({ show, handleClose, setPartnerUpload, partnerUpload
           ) : (
             <Button variant="primary" type="submit" disabled={!partnerUpload}>
               <i className="bi bi-upload me-2"></i>
-              อัพโหลด
+              อัปโหลด
             </Button>
           )}
         </Modal.Footer>

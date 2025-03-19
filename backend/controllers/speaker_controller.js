@@ -85,7 +85,7 @@ const uploadInvImage = async (req, res) => {
             }
             console.log("file is deleted")
         })
-        return res.status(400).json({ error: 'ไม่พบไฟล์อัพโหลด' })
+        return res.status(400).json({ error: 'ไม่พบไฟล์อัปโหลด' })
     }
 
     try {

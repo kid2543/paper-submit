@@ -20,7 +20,7 @@ const checkInvImageUpload = async (req, res, next) => {
             return res.status(400).json({error: 'ไม่พบข้อมูล'})
         }
         if(inv.img) {
-            return res.status(400).json({error: 'ลบรูปอันเดิมก่อนทำการอัพโหลดใหม่'})
+            return res.status(400).json({error: 'ลบรูปอันเดิมก่อนทำการอัปโหลดใหม่'})
         }
         next()
     } catch (error) {
@@ -42,7 +42,7 @@ const checkInvCvUpload = async (req, res, next) => {
             return res.status(400).json({error: 'ไม่พบข้อมูล'})
         }
         if(inv.cv) {
-            return res.status(400).json({error: 'ลบข้อมูลเดิมก่อนทำการอัพโหลดใหม่'})
+            return res.status(400).json({error: 'ลบข้อมูลเดิมก่อนทำการอัปโหลดใหม่'})
         }
         next()
     } catch (error) {

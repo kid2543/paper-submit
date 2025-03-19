@@ -64,7 +64,7 @@ function Review() {
                 formData.append('confr_id', confr_id)
                 formData.append('paper_code', paper.paper_code)
                 await axios.patch('/api/assign', formData)
-                toast.success('ให้คะแนน และอัพโหลดไฟล์สำเร็จ')
+                toast.success('ให้คะแนน และอัปโหลดไฟล์สำเร็จ')
                 setTimeout(
                     navigate('/committee'),
                     1000

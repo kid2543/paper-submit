@@ -55,6 +55,7 @@ function HostReview() {
         const res = await axios.patch('/api/paper/result', { _id: id, result: result, deadline: { name: e.target.name.value, date: e.target.deadline.value } })
         toast.success('เปลี่ยนผลลัพธ์บทความสำเร็จ')
         setPaper(res.data)
+        window.location.reload()
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -66,6 +67,7 @@ function HostReview() {
         const res = await axios.patch('/api/paper/result', { _id: id, result: result })
         toast.success('เปลี่ยนผลลัพธ์บทความสำเร็จ')
         setPaper(res.data)
+        window.location.reload()
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -158,6 +160,8 @@ function HostReview() {
       toast.error('เกิดข้อผิดพลาด กรุราลองใหม่อีกครั้ง')
     } finally {
       setPaymentLoading(false)
+      setShowPayment(false)
+      setPaymentStatus('')
     }
   }
 
@@ -524,6 +528,7 @@ function HostReview() {
                             className='form-control-plaintext'
                             readOnly
                             value={paper.confr_code?.title}
+                            name='confr_title'
                           />
                         </div>
                       </div>

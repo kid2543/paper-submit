@@ -59,10 +59,17 @@ const createCloseNameFile = async (req, res) => {
     const { filename } = req.file
 
     try {
-        const file = await PaperFile.findByIdAndUpdate(_id, {close_name_file: filename}, { new : true })
-        if(!file) {
-            return res.status(404).json({error: 'ไม่พบข้อมูลไฟล์ในฐานข้อมูล'})
+        const check = await PaperFile.findById(_id)
+        if(check.close_name_file) {
+            fs.unlink('public/uploads/' + check.close_name_file, (err) => {
+                if(err) {
+                    console.log("เกิดข้อผิดพลาดเมื่อลบไฟล์ปิดชื่อ",err)
+                } else {
+                    console.log('ลบไฟล์สำเร็จ')
+                }
+            })
         }
+        const file = await PaperFile.findByIdAndUpdate(_id, {close_name_file: filename}, { new : true })
         res.status(200).json(file)
     } catch (error) {
         console.log(error)

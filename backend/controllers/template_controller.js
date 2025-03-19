@@ -16,7 +16,7 @@ const uploadTemplate = async (req, res) => {
     }
     
     if(!req.file) {
-        return res.status(400).json({error : 'กรุณาเลือกไฟล์ก่อนอัพโหลด'})
+        return res.status(400).json({error : 'กรุณาเลือกไฟล์ก่อนอัปโหลด'})
     }
 
     const { filename } = req.file

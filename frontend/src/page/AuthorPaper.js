@@ -28,9 +28,11 @@ function AuthorPaper() {
   // hadnle payment
   const [paymentFile, setPaymentFile] = useState(null)
 
+  const [showConfirmUpload, setShowConfirmUpload] = useState(false)
+
   const handleUploadPayment = async () => {
     if (!paymentFile) {
-      toast.warning('กรุณาเลือกไฟล์ก่อนทำการกดอัพโหลด')
+      toast.warning('กรุณาเลือกไฟล์ก่อนทำการกดอัปโหลด')
       return
     }
 
@@ -39,7 +41,7 @@ function AuthorPaper() {
       formData.append('image', paymentFile)
       const res = await axios.patch('/api/paper/upload/payment/' + id, formData)
       setData(res.data)
-      toast.success('อัพโหลดหลักฐานการชำระเงินสำเร็จ รอติดตามผลการตรวจสอบ')
+      toast.success('อัปโหลดหลักฐานการชำระเงินสำเร็จ รอติดตามผลการตรวจสอบ')
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -66,7 +68,7 @@ function AuthorPaper() {
   const hanleEditPaper = async (e, file_id) => {
     e.preventDefault()
     if (!e.target.edit_file.files[0]) {
-      toast.warning('กรุณาเลือกไฟล์ก่อนทำการอัพโหลด')
+      toast.warning('กรุณาเลือกไฟล์ก่อนทำการอัปโหลด')
       return
     }
 
@@ -75,7 +77,7 @@ function AuthorPaper() {
       formData.append('file', e.target.edit_file.files[0])
       const res = await axios.post('/api/paperfile/edit/' + file_id, formData)
       setUploaded([...uploaded, res.data._id])
-      toast.success('อัพโหลดฉบับแก้ไขสำเร็จ กรุณาตรวจสอบให้แน่ใจว่าได้ทำการอัพโหลดครบแล้วก่อนทำการกดยืนยัน')
+      toast.success('อัปโหลดฉบับแก้ไขสำเร็จ กรุณาตรวจสอบให้แน่ใจว่าได้ทำการอัปโหลดครบแล้วก่อนทำการกดยืนยัน')
     } catch (error) {
       console.log(error)
       toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -295,7 +297,7 @@ function AuthorPaper() {
             <section className='card  shadow-sm mb-3'>
               <div className='card-body'>
                 <div>
-                  <h4>อัพโหลดบทความฉบับแก้ไข</h4>
+                  <h4>อัปโหลดบทความฉบับแก้ไข</h4>
                   <hr />
                   <p className='fw-bold'>
                     กำหนดการแก้ไข
@@ -336,7 +338,7 @@ function AuthorPaper() {
                                           <div className='mt-3'>
                                             <button disabled={uploaded.includes(items._id)} type='submit' className='btn btn-outline-primary'>
                                               <i className="bi bi-upload me-2"></i>
-                                              อัพโหลด
+                                              อัปโหลด
                                             </button>
                                           </div>
                                         </form>
@@ -344,7 +346,7 @@ function AuthorPaper() {
                                     </div>
                                   }
                                   <div className="text-muted">
-                                    กรุณาอัพโหลดฉบับแก้ไขให้ครบ หรืออัพโหลดเฉพาะที่แก้ไขก่อนทำการกดยืนยัน
+                                    กรุณาอัปโหลดฉบับแก้ไขให้ครบ หรืออัปโหลดเฉพาะที่แก้ไขก่อนทำการกดยืนยัน
                                   </div>
                                   <div className='text-end mt-3'>
                                     <button
@@ -369,6 +371,13 @@ function AuthorPaper() {
           }
           {(data.payment_status === 'PENDING' || data.payment_status === 'REJECT') &&
             <section className="mb-3">
+              <ConfirmDialog 
+                handleClose={() => setShowConfirmUpload(false)}
+                show={showConfirmUpload}
+                header='ยืนยันการแนบหลักฐานการชำระเงิน'
+                text='ต้องการยืนยันการแนบหลักฐานหรือไม่เนื่องจากจะไม่สามารถแก้ไขได้จนกว่าผู้จัดงานจะตรวจสอบเสร็จสิ้น'
+                handleSubmit={handleUploadPayment}
+              />
               <div className="card">
                 <div className="card-body">
                   <h4 className="card-title">ชำระเงินและแนบหลักฐานการชำระเงิน</h4>
@@ -426,14 +435,15 @@ function AuthorPaper() {
                         <label className="form-label">แนบหลักฐาน</label>
                         <input
                           className="form-control"
-                          type='file' accept='image/*'
+                          type='file' 
+                          accept='image/*'
                           onChange={e => setPaymentFile(e.target.files[0])}
                         />
                       </div>
                       <div className="text-end">
-                        <button type='button' disabled={!paymentFile} onClick={handleUploadPayment} className="btn btn-primary">
+                        <button type='button' disabled={!paymentFile} onClick={() => setShowConfirmUpload(true)} className="btn btn-primary">
                           <i className="bi bi-upload me-2"></i>
-                          อัพโหลด
+                          อัปโหลด
                         </button>
                       </div>
                     </form>

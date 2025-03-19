@@ -188,7 +188,7 @@ function Edit() {
                             <div className='py-4'>
                                 <h4>โลโก้ประจำงานประชุม</h4>
                                 <div className='text-muted'>
-                                    อัพโหลดโลโก้เพื่อแสดงในหน้าเพจของงานประชุม
+                                    อัปโหลดโลโก้เพื่อแสดงในหน้าเพจของงานประชุม
                                 </div>
                                 <hr />
                             </div>
@@ -637,7 +637,7 @@ function UploadLogo(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>อัพโหลดรูป Logo</Modal.Title>
+                <Modal.Title>อัปโหลดรูป Logo</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body>
@@ -656,7 +656,7 @@ function UploadLogo(props) {
                     ) : (
                         <Button variant="primary" type='submit' disabled={!file}>
                             <i className='bi bi-upload me-2'></i>
-                            อัพโหลด
+                            อัปโหลด
                         </Button>
                     )}
                 </Modal.Footer>

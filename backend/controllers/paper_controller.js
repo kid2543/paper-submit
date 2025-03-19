@@ -280,7 +280,7 @@ const uploadEditPaper = async (req, res) => {
             },
             { new: true }
         )
-        await Notification.create({ user_id: paper.confr_code, title: 'มีการแก้ไขบทความ', message: paper.paper_code + ' มีการอัพโหลดไฟล์บทความฉบับแก้ไข' })
+        await Notification.create({ user_id: paper.confr_code, title: 'มีการแก้ไขบทความ', message: paper.paper_code + ' มีการอัปโหลดไฟล์บทความฉบับแก้ไข' })
         res.status(200).json(paper)
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -292,7 +292,7 @@ const uploadPayment = async (req, res) => {
     const { id } = req.params
 
     if (!req.file) {
-        return res.status(400).json({ error: 'ไม่พบข้อมูลหลักฐานการชำระเงินที่อัพโหลดมา' })
+        return res.status(400).json({ error: 'ไม่พบข้อมูลหลักฐานการชำระเงินที่อัปโหลดมา' })
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -309,6 +309,16 @@ const uploadPayment = async (req, res) => {
     const { filename } = req.file
 
     try {
+        const check = await Paper.findById(id)
+        if(check.payment_image) {
+            fs.unlink('public/uploads/' + check.payment_image, (err) => {
+                if(err) {
+                    console.log('เกิดข้อผิดพลาดระหว่างการลบรูหลักฐาน', err)
+                } else {
+                    console.log('ลบหลักฐานการชำระเงินสำเร็จ')
+                }
+            })
+        }
         const paper = await Paper.findByIdAndUpdate(id, {
             payment_status: 'CHECKING',
             payment_image: filename

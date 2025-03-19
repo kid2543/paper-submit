@@ -299,7 +299,7 @@ function HostAssign() {
                 <div className='col-12 my-5'>
                   <h4>รายการบทความ</h4>
                   <div className="text-warning mb-3">
-                    ** กรุณาอัพโหลดไฟล์ ปิดชื่อ เนื่องจากหากไม่อัพโหลดกรรมการจะไม่สามารถอ่านไฟล์ได้
+                    ** กรุณาอัปโหลดไฟล์ ปิดชื่อ เนื่องจากหากไม่อัปโหลดกรรมการจะไม่สามารถอ่านไฟล์ได้
                   </div>
                   {paperFile.data &&
                     <div className='table-resonsive'>
@@ -322,6 +322,9 @@ function HostAssign() {
                               ไฟล์ปิดชื่อ
                             </th>
                             <th>
+                              อัปโหลด
+                            </th>
+                            <th>
                               ประวัติ
                             </th>
                           </tr>
@@ -339,14 +342,34 @@ function HostAssign() {
                                 {items.name}
                               </td>
                               <td>
-                                <Link target='_blank' rel='noreferrer' to={`/uploads/${items.original_file}`} className='btn btn-link'>ดูไฟล์</Link>
+                                <Link
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  to={`/uploads/${items.original_file}`}
+                                  className='btn btn-link'>
+                                  ดูไฟล์
+                                </Link>
                               </td>
                               <td>
                                 {items.close_name_file ? (
-                                  <Link target='_blank' rel='noreferrer' to={`/uploads/${items.close_name_file}`} className='btn btn-link'>ดูไฟล์</Link>
+                                  <Link
+                                    target='_blank'
+                                    rel='noreferrer'
+                                    to={`/uploads/${items.close_name_file}`}
+                                    className='btn btn-link'>
+                                    ดูไฟล์
+                                  </Link>
                                 ) : (
-                                  <button onClick={() => handleShowUpload(items._id, items.name)} type='button' className='btn btn-outline-primary'><i className="bi bi-upload"></i></button>
+                                  '-'
                                 )}
+                              </td>
+                              <td>
+                                <button
+                                  onClick={() => handleShowUpload(items._id, items.name)}
+                                  type='button'
+                                  className='btn btn-outline-primary'>
+                                  <i className="bi bi-upload"></i>
+                                </button>
                               </td>
                               <td>
                                 <Link type='button' onClick={() => handleShowHistory(items._id, items.name)} className='btn btn-outline-primary btn-sm'>ดูประวัติ</Link>
@@ -371,7 +394,7 @@ function HostAssign() {
                   }
                   {paper.status === 'PENDING' && paper.deadline?.length > 0 &&
                     <div>
-                      <div className="form-text mb-3">ในกรณีที่มีการแก้ไขให้อัพโหลดไฟล์บทความปิดชื่อใหม่ และกด "ยืนยันการแก้ไข" เพื่อมอบหมายให้กรรมการตรวจอีกครั้ง</div>
+                      <div className="form-text mb-3">ในกรณีที่มีการแก้ไขให้อัปโหลดไฟล์บทความปิดชื่อใหม่ และกด "ยืนยันการแก้ไข" เพื่อมอบหมายให้กรรมการตรวจอีกครั้ง</div>
                       <button onClick={() => handleShowEdit(paper.paper_code)} type='button' className='btn btn-primary'>ยืนยันการแก้ไข</button>
                     </div>
                   }
@@ -567,7 +590,7 @@ function UploadCloseNameFile(props) {
         }
       })
       props.list.setData(newData)
-      toast.success('อัพโหลดสำเร็จ')
+      toast.success('อัปโหลดสำเร็จ')
       props.handleClose()
     } catch (error) {
       console.log(error)
@@ -580,7 +603,7 @@ function UploadCloseNameFile(props) {
   return (
     <Modal show={props.show} onHide={props.handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>อัพโหลดบทความฉบับปิดชื่อ:  <br /> <span className="text-primary">{props.data.name}</span></Modal.Title>
+        <Modal.Title>อัปโหลดบทความฉบับปิดชื่อ:  <br /> <span className="text-primary">{props.data.name}</span></Modal.Title>
       </Modal.Header>
       <form onSubmit={handleUpload}>
         <Modal.Body>
@@ -599,7 +622,7 @@ function UploadCloseNameFile(props) {
           ) : (
             <Button variant="primary" type='submit'>
               <i className="me-2 bi bi-upload"></i>
-              อัพโหลด
+              อัปโหลด
             </Button>
           )}
         </Modal.Footer>

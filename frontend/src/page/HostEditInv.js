@@ -118,7 +118,7 @@ function HostEditInv() {
                         <div className='mb-3 mb-lg-0'>
                             <h4 className='card-title'>รายการวิทยากร</h4>
                             <div className='text-muted'>
-                                เพิ่มรายละเอียดและอัพโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
+                                เพิ่มรายละเอียดและอัปโหลดรูปภาพ พร้อมกับประวัติของวิทยากรเพื่อให้ผู้ส่งบทความที่สนใจฟังการบรรยายในงานประชุมได้ทราบข้อมูลเพิ่มเติม
                             </div>
                         </div>
                         <div className='mb-3 mb-lg-0'>
@@ -206,7 +206,7 @@ function HostEditInv() {
                                             </div>
                                             <button type='button' onClick={() => handleShowCvModal(items._id, items.name)} className='btn btn-outline-dark'>
                                                 <i className="bi bi-upload me-2"></i>
-                                                อัพโหลด CV
+                                                อัปโหลด CV
                                             </button>
                                             <button type='submit' className='btn btn-primary'>ยืนยันการแก้ไข</button>
 
@@ -303,7 +303,7 @@ function UploadImage(props) {
             const formData = new FormData()
             formData.append('image', imageFile)
             const res = await axios.patch('/api/inv/img/' + props.id, formData)
-            toast.success('อัพโหลดสำเร็จ')
+            toast.success('อัปโหลดสำเร็จ')
             let temp = [...props.data]
             let newData = temp.map(items => {
                 if (items._id === res.data._id) {
@@ -325,7 +325,7 @@ function UploadImage(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>อัพโหลดรูปภาพ: <span className='text-primary'>{props.name}</span></Modal.Title>
+                <Modal.Title>อัปโหลดรูปภาพ: <span className='text-primary'>{props.name}</span></Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpload}>
                 <Modal.Body>
@@ -346,7 +346,7 @@ function UploadImage(props) {
                     ) : (
                         <Button variant="primary" type='submit' disabled={!imageFile} >
                             <i className='bi bi-upload me-2'></i>
-                            อัพโหลด
+                            อัปโหลด
                         </Button>
                     )}
                 </Modal.Footer>
@@ -382,7 +382,7 @@ function UploadCv(props) {
                 }
             })
             props.setData(newData)
-            toast.success('อัพโหลดสำเร็จ')
+            toast.success('อัปโหลดสำเร็จ')
             closeModal()
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -395,7 +395,7 @@ function UploadCv(props) {
     return (
         <Modal show={props.show} onHide={closeModal}>
             <Modal.Header closeButton>
-                <Modal.Title>อัพโหลดประวัติ: <span className='text-primary'>{props.name}</span></Modal.Title>
+                <Modal.Title>อัปโหลดประวัติ: <span className='text-primary'>{props.name}</span></Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpload}>
                 <Modal.Body>
@@ -416,7 +416,7 @@ function UploadCv(props) {
                     ) : (
                         <Button variant="primary" type='submit' disabled={!cvFile} >
                             <i className='bi bi-upload me-2'></i>
-                            อัพโหลด
+                            อัปโหลด
                         </Button>
                     )}
                 </Modal.Footer>

@@ -20,7 +20,7 @@ function ReviewResult() {
         formData.append("file", suggestionFile)
         const res = await axios.patch('/api/assign/suggestion/' + id, formData)
         setData(res.data)
-        toast.success('อัพโหลดไฟล์ข้อแนะนำสำเร็จ')
+        toast.success('อัปโหลดไฟล์ข้อแนะนำสำเร็จ')
       } catch (error) {
         console.log(error)
         toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -73,7 +73,7 @@ function ReviewResult() {
                   </div>
                 ) : (
                   <form className='col-md-6 col-lg-3' onSubmit={handleUpload}>
-                    <label className='form-label text-muted'>อัพโหลดข้อเสนอแนะนำ</label>
+                    <label className='form-label text-muted'>อัปโหลดข้อเสนอแนะนำ</label>
                     <input className='form-control form-control-sm' type='file' accept='.pdf,.doc' onChange={e => setSuggestionFile(e.target.files[0])} />
                     <div className='mt-2'>
                       <button className='btn btn-outline-success btn-sm' type='submit' disabled={!suggestionFile}>Upload</button>

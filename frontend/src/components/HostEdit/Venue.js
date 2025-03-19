@@ -48,7 +48,7 @@ function Venue() {
                     <div className='mb-3 card'>
                         <div className='card-body'>
                             <h4 className='fw-bold card-title'>สถานที่จัดงาน</h4>
-                            <p className='text-muted card-text'>แก้ไขสถานที่จัดงานและอัพโหลดรูปสถานที่จัดงานได้ที่นี่</p>
+                            <p className='text-muted card-text'>แก้ไขสถานที่จัดงานและอัปโหลดรูปสถานที่จัดงานได้ที่นี่</p>
                         </div>
                     </div>
                     <div className='card  shadow-sm'>
@@ -57,7 +57,7 @@ function Venue() {
                                 <div className='mb-3'>
                                     <h4>รายละเอียดสถานที่จัดงาน</h4>
                                     <div className='text-muted'>
-                                        กรอกรายละเอียด เพิ่มลิ้งค์ และอัพโหลดรูปสถานที่จัดงานเพื่อให้ผู้ส่งบทความสามารถเข้ามาอ่านได้
+                                        กรอกรายละเอียด เพิ่มลิ้งค์ และอัปโหลดรูปสถานที่จัดงานเพื่อให้ผู้ส่งบทความสามารถเข้ามาอ่านได้
                                     </div>
                                 </div>
                                 <div className='mb-3 mb-lg-0'>
@@ -69,7 +69,7 @@ function Venue() {
                                         <span className='me-2'>
                                             <i className='bi bi-upload'></i>
                                         </span>
-                                        อัพโหลดรูป
+                                        อัปโหลดรูป
                                     </button>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ function ModalVenue(props) {
                 venue: edit
             })
             props.setData(update.data)
-            toast.success('อัพโหลดสำเร็จ')
+            toast.success('อัปโหลดสำเร็จ')
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาดกรุณาลองใหม่อีกครั้ง')
@@ -253,7 +253,7 @@ function ModalUploadVenue(props) {
     return (
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>อัพโหลดรูป</Modal.Title>
+                <Modal.Title>อัปโหลดรูป</Modal.Title>
             </Modal.Header>
             <form onSubmit={handleUpdate}>
                 <Modal.Body>
@@ -274,7 +274,7 @@ function ModalUploadVenue(props) {
                     ) : (
                         <Button variant="primary" type='submit' disabled={!newFile}>
                             <i className='me-2 bi bi-upload'></i>
-                            อัพโหลด
+                            อัปโหลด
                         </Button>
                     )}
                 </Modal.Footer>

@@ -22,7 +22,7 @@ const uploadVenue = async (req, res) => {
     }
 
     if (!filename) {
-        return res.status(400).json({ error: 'ไม่พบข้อมูลการอัพโหลด' })
+        return res.status(400).json({ error: 'ไม่พบข้อมูลการอัปโหลด' })
     }
 
     try {
@@ -89,7 +89,7 @@ const uploadLogo = async (req, res) => {
     }
 
     if (!filename) {
-        return res.status(400).json({ error: 'ไม่พบข้อมูลการอัพโหลด' })
+        return res.status(400).json({ error: 'ไม่พบข้อมูลการอัปโหลด' })
     }
 
     try {

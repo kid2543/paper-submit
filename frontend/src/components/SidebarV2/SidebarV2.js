@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Navbar, Nav, Button, Offcanvas, Container, Row, Col } from 'react-bootstrap';
 import './index.css'
 import { UserDropdown } from '../UserDropdown';
+import { Link } from 'react-router-dom';
 
 
 function SidebarV2({ children }) {
@@ -50,9 +51,11 @@ function SidebarV2({ children }) {
           </Navbar>
           <Offcanvas show={show} onHide={handleClose}>
             <Offcanvas.Header closeButton>
-              <Offcanvas.Title>
-                PAPERSS<br />
-                <h6 className='text-primary fw-bold'>{confrCode}</h6>
+              <Offcanvas.Title className='px-3'>
+                <Link to='/' className='text-dark fw-bold fs-1'>
+                  PAPERSS
+                </Link>
+                <h6 className='text-primary'>{confrCode}</h6>
               </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body>
@@ -71,6 +74,7 @@ function SidebarV2({ children }) {
                 <Nav.Link href="/host/edit/invite-speaker">วิทยากร</Nav.Link>
                 <Nav.Link href="/host/edit/award">รางวัลดีเด่น</Nav.Link>
               </Nav>
+              <UserDropdown />
             </Offcanvas.Body>
           </Offcanvas>
           <div className="px-lg-4">

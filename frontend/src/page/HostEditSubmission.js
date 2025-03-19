@@ -105,7 +105,7 @@ function HostEditSubmission() {
       <div className='mb-3 card'>
         <div className='card-body'>
           <h4 className='fw-bold card-title'>การส่งบทความ</h4>
-          <p className='text-muted card-text'>แก้ไขข้อแนะนำการส่งบทความ และอัพโหลดเทมเพลตได้ที่นี่</p>
+          <p className='text-muted card-text'>แก้ไขข้อแนะนำการส่งบทความ และอัปโหลดเทมเพลตได้ที่นี่</p>
         </div>
       </div>
       <div className='card  shadow-sm mb-3'>
@@ -114,7 +114,7 @@ function HostEditSubmission() {
             <div className='mb-3 mb-lg-0'>
               <h4 className='card-title'>รายการเทมเพลต</h4>
               <div className='text-muted'>
-                อัพโหลดเทมเพลตเพื่อให้ ผู้ส่งบทความสามารถโหลด และนำไปปรับใช้กับบทความเพื่อให้รูปแบบของบทความเป็นไปตามที่งานประชุมกำหนด
+                อัปโหลดเทมเพลตเพื่อให้ ผู้ส่งบทความสามารถโหลด และนำไปปรับใช้กับบทความเพื่อให้รูปแบบของบทความเป็นไปตามที่งานประชุมกำหนด
               </div>
             </div>
             <div className='mb-3 mb-lg-0'>
@@ -285,7 +285,7 @@ function TemplateModal(props) {
           ) : (
             <Button variant="primary" disabled={!templateFile || !templateName} type='submit'>
               <i className='bi bi-upload me-2'></i>
-              อัพโหลด
+              อัปโหลด
             </Button>
           )}
         </Modal.Footer>

@@ -100,7 +100,7 @@ function HostEditPresentation() {
                                 <div className='mb-3'>
                                     <h4>กำหนดการงานประชุม / กำหนดการนำเสนอ</h4>
                                     <div className='text-muted'>
-                                        อัพโหลดกำหนดการนำเสนอ เพื่อให้ผู้เข้าร่วมงานประชุมดูเวลา และสถานที่ในการนำเสนอ หรือเข้าร่วมกิจกรรมต่างๆ ของงานประชุม
+                                        อัปโหลดกำหนดการนำเสนอ เพื่อให้ผู้เข้าร่วมงานประชุมดูเวลา และสถานที่ในการนำเสนอ หรือเข้าร่วมกิจกรรมต่างๆ ของงานประชุม
                                     </div>
                                 </div>
                                 {data?.schedule ? (
@@ -121,7 +121,7 @@ function HostEditPresentation() {
 
                             ) : (
                                 <button onClick={() => setShowModalD(true)} type='button' className="btn btn-outline-primary">
-                                    อัพโหลดไฟล์กำหนดการ
+                                    อัปโหลดไฟล์กำหนดการ
                                 </button>
                             )}
                         </div>
@@ -152,7 +152,7 @@ function ModalSchedule(props) {
             formData.append('file', scheduleFile)
             const res = await axios.patch('/api/conference/schedule/' + props.id, formData)
             props.setData(res.data)
-            toast.success('อัพโหลดไฟล์กำหนดการสำเร็จ')
+            toast.success('อัปโหลดไฟล์กำหนดการสำเร็จ')
         } catch (error) {
             console.log(error)
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
@@ -195,7 +195,7 @@ function ModalSchedule(props) {
                     ) : (
                         <Button variant="primary" type='submit' disabled={!scheduleFile}>
                             <i className="me-2 bi bi-upload"></i>
-                            อัพโหลด
+                            อัปโหลด
                         </Button>
                     )}
                 </Modal.Footer>
