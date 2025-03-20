@@ -352,7 +352,7 @@ function HostReview() {
                         name='university'
                       />
                     </div>
-                    {paper.publication &&
+                    {paper.publication !== undefined &&
                       <div>
                         <label className="form-label">วารสาร</label>
                         <input
