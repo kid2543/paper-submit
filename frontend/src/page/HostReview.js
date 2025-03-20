@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { UserDropdown } from '../components/UserDropdown';
 import ConfirmDeleteDialog from '../components/ConfirmDeleteDialog';
 import ConfirmDialog from '../components/ConfirmDialog';
+import ErrorPage from './ErrorPage';
 
 function HostReview() {
 
@@ -17,6 +18,7 @@ function HostReview() {
   const [paper, setPaper] = useState({})
   const [review, setReview] = useState([])
   const [result, setResult] = useState('')
+  const [error, setError] = useState(false)
 
   const navigate = useNavigate()
 
@@ -30,6 +32,7 @@ function HostReview() {
         setPaper(res.data)
       } catch (error) {
         console.log(error)
+        setError(true)
       }
     }
 
@@ -213,6 +216,10 @@ function HostReview() {
     } finally {
       setUpdateLoading(false)
     }
+  }
+
+  if(error) {
+    return <ErrorPage />
   }
 
   return (

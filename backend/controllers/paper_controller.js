@@ -154,7 +154,7 @@ const getReviewPaper = async (req, res) => {
     try {
         const paper = await Paper.findById(id).populate('cate_code confr_code publication owner', '-owner.password')
         if (!paper) {
-            return res.status(404).json({ error: 'ไม่พบงานประชุม' })
+            return res.status(404).json({ error: 'ไม่พบบทความ' })
         }
         res.status(200).json(paper)
     } catch (error) {
