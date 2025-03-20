@@ -39,6 +39,7 @@ const Login = () => {
                                         placeholder='Username'
                                         value={username}
                                         onChange={e => setUsername(e.target.value)}
+                                        autoFocus
                                     />
                                     <label htmlFor='floatingInput'>Username</label>
                                 </div>
