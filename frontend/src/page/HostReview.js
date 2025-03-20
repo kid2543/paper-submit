@@ -352,9 +352,9 @@ function HostReview() {
                         name='university'
                       />
                     </div>
-                    {paper.publication !== undefined &&
+                    {paper.publication && paper.publication !== undefined &&
                       <div>
-                        <label className="form-label">วารสาร</label>
+                        <label className="form-label fw-bold">วารสาร</label>
                         <input
                           type='text'
                           placeholder={`${paper.publication?.th_name}/${paper.publication?.en_name}`}
