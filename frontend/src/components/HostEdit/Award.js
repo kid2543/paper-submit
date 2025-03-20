@@ -15,7 +15,7 @@ function Award() {
 
     const { id } = useParams()
     const paper = useFetch('/api/paper/edit/award/' + id)
-    const cate = useFetch('/api/paper/one/' + id)
+    const cate = useFetch('/api/category/one/' + id)
 
     const [show, setShow] = useState(false)
     const [modalData, setModalData] = useState({
@@ -47,16 +47,16 @@ function Award() {
                     <p className='text-muted card-text'>จัดอันดับรางวัลดีเด่นได้ที่นี่!</p>
                 </div>
             </div>
-            {paper.data &&
+            {paper.status === 'success' &&
                 <div>
                     <UpdateAwardRateModal
                         show={show}
                         handleClose={handleClose}
                         data={modalData}
-                        key={paper.key}
-                        setKey={paper.setKey}
+                        allData={paper.data}
+                        setData={paper.setData}
                     />
-                    <div className='card'>
+                    <div className='card' >
                         <div className="card-body">
                             <h4 className='card-title'>รายการบทความในหัวข้อนี้</h4>
                             <div className='text-muted'>
@@ -72,28 +72,25 @@ function Award() {
                                             <th>เครื่องมือ</th>
                                         </tr>
                                     </thead>
-                                    {paper.data?.lenght > 0 ? (
-                                        <tbody>
-                                            {paper.data.map(papers => (
-                                                <tr key={papers._id}>
-                                                    <td>{papers.award_rate}</td>
-                                                    <td>{papers.paper_code}</td>
-                                                    <td>{papers.title}</td>
-                                                    <td>
-                                                        <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
-                                                            <i className='bi bi-pencil-square'></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    ) : (
-                                        <tbody>
+                                    <tbody>
+                                        {paper.data?.length <= 0 && 
                                             <tr>
-                                                <td className='text-center p-3' colSpan={4}>ไม่พบข้อมูลบทความ</td>
+                                                <td className='p-3 text-center' colSpan={4}>ไม่พบข้อมูล</td>
                                             </tr>
-                                        </tbody>
-                                    )}
+                                        }
+                                        {paper.data?.map(papers => (
+                                            <tr key={papers._id}>
+                                                <td>{papers.award_rate}</td>
+                                                <td>{papers.paper_code}</td>
+                                                <td>{papers.title}</td>
+                                                <td>
+                                                    <button onClick={() => handleShow(papers._id, papers.paper_code)} type='button' className='btn btn-primary'>
+                                                        <i className='bi bi-pencil-square'></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -111,15 +108,23 @@ function UpdateAwardRateModal(props) {
 
     const [award, setAward] = useState('')
 
+
     const handleUpdate = async (e) => {
         e.preventDefault()
         try {
-            await axios.patch('/api/paper/award', {
+            const res = await axios.patch('/api/paper/award', {
                 id: props.data._id,
                 award_rate: award
             })
             toast.success('สำเร็จ')
-            props.setKey(props.key + 1)
+            let temp = props.allData.map(items => {
+                if(items._id === props.data._id) {
+                    return res.data
+                } else {
+                    return items
+                }
+            })
+            props.setData(temp)
             props.handleClose()
         } catch (error) {
             toast.error('เกิดข้อผิดพลาด')

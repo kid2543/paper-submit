@@ -441,7 +441,7 @@ function HostReview() {
                           <Link
                             target='_blank'
                             rel='noreferrer'
-                            to={`/upload/${paper.payment_image}`}
+                            to={`/uploads/${paper.payment_image}`}
                           >
                             {paper.payment_image}
                           </Link>
