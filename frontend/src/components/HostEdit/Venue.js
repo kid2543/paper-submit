@@ -86,7 +86,7 @@ function Venue() {
                                     {data?.venue.desc.map((descs, index) => (
                                         <p key={index}>{descs}</p>
                                     ))}
-                                    <Link to={data?.venue.remark}>{data?.venue.remark}</Link>
+                                    <Link target='_blank' rel='noreferrer' to={data?.venue.remark}>{data?.venue.remark}</Link>
                                 </div>
                             </div>
                         </div>
