@@ -161,7 +161,7 @@ function HostDashboard() {
                             <div>
                                 {searchConfr.data &&
                                     <div className='table-responsive' style={{ minHeight: 400 }}>
-                                        <table className='table' style={{ minWidth: '800px' }}>
+                                        <table className='table' style={{ minWidth: '1000px' }}>
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
