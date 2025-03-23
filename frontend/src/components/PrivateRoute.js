@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import LoadingPage from './LoadingPage'
 import { useAuthContext } from '../hook/useAuthContext'
 import UnAuthorized from '../page/UnAuthorized'
 import { Navigate } from 'react-router-dom'
