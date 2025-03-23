@@ -1,5 +1,5 @@
 {
-  "proxy": "https://stunning-mooncake-f32f96.netlify.app/",
+  "proxy": "https://paper-submission-api.onrender.com/",
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
