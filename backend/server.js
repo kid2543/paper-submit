@@ -33,7 +33,7 @@ const templateRoutes = require('./routes/template')
 const paperFile = require('./routes/paper_file')
 const editFile = require('./routes/paper_edit')
 const assignHistory = require('./routes/paper_assign_history')
-const notificationRouter = require('./routes/notification');
+const notificationRouter = require('./routes/notification')
 
 app.use(express.static('public'))
 app.use(express.json())
@@ -70,7 +70,7 @@ mongoose.connect(uri)
 .then(() => { console.log('Connected to MongoDB!'); }) 
 .catch((error) => { console.error('Connection error:', error); })
 
-// start the server 
+// start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`)
 })
