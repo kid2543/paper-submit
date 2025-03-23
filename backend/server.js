@@ -9,7 +9,7 @@ const port = process.env.PORT;
 
 // connect to mongodb database
 const mongoose = require('mongoose')
-const uri = 'mongodb://localhost:27017/paper_submition'
+const uri = process.env.MONGODB_URL
 
 const db = mongoose.connection; 
 db.on('error', console.error.bind(console, 'connection error:')); 
