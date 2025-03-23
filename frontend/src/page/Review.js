@@ -8,8 +8,7 @@ import dayjs from 'dayjs'
 
 function Review() {
 
-    const { id } = useParams()
-    const confr_id = sessionStorage.getItem('confr_id')
+    const { id, confr_id } = useParams()
 
     const [paper, setPaper] = useState({})
     const [PaperFile, setPaperFile] = useState([])

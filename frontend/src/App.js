@@ -394,7 +394,7 @@ function App() {
         />
 
         <Route
-          path='/committee/review/:id'
+          path='/committee/review/:id/:confr_id'
           element={
             <PrivateRoute api={committeeApi}>
               <Review />

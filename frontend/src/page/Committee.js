@@ -55,10 +55,9 @@ function Committee() {
     }
 
     const handleReviewStatus = (status, id, confr_id) => {
-        sessionStorage.setItem('confr_id', confr_id)
         switch (status) {
-            case "PENDING": return <Dropdown.Item onClick={() => navigate("/committee/review/" + id)}><i className="bi bi-pen me-2"></i>ให้คะแนน</Dropdown.Item>
-            case "SUCCESS": return <Dropdown.Item onClick={() => navigate("/committee/review/result/" + id)}><i className="bi bi-eye me-2"></i>ดูการให้คะแนน</Dropdown.Item>
+            case "PENDING": return <Dropdown.Item onClick={() => navigate(`/committee/review/${id}/${confr_id}`)}><i className="bi bi-pen me-2"></i>ให้คะแนน</Dropdown.Item>
+            case "SUCCESS": return <Dropdown.Item onClick={() => navigate(`/committee/review/result/${id}`)}><i className="bi bi-eye me-2"></i>ดูการให้คะแนน</Dropdown.Item>
             case "CANCEL": return "-"
             default: return "ไม่ระบุ"
         }
