@@ -202,7 +202,7 @@ function Conference() {
                                 ) : (
                                     <tbody>
                                         <tr>
-                                            <td colSpan={5} className='text-center'>ไม่พบข้อมูล</td>
+                                            <td colSpan={6} className='text-center'>ไม่พบข้อมูล</td>
                                         </tr>
                                     </tbody>
                                 )}
